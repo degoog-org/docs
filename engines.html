@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Search engines - Degoog docs</title>
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("ade:theme");
+          if (t !== "light" && t !== "dark") {
+            t = window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+          }
+          document.documentElement.setAttribute("data-theme", t);
+        } catch (e) {}
+      })();
+    </script>
+    <link
+      rel="icon"
+      href="https://github.com/fccview/degoog/raw/main/src/public/images/degoog-logo.png"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    />
+    <link rel="stylesheet" href="style.css?cache=burstthefucker" />
+  </head>
+  <body>
+    <div class="degoog-docs-layout">
+      <header class="degoog-docs-mobile-header">
+        <button id="degoog-docs-burger" type="button" class="degoog-docs-btn degoog-docs-btn-burger">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <span class="degoog-docs-mobile-title">Degoog Docs</span>
+      </header>
+      <div class="degoog-docs-content">
+        <aside class="degoog-docs-sidebar">
+          <div class="degoog-docs-sidebar-brand">
+            <img
+              src="https://github.com/fccview/degoog/raw/main/src/public/images/degoog-logo.png"
+              alt="degoog logo"
+              class="degoog-docs-brand-img"
+              onerror="this.style.display = 'none'"
+            />
+            <a href="index.html" class="degoog-docs-brand-name">Degoog Docs</a>
+          </div>
+          <div class="degoog-docs-sidebar-search">
+            <div class="doc-search-wrap">
+              <input
+                type="search"
+                id="doc-search-input"
+                class="degoog-docs-input doc-search"
+                placeholder="Search docs..."
+                autocomplete="off"
+              />
+              <button
+                type="button"
+                class="doc-search-clear degoog-docs-btn"
+                aria-label="Clear search"
+                style="display: none"
+              >
+                Clear
+              </button>
+              <span class="doc-search-count"></span>
+            </div>
+          </div>
+          <nav class="degoog-docs-nav" aria-label="Documentation">
+            <a href="index.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-book-open fa-lg"></i></i
+              ><span class="degoog-docs-nav-item-name">Overview</span></a
+            >
+            <a href="plugins.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-puzzle-piece fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Plugins</span></a
+            >
+            <a href="themes.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-palette fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Themes</span></a
+            >
+            <a href="engines.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-bolt fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Search engines</span></a
+            >
+            <a href="autocomplete.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-keyboard fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Autocomplete</span></a
+            >
+            <a href="transports.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-network-wired fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Transports</span></a
+            >
+            <a href="store.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-store fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Store</span></a
+            >
+            <a href="aliases.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-link fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Aliases</span></a
+            >
+            <a href="env.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-lock fa-lg"></i></i
+              ><span class="degoog-docs-nav-item-name">ENV Variables</span></a
+            >
+            <a href="styling.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-swatchbook fa-lg"></i></i
+              ><span class="degoog-docs-nav-item-name"> Styling</span></a
+            >
+            <a href="translations.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-language fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Translations</span></a
+            >
+            <a href="api.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-code fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> API</span></a
+            >
+          </nav>
+          <div class="degoog-docs-sidebar-actions">
+            <button
+              id="doc-theme-toggle"
+              type="button"
+              class="degoog-docs-btn"
+              aria-label="Toggle theme"
+            >
+              <i class="fa-solid fa-circle-half-stroke"></i>
+            </button>
+          </div>
+        </aside>
+        <main class="degoog-docs-main">
+          <div class="doc-page-header">
+            <h1><a href="index.html">Degoog</a> Search engines</h1>
+            <p class="doc-page-desc">
+              Build your own custom search backends for web, images, videos or
+              anything you can think of.
+            </p>
+          </div>
+
+          <div class="doc-cli-banner">
+            <i class="fa-solid fa-terminal"></i>
+            <p>
+              <strong>degoog-cli is now available.</strong>
+              Scaffold engine boilerplate directly from your terminal - no copy-pasting, no guessing the folder structure.
+              Install with <code>curl -fsSL https://raw.githubusercontent.com/degoog-org/cli/main/install.sh | sh</code>
+              or grab it from <a href="https://github.com/degoog-org/cli" target="_blank" rel="noopener">github.com/degoog-org/cli</a>.
+            </p>
+          </div>
+
+          <h2>Where engines live</h2>
+          <p>
+            You can drop your custom engines right into
+            <code>data/engines/</code> or whatever you set
+            <code>DEGOOG_ENGINES_DIR</code> to. Each engine is just a file or
+            folder with an entry file that exports an object or class containing
+            a <strong>name</strong> and <strong>executeSearch</strong>.
+          </p>
+
+          <h2>Engine contract</h2>
+          <p><strong>What you need:</strong></p>
+          <ul>
+            <li>
+              <strong>name</strong>: The display name shown in Settings then
+              Engines.
+            </li>
+            <li>
+              <strong>executeSearch(query, page?, timeFilter?, context)</strong>
+              (async): This needs to return a Promise that resolves to an array
+              of results. Each result is an object holding a <code>title</code>,
+              <code>url</code>, <code>snippet</code>, <code>source</code>, and
+              optionally a <code>thumbnail</code> and <code>duration</code>.
+              Make sure you use <code>context.fetch</code> for all your outbound
+              HTTP requests so your engine respects any proxy settings the user
+              has configured.
+            </li>
+          </ul>
+          <p><strong>Optional extras:</strong></p>
+          <ul>
+            <li>
+              <strong>bangShortcut</strong>: Lets users type a shortcut like
+              <code>!shortcut query</code> or <code>query !shortcut</code> to search only this engine (like
+              setting <code>bangShortcut: "ecosia"</code> so users can type
+              <code>!ecosia linux</code>).
+            </li>
+            <li>
+              <strong>settingsSchema</strong> and
+              <strong>configure(settings)</strong>: These work just like they do
+              for plugins. You will get a Configure button in Settings then
+              Engines, and the values are securely saved in
+              <code>data/plugin-settings.json</code>.
+            </li>
+          </ul>
+          <p>
+            Your SettingField shape needs a <code>key</code>,
+            <code>label</code>, and <code>type</code> (which can be text,
+            password, url, toggle, textarea, select, or urllist). You can also
+            add optional properties like <code>required</code>,
+            <code>placeholder</code>, <code>description</code>,
+            <code>secret</code>, <code>options</code> (if using select), and
+            <code>default</code>.
+          </p>
+          <p>
+            If you have sensitive fields like API keys or tokens, mark them with
+            <code>secret: true</code>. The UI will never expose the saved value
+            to the user and will just show a <code>Set</code> or
+            <code>Not set</code> indicator instead. When saving, if the field
+            value equals the special <code>"__SET__"</code> string, the existing
+            stored value stays put. This ensures a page reload never wipes out a
+            key you already entered.
+          </p>
+
+          <h2>HTTP method</h2>
+          <p>
+            Your engines are completely free to use more than just GET requests.
+            Because you control the fetch call inside
+            <code>executeSearch</code>, you can use any method like POST and set
+            whatever headers or body your API needs. Here is what a GraphQL
+            engine using POST looks like:
+          </p>
+          <pre><code>async executeSearch(query, page = 1, _timeFilter, context) {
+  const doFetch = context?.fetch ?? fetch;
+  const response = await doFetch("https://graphql.example.com", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query: MY_QUERY, variables: { search: query, page } }),
+  });
+  context?.sentinel?.(response, this.name);
+  const data = await response.json();
+  // parse and return array of { title, url, snippet, source }
+}</code></pre>
+
+          <h2>Search types</h2>
+          <p>
+            You can export a named <code>type</code> such as
+            <code>"web"</code> (which is the default), <code>"images"</code>,
+            <code>"videos"</code>, <code>"news"</code>, or even your own custom
+            string like <code>"books"</code>. Creating a custom type
+            automatically adds a new tab on the search results page. When
+            someone selects that tab, all engines sharing that type will run
+            together.
+          </p>
+
+          <h2>Language &amp; time filters</h2>
+          <p>
+            When someone selects a language or time filter in the UI, those
+            values get passed to every engine through the
+            <code>context</code> argument. You do not have to read them if you
+            do not want to. Engines that ignore these will just return
+            unfiltered results.
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>context.lang</code></td>
+                <td><code>string | undefined</code></td>
+                <td>
+                  The ISO 639 1 language code chosen by the user (like
+                  <code>"en"</code>, <code>"de"</code>, or <code>"it"</code>).
+                  If it is <code>undefined</code>, no language filter was
+                  selected.
+                </td>
+              </tr>
+              <tr>
+                <td><code>context.buildAcceptLanguage()</code></td>
+                <td><code>() =&gt; string</code></td>
+                <td>
+                  Returns a ready to use <code>Accept-Language</code> header
+                  value derived from <code>context.lang</code>. It safely falls
+                  back to <code>"en,en-US;q=0.9"</code> when no language is set
+                  so you can pass it directly to your fetch headers.
+                </td>
+              </tr>
+              <tr>
+                <td><code>context.dateFrom</code></td>
+                <td><code>string | undefined</code></td>
+                <td>
+                  The start of a custom date range formatted as
+                  <code>YYYY-MM-DD</code>. This is only set when the timeFilter
+                  is custom.
+                </td>
+              </tr>
+              <tr>
+                <td><code>context.dateTo</code></td>
+                <td><code>string | undefined</code></td>
+                <td>
+                  The end of a custom date range formatted as
+                  <code>YYYY-MM-DD</code>. This is only set when the timeFilter
+                  is custom.
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code
+                    >context.extractImageUrl($el, baseUrl?, selectors?)</code
+                  >
+                </td>
+                <td>
+                  <code>($el, baseUrl?, selectors?) =&gt; string</code>
+                </td>
+                <td>
+                  Easily extract an article image URL from a cheerio element. It
+                  checks all the common attributes like <code>src</code> and
+                  <code>data src</code>, normalizes URLs, and resolves relative
+                  paths against your <code>baseUrl</code>. It even skips tiny
+                  images and favicons. You can pass <code>selectors</code> to
+                  target a specific thumbnail container first.
+                </td>
+              </tr>
+              <tr>
+                <td><code>context.signProxyUrl(url)</code></td>
+                <td><code>(url: string) =&gt; string</code></td>
+                <td>
+                  Returns a signed <code>/api/proxy/image</code> URL for the
+                  given external image URL. Use this when you include thumbnails
+                  in your results so they load correctly regardless of the
+                  outgoing allowlist configuration.
+                </td>
+              </tr>
+              <tr>
+                <td><code>context.sentinel(response, name?)</code></td>
+                <td>
+                  <code>(response: { ok, status }, name?: string) =&gt; void</code>
+                </td>
+                <td>
+                  Call this right after every <code>doFetch</code> in your
+                  engine. If the upstream returned a non-OK status (403, 429,
+                  5xx, ...) it throws a structured <code>SentinelBreach</code> with
+                  a <code>status</code> of <code>"blocked"</code>,
+                  <code>"rate_limited"</code> or <code>"network"</code> that the
+                  orchestrator logs and surfaces back to the UI as a real
+                  "engine blocked" signal instead of a silent 0 results. Always
+                  prefer this to <code>if (!response.ok) return [];</code>.
+                </td>
+              </tr>
+              <tr>
+                <td><code>context.engineError(status, message, opts?)</code></td>
+                <td>
+                  <code>
+                    (status, message, opts?: { httpStatus?, engine? }) =&gt;
+                    Error
+                  </code>
+                </td>
+                <td>
+                  Build the same structured <code>SentinelBreach</code> manually
+                  when you detect a soft block (Cloudflare challenge page,
+                  consent interstitial, captcha HTML, empty JSON envelope from a
+                  rate-limited API, ...). Valid statuses:
+                  <code>"blocked"</code>, <code>"rate_limited"</code>,
+                  <code>"captcha"</code>, <code>"interstitial"</code>,
+                  <code>"parse_error"</code>, <code>"timeout"</code>,
+                  <code>"network"</code>.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <h3>Surfacing upstream failures</h3>
+          <p>
+            Engines used to silently <code>return []</code> on a 403 or 429,
+            which made "engine got walled" indistinguishable from "no results
+            for this query". Don't do that anymore. Two rules:
+          </p>
+          <ol>
+            <li>
+              After every <code>const response = await doFetch(...)</code>, call
+              <code>context?.sentinel?.(response, this.name);</code>
+              before reading the body. This converts non-OK HTTP into a
+              structured throw the orchestrator understands.
+            </li>
+            <li>
+              If you have an outer <code>try / catch</code> that returns
+              <code>[]</code> on any error, re-throw structured engine errors so
+              they reach the orchestrator:
+              <pre><code>} catch (e) {
+  if (e?.name === "SentinelBreach") throw e;
+  return [];
+}</code></pre>
+              Without the re-throw, your catch swallows the new signal and the
+              UI is back to showing 0 results with no context.
+            </li>
+          </ol>
+          <p>
+            For soft blocks you detect yourself (Cloudflare challenge HTML,
+            JavaScript consent interstitial, empty API envelope from a
+            rate-limited backend, ...) build the error explicitly:
+          </p>
+          <pre><code>const html = await response.text();
+if (html.includes("cf-challenge")) {
+  throw context.engineError(
+    "captcha",
+    `${this.name} hit a Cloudflare challenge`,
+    { engine: this.name },
+  );
+}</code></pre>
+          <p>
+            The <code>timeFilter</code> parameter passed to
+            <code>executeSearch</code> will be one of these options:
+            <code>"any"</code>, <code>"hour"</code>, <code>"day"</code>,
+            <code>"week"</code>, <code>"month"</code>, <code>"year"</code>, or
+            <code>"custom"</code>. If it is <code>"custom"</code>, just read
+            <code>context.dateFrom</code> and <code>context.dateTo</code>.
+          </p>
+          <pre><code>export default class MyEngine {
+  name = "My Search";
+
+  async executeSearch(query, page = 1, timeFilter, context) {
+    const lang = context?.lang;
+    const acceptLang = context?.buildAcceptLanguage?.() ?? "en,en-US;q=0.9";
+    const doFetch = context?.fetch ?? fetch;
+
+    const params = new URLSearchParams({ q: query });
+
+    if (lang) params.set("lang", lang);
+
+    if (timeFilter === "day") params.set("when", "24h");
+    else if (timeFilter === "week") params.set("when", "7d");
+    else if (timeFilter === "custom" && context?.dateFrom) {
+      params.set("from", context.dateFrom);
+      if (context.dateTo) params.set("to", context.dateTo);
+    }
+
+    const res = await doFetch(`https://example.com/search?${params}`, {
+      headers: { "Accept-Language": acceptLang },
+    });
+    // parse and return array of { title, url, snippet, source }
+  }
+}</code></pre>
+
+          <h2>Safe Search</h2>
+          <p>
+            Our default engines like Brave and Bing include a
+            <strong>Safe Search</strong> dropdown in Settings then Engines. The
+            default behavior stays the same where Brave defaults to
+            <code>moderate</code> and the rest default to <code>off</code>.
+            Users can easily raise or lower the filter for each engine
+            individually.
+          </p>
+          <p>
+            You can add this exact same setting to your custom engines by
+            including a <code>select</code> field in your
+            <code>settingsSchema</code> and applying the value in your
+            <code>executeSearch</code> function:
+          </p>
+          <pre><code>settingsSchema = [
+  {
+    key: "safeSearch",
+    label: "Safe Search",
+    type: "select",
+    options: ["off", "moderate", "strict"],
+    description: "Filter explicit content from search results.",
+  },
+];
+
+safeSearch = "moderate";
+
+configure(settings) {
+  if (typeof settings.safeSearch === "string") {
+    this.safeSearch = settings.safeSearch;
+  }
+}
+
+async executeSearch(query, page = 1, timeFilter, context) {
+  const params = new URLSearchParams({ q: query, safesearch: this.safeSearch });
+  // ...
+}</code></pre>
+
+          <h2>Proxies</h2>
+          <p>
+            When someone enables a proxy for search, your engine requests can
+            route through it. To make sure your engine plays nicely with
+            proxies:
+          </p>
+          <ol>
+            <li>
+              Use <code>context.fetch</code> for every outbound HTTP request
+              instead of the global <code>fetch</code>.
+            </li>
+          </ol>
+          <pre><code>export default class MyEngine {
+  name = "My Search";
+  async executeSearch(query, page = 1, _timeFilter, context) {
+    const url = `https://www.example.com/search?q=${encodeURIComponent(query)}`;
+    const doFetch = context?.fetch ?? fetch;
+    const response = await doFetch(url, { headers: { "User-Agent": "my-engine/1.0" } });
+    const html = await response.text();
+    // parse and return array of { title, url, snippet, source, ... }
+  }
+}</code></pre>
+          <p>
+            Every engine also features an
+            <strong>Outgoing HTTP client</strong> control under the
+            <strong>Advanced</strong> section in Settings then Engines. This
+            setting is stored per engine and can be set to <code>fetch</code>,
+            system <code>curl</code>, <code>auto</code>, or any custom
+            <a href="transports.html">transport</a> you install from the Store.
+            You should still use <code>context.fetch</code> in your custom
+            engines so this setting applies automatically.
+          </p>
+          <p>
+            <strong>Client exposure:</strong> The network indicator on extension
+            cards in Settings applies to plugins only, not search engines. Your
+            <code>executeSearch</code> calls always run on the server when you use
+            <code>context.fetch</code>. If your results include
+            <code>thumbnail</code> or <code>imageUrl</code> fields, the search
+            theme may load those URLs in the user's browser. Use
+            <code>context.signProxyUrl(url)</code> so images are served through
+            the server instead. See
+            <a href="plugins.html#declaring-client-exposure">Declaring client exposure</a>
+            for how plugins declare <code>isClientExposed</code>.
+          </p>
+
+          <h2>Setup</h2>
+          <p>
+            Create your <code>data/engines/</code> directory or set your
+            <code>DEGOOG_ENGINES_DIR</code>. Add a single file like
+            <code>my-engine.js</code> or a folder with an
+            <code>index.js</code> file. The engine ID will simply be the
+            filename or folder name prefixed with <code>engine-</code>.
+          </p>
+
+          <h2>How settings work</h2>
+          <ol>
+            <li>
+              Declare your <code>settingsSchema</code> so the Configure button
+              appears in Settings then Engines.
+            </li>
+            <li>
+              The user saves their preferences and the values are stored in
+              <code>data/plugin-settings.json</code>.
+            </li>
+            <li>
+              Your <code>configure(settings)</code> function is called right
+              after saving and every time the server restarts.
+            </li>
+            <li>
+              You can just return an empty array from
+              <code>executeSearch</code> if any required settings are missing.
+            </li>
+          </ol>
+
+          <h2>Examples from the official store</h2>
+          <ul>
+            <li>
+              <a
+                href="https://github.com/degoog-org/official-extensions/tree/main/engines/ecosia"
+                class="external"
+                target="_blank"
+                rel="noopener"
+                >Ecosia</a
+              >
+              is a web engine using <code>bangShortcut</code> while correctly
+              utilizing <code>context.fetch</code>.
+            </li>
+            <li>
+              <a
+                href="https://github.com/degoog-org/official-extensions/tree/main/engines/startpage"
+                class="external"
+                target="_blank"
+                rel="noopener"
+                >Startpage</a
+              >
+              is another web engine featuring optional Anonymous View settings.
+            </li>
+            <li>
+              <a
+                href="https://github.com/degoog-org/official-extensions/tree/main/engines/internet-archive"
+                class="external"
+                target="_blank"
+                rel="noopener"
+                >Internet Archive</a
+              >
+              is a file type engine that works perfectly as a dependency for the
+              File tab plugin.
+            </li>
+          </ul>
+          <p>
+            If you plan on distributing your engine through the
+            <a href="store.html">Store</a>, make sure to add a
+            <code>screenshots/</code> folder inside your engine folder so the
+            Store card looks great.
+          </p>
+        </main>
+      </div>
+      <div id="degoog-docs-backdrop" class="degoog-docs-backdrop"></div>
+    </div>
+    <script
+      src="https://code.jquery.com/jquery-4.0.0.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="docs.js"></script>
+    <script src="docs-ui.js"></script>
+  </body>
+</html>

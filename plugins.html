@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Plugins - Degoog docs</title>
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("ade:theme");
+          if (t !== "light" && t !== "dark") {
+            t = window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+          }
+          document.documentElement.setAttribute("data-theme", t);
+        } catch (e) {}
+      })();
+    </script>
+    <link
+      rel="icon"
+      href="https://github.com/fccview/degoog/raw/main/src/public/images/degoog-logo.png"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    />
+    <link rel="stylesheet" href="style.css?cache=burstthefucker" />
+  </head>
+  <body>
+    <div class="degoog-docs-layout">
+      <header class="degoog-docs-mobile-header">
+        <button id="degoog-docs-burger" type="button" class="degoog-docs-btn degoog-docs-btn-burger">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <span class="degoog-docs-mobile-title">Degoog Docs</span>
+      </header>
+      <div class="degoog-docs-content">
+        <aside class="degoog-docs-sidebar">
+          <div class="degoog-docs-sidebar-brand">
+            <img
+              src="https://github.com/fccview/degoog/raw/main/src/public/images/degoog-logo.png"
+              alt="degoog logo"
+              class="degoog-docs-brand-img"
+              onerror="this.style.display = 'none'"
+            />
+            <a href="index.html" class="degoog-docs-brand-name">Degoog Docs</a>
+          </div>
+          <div class="degoog-docs-sidebar-search">
+            <div class="doc-search-wrap">
+              <input
+                type="search"
+                id="doc-search-input"
+                class="degoog-docs-input doc-search"
+                placeholder="Search docs..."
+                autocomplete="off"
+              />
+              <button
+                type="button"
+                class="doc-search-clear degoog-docs-btn"
+                aria-label="Clear search"
+                style="display: none"
+              >
+                Clear
+              </button>
+              <span class="doc-search-count"></span>
+            </div>
+          </div>
+          <nav class="degoog-docs-nav" aria-label="Documentation">
+            <a href="index.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-book-open fa-lg"></i></i
+              ><span class="degoog-docs-nav-item-name">Overview</span></a
+            >
+            <a href="plugins.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-puzzle-piece fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Plugins</span></a
+            >
+            <a href="themes.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-palette fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Themes</span></a
+            >
+            <a href="engines.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-bolt fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Search engines</span></a
+            >
+            <a href="autocomplete.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-keyboard fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Autocomplete</span></a
+            >
+            <a href="transports.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-network-wired fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Transports</span></a
+            >
+            <a href="store.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-store fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Store</span></a
+            >
+            <a href="aliases.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-link fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Aliases</span></a
+            >
+            <a href="env.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-lock fa-lg"></i></i
+              ><span class="degoog-docs-nav-item-name">ENV Variables</span></a
+            >
+            <a href="styling.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-swatchbook fa-lg"></i></i
+              ><span class="degoog-docs-nav-item-name"> Styling</span></a
+            >
+            <a href="translations.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-language fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Translations</span></a
+            >
+            <a href="api.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-code fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> API</span></a
+            >
+          </nav>
+          <div class="degoog-docs-sidebar-actions">
+            <button
+              id="doc-theme-toggle"
+              type="button"
+              class="degoog-docs-btn"
+              aria-label="Toggle theme"
+            >
+              <i class="fa-solid fa-circle-half-stroke"></i>
+            </button>
+          </div>
+        </aside>
+        <main class="degoog-docs-main">
+          <div class="doc-page-header">
+            <h1><a href="index.html">Degoog</a> Plugins</h1>
+            <p class="doc-page-desc">
+              Create custom bang commands, slots, search result tabs, search bar
+              actions, routes, and middleware.
+            </p>
+          </div>
+
+          <div class="doc-cli-banner">
+            <i class="fa-solid fa-terminal"></i>
+            <p>
+              <strong>degoog-cli is now available.</strong>
+              Scaffold plugin boilerplate directly from your terminal - no copy-pasting, no guessing the folder structure.
+              Install with <code>curl -fsSL https://raw.githubusercontent.com/degoog-org/cli/main/install.sh | sh</code>
+              or grab it from <a href="https://github.com/degoog-org/cli" target="_blank" rel="noopener">github.com/degoog-org/cli</a>.
+            </p>
+          </div>
+
+          <h2>What plugins are</h2>
+          <p>
+            Your plugins belong in the <code>data/plugins/</code> directory, or
+            whatever you set <code>DEGOOG_PLUGINS_DIR</code> to. A plugin is
+            simply a <strong>folder</strong> containing an entry file. You can
+            use a single plugin to handle multiple tasks like a bang command, a
+            slot, search bar actions, HTTP routes, or request middleware.
+          </p>
+
+          <h2>Folder structure</h2>
+          <pre><code>data/plugins/
+  my-plugin/
+    index.js
+    template.html
+    style.css
+    script.js
+    card.html
+    author.json     </code></pre>
+          <p>
+            Your entry file needs to be <code>index.js</code>,
+            <code>index.ts</code>, <code>index.mjs</code>, or
+            <code>index.cjs</code>.
+          </p>
+
+          <h3>Asset files</h3>
+          <ul>
+            <li>
+              <strong>template.html</strong>: This is the HTML fragment for your
+              plugin output. You can use <code>{{placeholders}}</code> and
+              replace them inside <code>execute()</code>. This gets injected
+              directly into the search results rather than rendering a full
+              page.
+            </li>
+            <li>
+              <strong>style.css</strong>: This loads automatically when your
+              plugin is active. Make sure to use class names scoped to your
+              specific plugin to avoid styling conflicts. You can check the
+              <a href="styling.html">Styling</a> page for available CSS
+              variables.
+            </li>
+            <li>
+              <strong>script.js</strong>: Your client side JavaScript that loads
+              automatically.
+            </li>
+          </ul>
+          <p>
+            You can add other files and read them while the app runs using
+            <code>ctx.readFile("filename")</code> inside your
+            <code>init(ctx)</code> function.
+          </p>
+
+          <h3>Plugin context and init()</h3>
+          <p>
+            The system calls your optional <code>init(ctx)</code> function once
+            during startup before running <code>configure()</code>. The context
+            provides the following:
+          </p>
+          <pre><code>init(ctx) {
+  // ctx.template contains your template.html
+  // ctx.dir is the absolute path to your plugin folder
+  // ctx.readFile is an async function to read any file from your plugin folder
+  // ctx.signProxyUrl(url) returns a signed /api/proxy/image URL for any external image
+  // ctx.fetch(url, init?) is a proxy-aware fetch, respects your outgoing proxy settings
+  // ctx.useCache(namespace, defaultTtlMs) returns an async TTL cache { get, set, delete, clear }
+}</code></pre>
+          <h3>TTL cache (<code>useCache</code>)</h3>
+          <p>
+            Both <code>init(ctx)</code> and slot <code>execute(query, context)</code>
+            receive <strong><code>useCache</code></strong>: a factory that returns an
+            <strong>async</strong> namespaced cache. Call
+            <code>ctx.useCache&lt;T&gt;(namespace, defaultTtlMs)</code> (or
+            <code>context.useCache&lt;T&gt;(namespace, defaultTtlMs)</code> in slots) to
+            get an object with <code>await get(key)</code>,
+            <code>await set(key, value, ttlMs?)</code>, <code>await delete(key)</code>,
+            and <code>await clear()</code>. Keys are strings; values are typed by your
+            generic <code>T</code>. Entries expire automatically after the TTL
+            (milliseconds).
+          </p>
+          <p>
+            The <code>namespace</code> is a per-cache discriminator (for example,
+            <code>"ext:my-plugin:articles"</code>). It is combined with the instance's
+            ID internally, so different plugins never collide. When the optional Valkey
+            sidecar is configured (<code>DEGOOG_VALKEY_URL</code>), <code>useCache</code>
+            transparently becomes a shared cache across all replicas of the instance;
+            otherwise it falls back to a per-process in-memory store. The API is
+            identical either way.
+          </p>
+          <p>
+            Typical usage: call <code>useCache</code> once in <code>init</code>, keep
+            the returned cache on a module-level variable, and use
+            <code>await get</code> / <code>await set</code> from <code>execute</code>
+            (for example, for fetched page excerpts). Always prefer
+            <code>ctx.useCache</code> / <code>context.useCache</code> over importing
+            cache helpers from server internals so plugins behave the same in every
+            environment.
+          </p>
+          <p>
+            Store <code>ctx.fetch</code> during <code>init</code> if your plugin
+            makes outgoing HTTP requests outside of <code>execute()</code>, for
+            example inside custom plugin routes. Using it keeps your requests
+            consistent with the proxy settings configured in Settings.
+          </p>
+          <p>
+            For example, you might build a plugin that uses both a command
+            template and a separate card template. The
+            <a
+              href="https://github.com/degoog-org/official-extensions/tree/main/plugins/rss"
+              class="external"
+              target="_blank"
+              rel="noopener"
+              >RSS</a
+            >
+            plugin does exactly this by reading <code>card.html</code> through
+            <code>ctx.readFile("card.html")</code>.
+          </p>
+
+          <h2 id="bang-commands">Bang commands</h2>
+          <p>
+            Bang commands run whenever you type
+            <code>!trigger something</code> or <code>something !trigger</code> into the search bar. You need to
+            export a single object using <code>export default</code> or
+            <code>export const command</code> containing these properties:
+          </p>
+          <ul>
+            <li>
+              <strong>name</strong> and <strong>description</strong>: These
+              appear in Settings and the <code>!help</code> menu.
+            </li>
+            <li>
+              <strong>trigger</strong>: The word you type right after the
+              <code>!</code> symbol. For example, typing
+              <code>weather</code> becomes <code>!weather</code>.
+            </li>
+            <li>
+              <strong>execute(args, context)</strong> (async): The
+              <code>args</code> parameter contains whatever text follows or precedes
+              your trigger. You must return an object containing a
+              <code>title</code> string and an <code>html</code> string. You can
+              also include an optional <code>totalPages</code> number.
+            </li>
+          </ul>
+          <p>
+            The second argument passed to <code>execute</code> is
+            <code>context</code>, which might contain your
+            <code>clientIp</code>, <code>page</code>, and
+            <code>signProxyUrl(url)</code>. Call
+            <code>context.signProxyUrl</code> to get a signed
+            <code>/api/proxy/image</code> URL for any external image you want to
+            serve through the built-in image proxy.
+          </p>
+          <p>
+            You can also include optional properties like
+            <code>aliases</code> for extra triggers, or
+            <code>naturalLanguagePhrases</code> which are phrases that trigger
+            the command without needing the <code>!</code> symbol when natural
+            language is enabled in Settings. You can also use
+            <code>settingsSchema</code>, <code>configure(settings)</code>,
+            <code>init(ctx)</code>, and <code>isConfigured()</code>. If
+            <code>isConfigured()</code> is async and returns false, your command
+            stays hidden from the <code>!help</code> menu until the user
+            configures it.
+          </p>
+          <p>
+            For your <code>settingsSchema</code>, each field requires a
+            <code>key</code>, <code>label</code>, and <code>type</code>. The
+            type can be <code>text</code>, <code>password</code>,
+            <code>url</code>, <code>toggle</code>, <code>textarea</code>,
+            <code>select</code>, or <code>urllist</code>. You can also add
+            optional flags like <code>required</code>, <code>placeholder</code>,
+            <code>description</code>, or <code>secret</code>. Secret fields are
+            never sent back to the browser. If you use the
+            <code>select</code> type, you will need to add an
+            <code>options</code> array containing your string choices.
+          </p>
+          <h3>How settings work</h3>
+          <ol>
+            <li>
+              Declare your <code>settingsSchema</code> so a Configure button
+              appears in Settings then Plugins.
+            </li>
+            <li>
+              When you save, the values are stored in
+              <code>data/plugin-settings.json</code> under
+              <code>plugin-&lt;folderName&gt;</code>.
+            </li>
+            <li>
+              The <code>configure(settings)</code> function runs right after
+              saving and every time the server restarts if settings are present.
+            </li>
+            <li>
+              Use <code>isConfigured()</code> to return false when required
+              settings are missing. This hides the command from the
+              <code>!help</code> menu.
+            </li>
+            <li>
+              You can disable any plugin using the toggle in Settings then
+              Plugins. Disabled plugins disappear from <code>!help</code> and
+              return an error if you try to invoke them.
+            </li>
+          </ol>
+          <p><strong>Examples from the official store:</strong></p>
+          <ul>
+            <li>
+              <a
+                href="https://github.com/degoog-org/official-extensions/tree/main/plugins/weather"
+                class="external"
+                target="_blank"
+                rel="noopener"
+                >Weather</a
+              >
+              is a bang command complete with a template, styles, settings for
+              things like default city or Fahrenheit, aliases, and natural
+              language phrases.
+            </li>
+            <li>
+              <a
+                href="https://github.com/degoog-org/official-extensions/tree/main/plugins/define"
+                class="external"
+                target="_blank"
+                rel="noopener"
+                >Define</a
+              >,
+              <a
+                href="https://github.com/degoog-org/official-extensions/tree/main/plugins/qr"
+                class="external"
+                target="_blank"
+                rel="noopener"
+                >QR</a
+              >,
+              <a
+                href="https://github.com/degoog-org/official-extensions/tree/main/plugins/time"
+                class="external"
+                target="_blank"
+                rel="noopener"
+                >Time</a
+              >, and
+              <a
+                href="https://github.com/degoog-org/official-extensions/tree/main/plugins/password"
+                class="external"
+                target="_blank"
+                rel="noopener"
+                >Password</a
+              >
+              are examples of simple command only plugins.
+            </li>
+            <li>
+              <a
+                href="https://github.com/degoog-org/official-extensions/tree/main/plugins/jellyfin"
+                class="external"
+                target="_blank"
+                rel="noopener"
+                >Jellyfin</a
+              >
+              and
+              <a
+                href="https://github.com/degoog-org/official-extensions/tree/main/plugins/meilisearch"
+                class="external"
+                target="_blank"
+                rel="noopener"
+                >Meilisearch</a
+              >
+              let you search your own personal backend through a bang command.
+            </li>
+          </ul>
+
+          <h2>Slot plugins</h2>
+          <p>
+            Slots let you inject custom panels directly into the search results
+            page when a query matches. Just export <code>slot</code> or
+            <code>slotPlugin</code>. A single module can actually export both a
+            slot and a bang command.
+          </p>
+          <ul>
+            <li>
+              <strong>id</strong> and <strong>name</strong>: Your unique
+              identifier and display name.
+            </li>
+            <li>
+              <strong>position</strong>: Choose between
+              <code>above-results</code>, <code>below-results</code>,
+              <code>above-sidebar</code>, <code>below-sidebar</code>,
+              <code>knowledge-panel</code>, or <code>at-a-glance</code>. Please
+              use the specific sidebar positions instead of the old deprecated
+              sidebar option.
+            </li>
+            <li>
+              <strong>trigger(query)</strong>: This needs to return true, or a
+              Promise that resolves to true, whenever the slot should appear for
+              a specific query.
+            </li>
+            <li>
+              <strong>execute(query, context)</strong> (async): Return an object
+              with an optional <code>title</code> string and an
+              <code>html</code> string. If you return an empty string for the
+              html, nothing will show up. The <code>context</code> includes
+              <code>clientIp</code>; <code>results</code> (only when
+              <code>waitForResults: true</code>); proxy-aware
+              <code>fetch(url, init?)</code>; <code>signProxyUrl(url)</code> for
+              external images; and <code>useCache(namespace, defaultTtlMs)</code> for the
+              same async TTL cache factory as in <code>init(ctx)</code>. Note that the
+              results
+              array is only populated if you set <code>waitForResults: true</code> on
+              your plugin.
+            </li>
+          </ul>
+          <p>
+            You can add an optional <strong>settingsId</strong> to specify the
+            key where your settings are stored. This defaults to
+            <code>slot-&lt;id&gt;</code>. You can also include
+            <code>settingsSchema</code>, <code>configure(settings)</code>, and
+            <code>init(ctx)</code>. If multiple slots match the exact same
+            query, they will all display together.
+          </p>
+          <p>
+            Another optional flag is <strong>waitForResults</strong>. Set this
+            to true if you need to receive <code>context.results</code> inside
+            your <code>execute()</code> function. While results are always
+            available when execution happens since slots run after the search
+            finishes, they are only passed to your plugin if you explicitly
+            enable this flag. It defaults to false so plugins that do not need
+            results can stay completely independent.
+          </p>
+          <p>
+            You can also provide an optional
+            <strong>slotPositions</strong> array. This lets you list multiple
+            position values like
+            <code>["knowledge-panel", "above-sidebar", "below-sidebar"]</code>.
+            If you include this, the application adds a Position dropdown in
+            your plugin settings so you can choose exactly where the slot
+            appears. If you leave it empty or omit it, the slot simply uses your
+            fixed <code>position</code> value.
+          </p>
+          <h3>Sidebar positions</h3>
+          <p>
+            Using <code>above-sidebar</code> renders right at the top of the
+            sidebar before any main content. Using
+            <code>below-sidebar</code> renders at the very bottom of the sidebar
+            below the engine timings and related searches.
+          </p>
+          <h3>Knowledge panel slot</h3>
+          <p>
+            Setting your position to <code>knowledge-panel</code> replaces only
+            the very first block in the sidebar, which is usually the Wikipedia
+            or knowledge panel. Your engine performance and related searches
+            blocks stay exactly where they are. When your plugin returns content
+            for this position, it shows up instead of the default knowledge
+            panel.
+          </p>
+          <h3 id="at-a-glance-slot">At a glance slot</h3>
+          <p>
+            Slots using the <code>at-a-glance</code> position will fill the
+            block directly above the search results. This does not delay your
+            search response. The client shows your results immediately and
+            fetches the panel content in a separate background request using
+            <code>POST /api/slots/glance</code>
+            with the query and results. Your
+            <code>execute(query, context)</code> function will always receive
+            <code>context.results</code> for these types of slots.
+          </p>
+          <p><strong>Examples from the official store:</strong></p>
+          <ul>
+            <li>
+              <a
+                href="https://github.com/degoog-org/official-extensions/tree/main/plugins/tmdb-slot"
+                class="external"
+                target="_blank"
+                rel="noopener"
+                >TMDb</a
+              >
+              is a slot above the results showing movie and TV details. It uses
+              a secret API key stored in settings.
+            </li>
+            <li>
+              <a
+                href="https://github.com/degoog-org/official-extensions/tree/main/plugins/math-slot"
+                class="external"
+                target="_blank"
+                rel="noopener"
+                >Math</a
+              >
+              and
+              <a
+                href="https://github.com/degoog-org/official-extensions/tree/main/plugins/github-slot"
+                class="external"
+                target="_blank"
+                rel="noopener"
+                >GitHub</a
+              >
+              are examples of slots appearing above the results.
+            </li>
+            <li>
+              <a
+                href="https://github.com/degoog-org/official-extensions/tree/main/plugins/rss"
+                class="external"
+                target="_blank"
+                rel="noopener"
+                >RSS</a
+              >
+              is a slot that reads feed URLs from settings and uses
+              <code>card.html</code> through <code>ctx.readFile()</code>.
+            </li>
+          </ul>
+          <p>
+            <strong>Slot API:</strong> Calling <code>POST /api/slots</code> with
+            the query and results returns the panels for the main positions.
+            Calling
+            <code>POST /api/slots/glance</code>
+            returns only the glance panels. Slots also work perfectly for custom
+            tabs. The client simply fetches the panels after a tab search and
+            renders them in the exact same positions.
+          </p>
+
+          <h2 id="search-result-tabs">Search result tabs</h2>
+          <p>
+            Search result tabs let you add new entries to the main tab bar, just
+            like the Web or Images tabs. Simply export <code>tab</code> or
+            <code>searchResultTab</code> from your plugin folder. You use the
+            exact same folder structure as any other plugin.
+          </p>
+          <p>
+            <strong>Required properties:</strong> You must provide an
+            <strong>id</strong> and a <strong>name</strong>. You also need to
+            provide either an <strong>engineType</strong> string like
+            <code>web</code>, <code>images</code>, <code>videos</code>,
+            <code>news</code>, or a custom type from your engines, or an
+            <strong>executeSearch(query, page?, context?)</strong> async
+            function. If you use the function, it must return an object
+            containing your results array and an optional totalPages number.
+            Each result needs a title, url, snippet, and source, plus an
+            optional thumbnail and duration.
+          </p>
+          <p>
+            <strong>Optional properties:</strong> You can add an
+            <strong>icon</strong>, <strong>settingsId</strong>,
+            <strong>settingsSchema</strong>,
+            <strong>configure(settings)</strong>, and
+            <strong>init(ctx)</strong>. If you are sharing this on the Store,
+            make sure to set your type to <code>search-result-tab</code> in your
+            <code>package.json</code>. You can also add a dependencies array
+            containing URLs if your tab relies on a specific engine, just like
+            how the File tab depends on the Internet Archive engine.
+          </p>
+          <p>
+            <strong>API:</strong> A <code>GET</code> request to
+            <code>/api/search-tabs</code> returns the list of available tabs. A
+            <code>GET</code> request to <code>/api/tab-search</code> along with
+            your tab id, query, and page number will run the specific search for
+            that tab.
+          </p>
+
+          <h2>Search bar actions</h2>
+          <p>
+            Your plugins can also add buttons right next to the search bar. Just
+            export <code>searchBarActions</code> as an array of objects
+            containing an <strong>id</strong>, a <strong>label</strong>, and a
+            <strong>type</strong>. The type can be <code>navigate</code> to open
+            a specific URL, <code>bang</code> to fill the search bar with your
+            trigger, or <code>custom</code>. If you use custom, your
+            <code>script.js</code> will listen for a
+            <code>search-bar-action</code> event that contains the action
+            details. You can also include an optional
+            <strong>icon</strong> image URL.
+          </p>
+
+          <h2>Plugin routes</h2>
+          <p>
+            Plugins can expose their own HTTP endpoints under the
+            <code>/api/plugin/&lt;folderName&gt;/</code> path. You do this by
+            exporting <code>routes</code> as an array containing the
+            <code>method</code>, <code>path</code>, and
+            <code>handler(req)</code>. Your method can be <code>get</code>,
+            <code>post</code>, <code>put</code>, <code>delete</code>, or
+            <code>patch</code>. The path is just the URL segment that comes
+            after your plugin id. Your handler receives the standard Request
+            object and needs to return a Response or a Promise that resolves to
+            a Response. These routes become available the moment your plugin
+            loads, meaning your <code>script.js</code> can call them immediately
+            using fetch.
+          </p>
+          <p>
+            When installed from the store, the plugin folder name is
+            <code>&lt;author&gt;-&lt;repo&gt;-&lt;plugin-name&gt;</code>. Never
+            hardcode that in your API URLs - use the injected
+            <strong><code>__PLUGIN_ID__</code></strong> constant instead.
+            Degoog injects it automatically into every plugin script at serve
+            time.
+          </p>
+          <pre><code>const MY_API = `/api/plugin/${__PLUGIN_ID__}/data`;
+
+fetch(MY_API).then(r => r.json()).then(data => { /* ... */ });</code></pre>
+
+          <h2 id="interceptors">Query interceptors</h2>
+          <p>
+            Interceptors run <strong>before</strong> the search engines execute.
+            They receive the raw query the user typed and return the query that
+            should actually be searched. The plugin can do anything in between:
+            correct spelling, expand abbreviations, translate, enrich, or replace
+            the query entirely. Export <code>interceptor</code> as an object with
+            a <strong>name</strong>, a <strong>description</strong>, and an
+            <strong>intercept(query, context)</strong> async function that returns
+            <code>{ query: string }</code>.
+          </p>
+          <pre><code>export const interceptor = {
+  name: "My Interceptor",
+  description: "Does something to the query.",
+
+  settingsSchema: [
+    { key: "enabled", label: "Enabled", type: "toggle", default: "true" },
+  ],
+
+  configure(settings) {
+    // called when settings change
+  },
+
+  init(ctx) {
+    // same ctx as other plugin types: ctx.fetch, ctx.useCache, ctx.readFile
+  },
+
+  async intercept(query, context) {
+    // context: { fetch, useCache, lang }
+    // return the query to actually search - may be the original or anything else
+    return { query };
+  },
+};</code></pre>
+          <p>
+            Interceptors are a plugin subtype - they live in the same
+            <code>data/plugins/</code> directory as bang commands and slots. A
+            single plugin folder can export an <code>interceptor</code> alongside
+            a <code>slot</code> or <code>command</code> if needed. There are no
+            builtin interceptors; all interceptors come from plugins.
+          </p>
+
+          <h2>Request middleware</h2>
+          <p>
+            Middleware allows your plugin to hook into specific request flows.
+            You export <code>middleware</code> as an object containing an
+            <strong>id</strong>, a <strong>name</strong>, and a
+            <strong>handle(req, context)</strong> function. The context might
+            include specific route information like <code>settings-auth</code>.
+            Your function should return a Response, a redirect URL object, or
+            simply null to let the request continue normally. The application
+            uses this middleware for the <strong>settings gate</strong>. To
+            choose a plugin for the gate, just click Use as settings gate in
+            that plugin configuration menu under Settings. This updates your
+            <code>plugin-settings.json</code> file automatically.
+          </p>
+
+          <h2>Settings gate (login flow)</h2>
+          <p>
+            You can protect your settings using a simple password with
+            <code>DEGOOG_SETTINGS_PASSWORDS</code> or by using a
+            <strong>middleware plugin</strong>. When you use a plugin, anyone
+            opening the Settings page goes through your custom flow like a magic
+            link or external login before returning to the settings with a valid
+            session token.
+          </p>
+          <h3>What your middleware must do</h3>
+          <ul>
+            <li>
+              <strong>route "settings-auth"</strong>: Return a JSON object with
+              required set to true, valid set to false, and your loginUrl.
+            </li>
+            <li>
+              <strong>route "settings-auth-callback"</strong>: After a
+              successful authentication, return a redirect to
+              <code>/settings</code>. The application will issue a session token
+              and redirect the user automatically.
+            </li>
+            <li>
+              <strong>route "settings-auth-post"</strong>: If you do not want to
+              support password submissions via POST, just return a 400 error or
+              something similar.
+            </li>
+          </ul>
+          <p>
+            Make sure to expose a <code>GET /login</code> route that redirects
+            back to the callback URL. You can clear the
+            <code>degoog-settings-token</code> in your browser Session Storage
+            anytime you need to test the flow.
+          </p>
+
+          <h2>Example: minimal bang command</h2>
+          <p>
+            Here is what a simple folder at
+            <code>data/plugins/greeting/</code> looks like with an
+            <code>index.js</code>, <code>template.html</code>, and
+            <code>style.css</code> file.
+          </p>
+          <pre><code>let template = "";
+export default {
+  name: "Greeting",
+  description: "Say hello",
+  trigger: "hello",
+  init(ctx) { template = ctx.template; },
+  async execute(args) {
+    const name = args.trim() || "world";
+    const html = template.replace("{{name}}", name);
+    return { title: "Hello", html };
+  },
+};</code></pre>
+          <p><strong>template.html</strong></p>
+          <pre><code>&lt;div class="command-result greeting"&gt;
+  &lt;h3 class="greeting-title"&gt;Hello, {{name}}!&lt;/h3&gt;
+&lt;/div&gt;</code></pre>
+          <p>
+            For your <strong>style.css</strong>, you should use variables like
+            <code>var(--text-primary)</code> to ensure everything matches. You
+            can find more details on the
+            <a href="styling.html">Styling</a> page.
+          </p>
+
+          <h2 id="declaring-client-exposure">Declaring client exposure</h2>
+          <p>
+            The settings page shows a small icon on each extension card indicating
+            whether the extension causes the user's browser to contact external
+            services directly. Set <code>isClientExposed</code> on your exported
+            object so users know what to expect:
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Value</th>
+                <th>Meaning</th>
+                <th>Badge</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>true</code></td>
+                <td>The browser makes direct requests to external services (images, APIs, scripts rendered into HTML).</td>
+                <td><i class="fa-solid fa-triangle-exclamation" style="color: var(--warning)"></i> Orange triangle</td>
+              </tr>
+              <tr>
+                <td><code>false</code></td>
+                <td>All network access goes through the server. Nothing contacts the outside from the browser.</td>
+                <td><i class="fa-solid fa-circle-check" style="color: var(--success)"></i> Green checkmark</td>
+              </tr>
+              <tr>
+                <td><em>not set</em></td>
+                <td>The extension does not declare its network behaviour. Users see an ambiguous indicator.</td>
+                <td><i class="fa-solid fa-circle-info" style="color: var(--warning); opacity: 0.6"></i> Grey info</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            Use <code>context.signProxyUrl(url)</code> to route external images
+            through the server proxy. Doing so means you can declare
+            <code>isClientExposed: false</code>.
+          </p>
+          <pre><code>export const slot = {
+  name: "My Slot",
+  isClientExposed: false, // all images are proxied via signProxyUrl
+  async execute(query, context) {
+    const imgUrl = context.signProxyUrl("https://example.com/cover.jpg");
+    return { html: `&lt;img src="${imgUrl}"&gt;` };
+  },
+};</code></pre>
+          <pre><code>export const slot = {
+  name: "My Slot",
+  isClientExposed: true, // renders raw external URLs the browser will fetch
+  async execute(query, context) {
+    return { html: `&lt;img src="https://example.com/cover.jpg"&gt;` };
+  },
+};</code></pre>
+
+          <h2>Debugging plugins</h2>
+          <p>
+            If you need to troubleshoot, set <code>LOG_LEVEL=debug</code> to
+            print the execution times for all your plugin types directly to the
+            server console. You can check the Environment variables page for
+            more details.
+          </p>
+        </main>
+      </div>
+      <div id="degoog-docs-backdrop" class="degoog-docs-backdrop"></div>
+    </div>
+    <script
+      src="https://code.jquery.com/jquery-4.0.0.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="docs.js"></script>
+    <script src="docs-ui.js"></script>
+  </body>
+</html>

@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Aliases - Degoog docs</title>
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("ade:theme");
+          if (t !== "light" && t !== "dark") {
+            t = window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+          }
+          document.documentElement.setAttribute("data-theme", t);
+        } catch (e) {}
+      })();
+    </script>
+    <link
+      rel="icon"
+      href="https://github.com/fccview/degoog/raw/main/src/public/images/degoog-logo.png"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    />
+    <link rel="stylesheet" href="style.css?cache=burstthefucker" />
+  </head>
+  <body>
+    <div class="degoog-docs-layout">
+      <header class="degoog-docs-mobile-header">
+        <button id="degoog-docs-burger" type="button" class="degoog-docs-btn degoog-docs-btn-burger">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <span class="degoog-docs-mobile-title">Degoog Docs</span>
+      </header>
+      <div class="degoog-docs-content">
+        <aside class="degoog-docs-sidebar">
+          <div class="degoog-docs-sidebar-brand">
+            <img
+              src="https://github.com/fccview/degoog/raw/main/src/public/images/degoog-logo.png"
+              alt="degoog logo"
+              class="degoog-docs-brand-img"
+              onerror="this.style.display = 'none'"
+            />
+            <a href="index.html" class="degoog-docs-brand-name">Degoog Docs</a>
+          </div>
+          <div class="degoog-docs-sidebar-search">
+            <div class="doc-search-wrap">
+              <input
+                type="search"
+                id="doc-search-input"
+                class="degoog-docs-input doc-search"
+                placeholder="Search docs..."
+                autocomplete="off"
+              />
+              <button
+                type="button"
+                class="doc-search-clear degoog-docs-btn"
+                aria-label="Clear search"
+                style="display: none"
+              >
+                Clear
+              </button>
+              <span class="doc-search-count"></span>
+            </div>
+          </div>
+          <nav class="degoog-docs-nav" aria-label="Documentation">
+            <a href="index.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-book-open fa-lg"></i></i
+              ><span class="degoog-docs-nav-item-name">Overview</span></a
+            >
+            <a href="plugins.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-puzzle-piece fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Plugins</span></a
+            >
+            <a href="themes.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-palette fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Themes</span></a
+            >
+            <a href="engines.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-bolt fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Search engines</span></a
+            >
+            <a href="autocomplete.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-keyboard fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Autocomplete</span></a
+            >
+            <a href="transports.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-network-wired fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Transports</span></a
+            >
+            <a href="store.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-store fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Store</span></a
+            >
+            <a href="aliases.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-link fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Aliases</span></a
+            >
+            <a href="env.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-lock fa-lg"></i></i
+              ><span class="degoog-docs-nav-item-name">ENV Variables</span></a
+            >
+            <a href="styling.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-swatchbook fa-lg"></i></i
+              ><span class="degoog-docs-nav-item-name"> Styling</span></a
+            >
+            <a href="translations.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-language fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Translations</span></a
+            >
+            <a href="api.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-code fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> API</span></a
+            >
+          </nav>
+          <div class="degoog-docs-sidebar-actions">
+            <button
+              id="doc-theme-toggle"
+              type="button"
+              class="degoog-docs-btn"
+              aria-label="Toggle theme"
+            >
+              <i class="fa-solid fa-circle-half-stroke"></i>
+            </button>
+          </div>
+        </aside>
+        <main class="degoog-docs-main">
+          <div class="doc-page-header">
+            <h1><a href="index.html">Degoog</a> Bang command aliases</h1>
+            <p class="doc-page-desc">
+              Map your custom <code>!alias</code> shortcuts to existing
+              <code>!command</code> triggers.
+            </p>
+          </div>
+
+          <h2>Setup</h2>
+          <ol>
+            <li>
+              Create a file at <code>data/aliases.json</code> or point
+              <code>DEGOOG_ALIASES_FILE</code> to your preferred location.
+            </li>
+            <li>Add your custom shortcuts to the file like this:</li>
+          </ol>
+          <pre><code>{
+  "jelly": "jellyfin",
+  "search": "meili",
+  "id": "uuid"
+}</code></pre>
+          <p>
+            The <strong>key</strong> is your new shortcut (what you type after
+            <code>!</code>) and the <strong>value</strong> is the command it
+            triggers. For example, typing <code>!jelly</code> will now run
+            <code>!jellyfin</code>.
+          </p>
+          <ol start="3">
+            <li>Restart your server to load your new shortcuts.</li>
+          </ol>
+
+          <h2>Rules</h2>
+          <ul>
+            <li>
+              You cannot override existing command triggers or built in aliases.
+            </li>
+            <li>
+              Your custom aliases will appear in the <code>!help</code> menu
+              right next to the target command.
+            </li>
+          </ul>
+
+          <h2>Included command aliases</h2>
+          <p>We have included a few default aliases right out of the box:</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Command</th>
+                <th>Aliases</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>!jellyfin</code></td>
+                <td><code>!jf</code></td>
+              </tr>
+              <tr>
+                <td><code>!meili</code></td>
+                <td><code>!ms</code></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Engine shortcuts</h2>
+          <p>
+            Search engines can use a <code>bangShortcut</code> so you can easily
+            search that specific engine:
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Shortcut</th>
+                <th>Engine</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>!g</code></td>
+                <td>Google</td>
+              </tr>
+              <tr>
+                <td><code>!b</code></td>
+                <td>Bing</td>
+              </tr>
+              <tr>
+                <td><code>!ddg</code></td>
+                <td>DuckDuckGo</td>
+              </tr>
+              <tr>
+                <td><code>!brave</code></td>
+                <td>Brave Search</td>
+              </tr>
+              <tr>
+                <td><code>!w</code></td>
+                <td>Wikipedia</td>
+              </tr>
+              <tr>
+                <td><code>!r</code></td>
+                <td>Reddit</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            For example, typing <code>!g linux kernel</code> will search only
+            Google for "linux kernel".
+          </p>
+
+          <h2>Custom path</h2>
+          <p>
+            You can set <code>DEGOOG_ALIASES_FILE</code> to load your shortcuts
+            from a totally different location, like
+            <code>/etc/degoog/aliases.json</code>.
+          </p>
+        </main>
+      </div>
+      <div id="degoog-docs-backdrop" class="degoog-docs-backdrop"></div>
+    </div>
+    <script
+      src="https://code.jquery.com/jquery-4.0.0.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="docs.js"></script>
+    <script src="docs-ui.js"></script>
+  </body>
+</html>

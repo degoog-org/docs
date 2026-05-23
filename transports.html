@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Transports - Degoog docs</title>
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("ade:theme");
+          if (t !== "light" && t !== "dark") {
+            t = window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+          }
+          document.documentElement.setAttribute("data-theme", t);
+        } catch (e) {}
+      })();
+    </script>
+    <link
+      rel="icon"
+      href="https://github.com/fccview/degoog/raw/main/src/public/images/degoog-logo.png"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    />
+    <link rel="stylesheet" href="style.css?cache=burstthefucker" />
+  </head>
+  <body>
+    <div class="degoog-docs-layout">
+      <header class="degoog-docs-mobile-header">
+        <button id="degoog-docs-burger" type="button" class="degoog-docs-btn degoog-docs-btn-burger">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <span class="degoog-docs-mobile-title">Degoog Docs</span>
+      </header>
+      <div class="degoog-docs-content">
+        <aside class="degoog-docs-sidebar">
+          <div class="degoog-docs-sidebar-brand">
+            <img
+              src="https://github.com/fccview/degoog/raw/main/src/public/images/degoog-logo.png"
+              alt="degoog logo"
+              class="degoog-docs-brand-img"
+              onerror="this.style.display = 'none'"
+            />
+            <a href="index.html" class="degoog-docs-brand-name">Degoog Docs</a>
+          </div>
+          <div class="degoog-docs-sidebar-search">
+            <div class="doc-search-wrap">
+              <input
+                type="search"
+                id="doc-search-input"
+                class="degoog-docs-input doc-search"
+                placeholder="Search docs..."
+                autocomplete="off"
+              />
+              <button
+                type="button"
+                class="doc-search-clear degoog-docs-btn"
+                aria-label="Clear search"
+                style="display: none"
+              >
+                Clear
+              </button>
+              <span class="doc-search-count"></span>
+            </div>
+          </div>
+          <nav class="degoog-docs-nav" aria-label="Documentation">
+            <a href="index.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-book-open fa-lg"></i></i
+              ><span class="degoog-docs-nav-item-name">Overview</span></a
+            >
+            <a href="plugins.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-puzzle-piece fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Plugins</span></a
+            >
+            <a href="themes.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-palette fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Themes</span></a
+            >
+            <a href="engines.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-bolt fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Search engines</span></a
+            >
+            <a href="autocomplete.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-keyboard fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Autocomplete</span></a
+            >
+            <a href="transports.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-network-wired fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Transports</span></a
+            >
+            <a href="store.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-store fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Store</span></a
+            >
+            <a href="aliases.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-link fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Aliases</span></a
+            >
+            <a href="env.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-lock fa-lg"></i></i
+              ><span class="degoog-docs-nav-item-name">ENV Variables</span></a
+            >
+            <a href="styling.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-swatchbook fa-lg"></i></i
+              ><span class="degoog-docs-nav-item-name"> Styling</span></a
+            >
+            <a href="translations.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-language fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> Translations</span></a
+            >
+            <a href="api.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-code fa-lg"></i
+              ><span class="degoog-docs-nav-item-name"> API</span></a
+            >
+          </nav>
+          <div class="degoog-docs-sidebar-actions">
+            <button
+              id="doc-theme-toggle"
+              type="button"
+              class="degoog-docs-btn"
+              aria-label="Toggle theme"
+            >
+              <i class="fa-solid fa-circle-half-stroke"></i>
+            </button>
+          </div>
+        </aside>
+        <main class="degoog-docs-main">
+          <div class="doc-page-header">
+            <h1><a href="index.html">Degoog</a> Transports</h1>
+            <p class="doc-page-desc">
+              Custom HTTP fetch strategies for your outgoing search requests.
+            </p>
+          </div>
+
+          <div class="doc-cli-banner">
+            <i class="fa-solid fa-terminal"></i>
+            <p>
+              <strong>degoog-cli is now available.</strong>
+              Scaffold transport boilerplate directly from your terminal - no copy-pasting, no guessing the folder structure.
+              Install with <code>curl -fsSL https://raw.githubusercontent.com/degoog-org/cli/main/install.sh | sh</code>
+              or grab it from <a href="https://github.com/degoog-org/cli" target="_blank" rel="noopener">github.com/degoog-org/cli</a>.
+            </p>
+          </div>
+
+          <h2>What transports are</h2>
+          <p>
+            A transport controls exactly how Degoog makes its outgoing HTTP
+            requests to search engines. You can select a specific transport for
+            each engine by navigating to Settings then Engines then Configure
+            then Advanced.
+          </p>
+          <p>We include three built in transports out of the box:</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Behaviour</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>fetch</code></td>
+                <td>
+                  The native Bun fetch implementation with full SOCKS 5 and HTTP
+                  proxy support. This is the default for all engines.
+                </td>
+              </tr>
+              <tr>
+                <td><code>curl</code></td>
+                <td>
+                  Shells out directly to your system curl binary. This uses a
+                  different TLS stack which helps immensely when a website tries
+                  to block the default Bun fingerprint.
+                </td>
+              </tr>
+              <tr>
+                <td><code>auto</code></td>
+                <td>
+                  Tries fetch first. If the server responds with a 403, 429,
+                  502, or 503 error, it automatically retries the request using
+                  curl.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            You can install additional transports like FlareSolverr straight
+            from the
+            <a href="store.html">Store</a> or place them manually inside your
+            <code>data/transports/</code> directory.
+          </p>
+
+          <h2>Where transports live</h2>
+          <p>
+            Your custom transports belong in <code>data/transports/</code> or
+            whatever path you set for <code>DEGOOG_TRANSPORTS_DIR</code>. Each
+            transport is just a file or folder containing an entry file that
+            exports a class or object implementing the transport contract.
+          </p>
+
+          <h2>Transport contract</h2>
+          <p><strong>Required properties:</strong></p>
+          <ul>
+            <li>
+              <strong>name</strong>: A unique identifier written in lowercase
+              with no spaces.
+            </li>
+            <li>
+              <strong>available()</strong>: Return <code>true</code> or a
+              Promise resolving to <code>true</code> when your transport is
+              ready to use. If you return <code>false</code>, the transport will
+              be hidden from the engine dropdown menus.
+            </li>
+            <li>
+              <strong>fetch(url, options, context)</strong> (async): Perform the
+              actual HTTP request and return a standard
+              <code>Response</code> object.
+            </li>
+          </ul>
+          <p><strong>Optional properties:</strong></p>
+          <ul>
+            <li>
+              <strong>displayName</strong>: The friendly name shown in Settings
+              then Transports.
+            </li>
+            <li>
+              <strong>description</strong>: A short description displayed in
+              Settings then Transports.
+            </li>
+            <li>
+              <strong>settingsSchema</strong> and
+              <strong>configure(settings)</strong>: These follow the exact same
+              pattern as engines and plugins. A Configure button will appear in
+              Settings then Transports, and your values are stored safely in
+              <code>data/plugin-settings.json</code> under
+              <code>transport-&lt;name&gt;</code>.
+            </li>
+          </ul>
+
+          <h2>Arguments</h2>
+          <h3>options</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>method</code></td>
+                <td><code>string</code></td>
+                <td>The HTTP method which defaults to <code>"GET"</code>.</td>
+              </tr>
+              <tr>
+                <td><code>headers</code></td>
+                <td><code>Record&lt;string, string&gt;</code></td>
+                <td>Your request headers.</td>
+              </tr>
+              <tr>
+                <td><code>body</code></td>
+                <td><code>string</code></td>
+                <td>The request body.</td>
+              </tr>
+              <tr>
+                <td><code>redirect</code></td>
+                <td><code>RequestRedirect</code></td>
+                <td>
+                  The redirect mode which defaults to <code>"follow"</code>.
+                </td>
+              </tr>
+              <tr>
+                <td><code>signal</code></td>
+                <td><code>AbortSignal</code></td>
+                <td>The abort signal used for cancellation.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>context</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>proxyUrl</code></td>
+                <td><code>string | undefined</code></td>
+                <td>
+                  The proxy URL configured in Settings then Server then Proxy.
+                  This comes already rotated. It will be
+                  <code>undefined</code> when proxies are disabled.
+                </td>
+              </tr>
+              <tr>
+                <td><code>fetch</code></td>
+                <td><code>(url, init?) =&gt; Promise&lt;Response&gt;</code></td>
+                <td>
+                  A proxy aware fetch function.
+                  <strong>Always use this</strong> for all your outbound
+                  requests so the user proxy settings like SOCKS 5 or HTTP
+                  CONNECT are respected automatically.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Proxies</h2>
+          <p>
+            When a user enables a proxy in Settings then Server,
+            <code>context.proxyUrl</code> is populated and
+            <code>context.fetch</code>
+            routes through it automatically. Your transport should always use
+            <code>context.fetch</code> for any outbound HTTP calls so proxy
+            routing just works effortlessly:
+          </p>
+          <pre><code>async fetch(url, options, context) {
+  const doFetch = context.fetch;
+  const res = await doFetch("https://my-service.example.com/api", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ target: url }),
+    signal: options.signal,
+  });
+  // transform and return a Response
+}</code></pre>
+
+          <h2>Client exposure</h2>
+          <p>
+            Transports run entirely on the server. They fetch pages and APIs on
+            behalf of engines and autocomplete providers. They do not render content
+            into the search UI themselves and do not appear in the plugin network
+            indicator in Settings. Use <code>context.fetch</code> in your
+            <code>fetch(url, options, context)</code> implementation so outgoing
+            proxy and transport settings apply.
+          </p>
+          <p>
+            Picking a transport for an engine or autocomplete provider only changes
+            how the <strong>server</strong> reaches upstream services. It does not
+            mean the user's browser skips Degoog's image proxy:
+          </p>
+          <ul>
+            <li>
+              <strong>Search results</strong>: thumbnails and image URLs are served
+              through <code>/api/proxy/image</code> when results are rendered.
+            </li>
+            <li>
+              <strong>Rich autocomplete</strong>: return upstream
+              <code>rich.thumbnail</code> URLs from your provider as usual. Degoog
+              signs them before the suggest API responds so the dropdown loads images
+              via <code>/api/proxy/image</code>. See
+              <a href="autocomplete.html#declaring-client-exposure">Autocomplete</a>.
+            </li>
+            <li>
+              <strong>Plugins</strong>: slots and commands that embed external URLs
+              in HTML declare <code>isClientExposed</code>. See
+              <a href="plugins.html#declaring-client-exposure">Declaring client exposure</a>.
+            </li>
+          </ul>
+
+          <h2>Setup</h2>
+          <p>
+            Create your <code>data/transports/</code> directory or set your
+            <code>DEGOOG_TRANSPORTS_DIR</code>. Add a single file like
+            <code>my-transport.js</code> or create a folder with an
+            <code>index.js</code> file. Your transport settings ID will
+            automatically become <code>transport-&lt;name&gt;</code>.
+          </p>
+
+          <h2>How settings work</h2>
+          <ol>
+            <li>
+              Declare your <code>settingsSchema</code> so a Configure button
+              appears in Settings then Transports.
+            </li>
+            <li>
+              When the user saves, the values go into
+              <code>data/plugin-settings.json</code> under
+              <code>transport-&lt;name&gt;</code>.
+            </li>
+            <li>
+              Your <code>configure(settings)</code> function is called right
+              after saving and every time the server restarts if settings exist.
+            </li>
+            <li>
+              Return <code>false</code> from <code>available()</code> when
+              required settings are missing so the transport does not show up in
+              engine dropdowns until it is fully configured.
+            </li>
+            <li>
+              Users can easily disable configurable transports using the toggle
+              switch in Settings then Transports.
+            </li>
+          </ol>
+
+          <h2>Example minimal transport</h2>
+          <pre><code>export default class MyTransport {
+  name = "my-transport";
+  displayName = "My Transport";
+  description = "Example custom transport.";
+
+  settingsSchema = [
+    {
+      key: "apiUrl",
+      label: "API URL",
+      type: "url",
+      required: true,
+      placeholder: "https://my-service.example.com",
+    },
+  ];
+
+  _apiUrl = "";
+
+  configure(settings) {
+    this._apiUrl = (settings.apiUrl || "").trim();
+  }
+
+  available() {
+    return this._apiUrl.length > 0;
+  }
+
+  async fetch(url, options, context) {
+    const doFetch = context.fetch;
+
+    const res = await doFetch(this._apiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url, timeout: 10000 }),
+      signal: options.signal,
+    });
+
+    if (!res.ok) return new Response("", { status: res.status });
+    const data = await res.json();
+    return new Response(data.html ?? "", {
+      status: data.status ?? 200,
+      headers: { "Content-Type": "text/html" },
+    });
+  }
+}</code></pre>
+
+          <h2>Examples from the official store</h2>
+          <ul>
+            <li>
+              <a
+                href="https://github.com/degoog-org/official-extensions/tree/main/transports/flaresolverr"
+                class="external"
+                target="_blank"
+                rel="noopener"
+                >FlareSolverr</a
+              >
+              lets you bypass Cloudflare challenges via a FlareSolverr instance.
+              It correctly uses <code>context.fetch</code> so all proxy settings
+              are respected.
+            </li>
+          </ul>
+          <p>
+            If you are distributing your transport through the
+            <a href="store.html">Store</a>, just add it under the
+            <code>transports/</code> directory in your repository and list it in
+            the <code>transports</code> array inside your
+            <code>package.json</code>.
+          </p>
+        </main>
+      </div>
+      <div id="degoog-docs-backdrop" class="degoog-docs-backdrop"></div>
+    </div>
+    <script
+      src="https://code.jquery.com/jquery-4.0.0.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="docs.js"></script>
+    <script src="docs-ui.js"></script>
+  </body>
+</html>
