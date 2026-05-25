@@ -212,11 +212,25 @@
           <pre><code>init(ctx) {
   // ctx.template contains your template.html
   // ctx.dir is the absolute path to your plugin folder
+  // ctx.pluginId (alias ctx.id) is your real installed plugin folder ID
+  // ctx.apiBase is /api/plugin/&lt;ctx.pluginId&gt;
+  // ctx.routeUrl("path") builds /api/plugin/&lt;ctx.pluginId&gt;/path
   // ctx.readFile is an async function to read any file from your plugin folder
   // ctx.signProxyUrl(url) returns a signed /api/proxy/image URL for any external image
   // ctx.fetch(url, init?) is a proxy-aware fetch, respects your outgoing proxy settings
   // ctx.useCache(namespace, defaultTtlMs) returns an async TTL cache { get, set, delete, clear }
 }</code></pre>
+          <p>
+            When your <strong>backend</strong> code generates a URL that points at
+            one of your own plugin routes (for example an image cache that returns a
+            link to a <code>/thumb</code> route), never hardcode the folder name or
+            derive it from <code>ctx.dir</code>. Store-installed plugins run under a
+            generated folder ID such as
+            <code>&lt;author&gt;-&lt;repo&gt;-&lt;plugin-name&gt;</code>, so the only
+            correct base is <code>ctx.apiBase</code> (or
+            <code>ctx.routeUrl("thumb")</code>). The frontend equivalent is the
+            injected <code>__PLUGIN_ID__</code> constant.
+          </p>
           <h3>TTL cache (<code>useCache</code>)</h3>
           <p>
             Both <code>init(ctx)</code> and slot <code>execute(query, context)</code>
@@ -634,14 +648,26 @@
           <p>
             When installed from the store, the plugin folder name is
             <code>&lt;author&gt;-&lt;repo&gt;-&lt;plugin-name&gt;</code>. Never
-            hardcode that in your API URLs - use the injected
-            <strong><code>__PLUGIN_ID__</code></strong> constant instead.
-            Degoog injects it automatically into every plugin script at serve
-            time.
+            hardcode that in your API URLs. In <strong>frontend</strong> scripts
+            use the injected <strong><code>__PLUGIN_ID__</code></strong> constant,
+            which Degoog injects automatically into every plugin script at serve
+            time. In <strong>backend</strong> plugin code use
+            <code>ctx.apiBase</code> or <code>ctx.routeUrl("path")</code> from
+            <code>init(ctx)</code>.
           </p>
-          <pre><code>const MY_API = `/api/plugin/${__PLUGIN_ID__}/data`;
+          <pre><code>// frontend script.js
+const MY_API = `/api/plugin/${__PLUGIN_ID__}/data`;
+fetch(MY_API).then(r => r.json()).then(data => { /* ... */ });
 
-fetch(MY_API).then(r => r.json()).then(data => { /* ... */ });</code></pre>
+// backend index.js
+let apiBase = "";
+export default {
+  routes: [{ method: "get", path: "/thumb", handler: async (req) => { /* ... */ } }],
+  init(ctx) { apiBase = ctx.apiBase; },
+  async execute() {
+    return { title: "Example", html: `&lt;img src="${apiBase}/thumb?id=abc"&gt;` };
+  },
+};</code></pre>
 
           <h2 id="interceptors">Query interceptors</h2>
           <p>
