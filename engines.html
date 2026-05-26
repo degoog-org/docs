@@ -526,7 +526,8 @@ async executeSearch(query, page = 1, timeFilter, context) {
             <code>DEGOOG_ENGINES_DIR</code>. Add a single file like
             <code>my-engine.js</code> or a folder with an
             <code>index.js</code> file. The engine ID will simply be the
-            filename or folder name prefixed with <code>engine-</code>.
+            filename or folder name with an <code>-engine</code> suffix (so
+            <code>my-engine</code> becomes <code>my-engine-engine</code>).
           </p>
 
           <h2>How settings work</h2>

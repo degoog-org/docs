@@ -349,7 +349,7 @@
             <li>
               When you save, the values are stored in
               <code>data/plugin-settings.json</code> under
-              <code>plugin-&lt;folderName&gt;</code>.
+              <code>&lt;folderName&gt;-command</code>.
             </li>
             <li>
               The <code>configure(settings)</code> function runs right after
@@ -474,7 +474,7 @@
           <p>
             You can add an optional <strong>settingsId</strong> to specify the
             key where your settings are stored. This defaults to
-            <code>slot-&lt;id&gt;</code>. You can also include
+            <code>&lt;id&gt;-slot</code>. You can also include
             <code>settingsSchema</code>, <code>configure(settings)</code>, and
             <code>init(ctx)</code>. If multiple slots match the exact same
             query, they will all display together.
@@ -680,6 +680,12 @@ export default {
             <strong>intercept(query, context)</strong> async function that returns
             <code>{ query: string }</code>.
           </p>
+          <p>
+            You can also return an optional <code>overrides</code> object to
+            influence how the search is executed - without touching the query text
+            at all. This is useful when your interceptor has enough information to
+            determine the best search context upfront.
+          </p>
           <pre><code>export const interceptor = {
   name: "My Interceptor",
   description: "Does something to the query.",
@@ -699,9 +705,19 @@ export default {
   async intercept(query, context) {
     // context: { fetch, useCache, lang }
     // return the query to actually search - may be the original or anything else
-    return { query };
+    // overrides is optional: searchType routes to a tab, lang/timeFilter override search params
+    return { query, overrides: { searchType: "my-tab" } };
   },
 };</code></pre>
+          <h3>Supported overrides</h3>
+          <ul>
+            <li><code>searchType</code> - route the search to a specific tab by its engine type (e.g. <code>"images"</code>, <code>"news"</code>, or any custom tab type registered by a plugin)</li>
+            <li><code>lang</code> - override the language for this search</li>
+            <li><code>timeFilter</code> - override the time filter (e.g. <code>"day"</code>, <code>"week"</code>)</li>
+          </ul>
+          <p>
+            All fields are optional. When multiple interceptors run, overrides are merged in order - later interceptors win for each field.
+          </p>
           <p>
             Interceptors are a plugin subtype - they live in the same
             <code>data/plugins/</code> directory as bang commands and slots. A
