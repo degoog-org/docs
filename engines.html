@@ -236,13 +236,23 @@
 
           <h2>Search types</h2>
           <p>
-            You can export a named <code>type</code> such as
-            <code>"web"</code> (which is the default), <code>"images"</code>,
-            <code>"videos"</code>, <code>"news"</code>, or even your own custom
-            string like <code>"books"</code>. Creating a custom type
-            automatically adds a new tab on the search results page. When
-            someone selects that tab, all engines sharing that type will run
-            together.
+            Export a <code>type</code> to declare which tab(s) your engine
+            belongs to. The default is <code>"web"</code>. Any other string
+            automatically creates a dedicated tab on the search results page,
+            all engines sharing that type run together when the tab is selected.
+          </p>
+          <p>
+            <code>type</code> can be a single string or an array of strings.
+            When an array is used, the engine participates in every listed tab
+            simultaneously.
+          </p>
+          <pre><code>export const type = "books"              // creates a Books tab
+export const type = ["web", "karakeep"]  // shows in Web tab AND Karakeep tab</code></pre>
+          <p>
+            Users can also override the type from the engine's Advanced settings
+            using the <strong>Engine type override</strong> field. Comma-separated
+            values are supported for multiple types, e.g. <code>web,karakeep</code>.
+            A runtime override always takes precedence over the exported <code>type</code>.
           </p>
 
           <h2>Language &amp; time filters</h2>
