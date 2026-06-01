@@ -726,6 +726,60 @@ export default {
             builtin interceptors; all interceptors come from plugins.
           </p>
 
+          <h2 id="multi-hook-plugins">Multi-hook plugins</h2>
+          <p>
+            A single plugin folder can export any combination of hooks - a
+            <code>slot</code>, an <code>interceptor</code>, a bang
+            <code>command</code>, a <code>tab</code>, <code>middleware</code>,
+            or a <code>route</code>. By default each hook gets its own settings
+            card in the UI. To merge them all into a single card with shared
+            settings, export a top-level <strong>plugin</strong> object as the
+            plugin's identity:
+          </p>
+          <pre><code>export const plugin = {
+  id: "my-plugin",        // shared settingsId for all hooks in this file
+  name: "My Plugin",      // name shown on the settings card
+  description: "...",
+
+  // fields listed here appear first in the combined settings form
+  settingsSchema: [
+    { key: "url", label: "Service URL", type: "url" },
+    { key: "apiKey", label: "API Key", type: "password", secret: true },
+  ],
+};
+
+// registered as a hook - not shown as a separate card
+export const slot = {
+  name: "My Slot",
+  position: "above-results",
+  // slot-specific fields (appended after plugin fields in the form)
+  settingsSchema: [],
+  configure(settings) { /* receives the full merged settings object */ },
+  async trigger(query) { return query.length > 0; },
+  async execute(query, context) { return { html: "" }; },
+};
+
+// registered as a hook - not shown as a separate card
+export const interceptor = {
+  name: "My Interceptor",
+  // interceptor-specific fields (appended after slot fields in the form)
+  settingsSchema: [
+    { key: "firstMode", label: "Enable first mode", type: "toggle" },
+  ],
+  configure(settings) { /* also receives the full merged settings object */ },
+  async intercept(query) { return { query }; },
+};</code></pre>
+          <p>
+            When <code>plugin</code> is present, both hooks use
+            <code>plugin.id</code> as their <code>settingsId</code>. The settings
+            form shows manifest fields first, then slot fields, then interceptor
+            fields. Saving calls <code>configure()</code> on each hook separately
+            with the same settings object - shared module-level state (caches,
+            config variables) works naturally since all hooks live in the same
+            file. Plugins that do not export <code>plugin</code> are unaffected
+            and continue to show as individual cards.
+          </p>
+
           <h2>Request middleware</h2>
           <p>
             Middleware allows your plugin to hook into specific request flows.
