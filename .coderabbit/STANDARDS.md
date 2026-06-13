@@ -595,49 +595,7 @@ Use these checklists during code review. They are not gates for every small patc
 - Public/private instance assumptions are preserved.
 - Regression tests cover any fixed vulnerability.
 
-## 14. Phased migration plan
-
-### Phase 0: Freeze compatibility assumptions
-
-- Document stable route response shapes, extension ID prefixes, settings keys, env vars, and plugin/theme/engine interfaces.
-- Add characterization tests for the most fragile existing behavior before refactors.
-- Start using these standards for all new code.
-
-### Phase 1: Low-risk helpers
-
-- Add shared helpers for JSON body parsing, route error responses, path containment, and atomic JSON writes.
-- Migrate one call site at a time.
-- Keep wrappers around old helpers to avoid import churn.
-
-### Phase 2: Search parity
-
-- Extract search request parsing and cache key construction from route files.
-- Add tests comparing streaming and non-streaming parameter handling.
-- Extract engine selection and final scoring/domain/cache steps after tests are in place.
-- Preserve `/api/search` and `/api/search/stream` response fields throughout.
-
-### Phase 3: Registry/store hardening
-
-- Lock down deterministic registry order and duplicate behavior with tests.
-- Migrate store and settings persistence to atomic writes and locks.
-- Add path traversal and corrupted metadata tests.
-- Improve install/update transparency without breaking existing installed items.
-
-### Phase 4: Client maintainability
-
-- Split the largest UI flows opportunistically, especially streaming search and settings/store tabs.
-- Introduce stable `data-*` hooks alongside existing selectors.
-- Centralize client fetch/auth/error helpers.
-- Add lightweight tests for pure parsing/state helpers.
-
-### Phase 5: Observability and secure defaults
-
-- Add timing logs to search, store, registry reloads, and cache invalidation.
-- Add optional structured logging while preserving current logger output by default.
-- Introduce stricter SSRF/path checks behind compatibility-aware helpers.
-- Document any behavior change and provide migration notes before out-of-beta or a breaking release.
-
-## 15. Review rule of thumb
+## 14. Review rule of thumb
 
 A change is aligned with this standard if it can answer “yes” to these questions:
 
