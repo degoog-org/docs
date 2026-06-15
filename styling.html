@@ -1,260 +1,211 @@
 <!doctype html>
 <html lang="en" data-theme="light">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Styling - Degoog docs</title>
-    <script>
-      (function () {
-        try {
-          var t = localStorage.getItem("ade:theme");
-          if (t !== "light" && t !== "dark") {
-            t = window.matchMedia("(prefers-color-scheme: dark)").matches
-              ? "dark"
-              : "light";
-          }
-          document.documentElement.setAttribute("data-theme", t);
-        } catch (e) {}
-      })();
-    </script>
-    <link
-      rel="icon"
-      href="https://github.com/fccview/degoog/raw/main/src/public/images/degoog-logo.png"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-    />
-    <link rel="stylesheet" href="style.css?cache=burstthefucker" />
-  </head>
-  <body>
-    <div class="degoog-docs-layout">
-      <header class="degoog-docs-mobile-header">
-        <button id="degoog-docs-burger" type="button" class="degoog-docs-btn degoog-docs-btn-burger">
-          <i class="fa-solid fa-bars"></i>
-        </button>
-        <span class="degoog-docs-mobile-title">Degoog Docs</span>
-      </header>
-      <div class="degoog-docs-content">
-        <aside class="degoog-docs-sidebar">
-          <div class="degoog-docs-sidebar-brand">
-            <img
-              src="https://github.com/fccview/degoog/raw/main/src/public/images/degoog-logo.png"
-              alt="degoog logo"
-              class="degoog-docs-brand-img"
-              onerror="this.style.display = 'none'"
-            />
-            <a href="index.html" class="degoog-docs-brand-name">Degoog Docs</a>
-          </div>
-          <div class="degoog-docs-sidebar-search">
-            <div class="doc-search-wrap">
-              <input
-                type="search"
-                id="doc-search-input"
-                class="degoog-docs-input doc-search"
-                placeholder="Search docs..."
-                autocomplete="off"
-              />
-              <button
-                type="button"
-                class="doc-search-clear degoog-docs-btn"
-                aria-label="Clear search"
-                style="display: none"
-              >
-                Clear
-              </button>
-              <span class="doc-search-count"></span>
-            </div>
-          </div>
-          <nav class="degoog-docs-nav" aria-label="Documentation">
-            <a href="index.html" class="degoog-docs-nav-item"
-              ><i class="fa-solid fa-book-open fa-lg"></i></i
-              ><span class="degoog-docs-nav-item-name">Overview</span></a
-            >
-            <a href="plugins.html" class="degoog-docs-nav-item"
-              ><i class="fa-solid fa-puzzle-piece fa-lg"></i
-              ><span class="degoog-docs-nav-item-name"> Plugins</span></a
-            >
-            <a href="themes.html" class="degoog-docs-nav-item"
-              ><i class="fa-solid fa-palette fa-lg"></i
-              ><span class="degoog-docs-nav-item-name"> Themes</span></a
-            >
-            <a href="engines.html" class="degoog-docs-nav-item"
-              ><i class="fa-solid fa-bolt fa-lg"></i
-              ><span class="degoog-docs-nav-item-name"> Search engines</span></a
-            >
-            <a href="autocomplete.html" class="degoog-docs-nav-item"
-              ><i class="fa-solid fa-keyboard fa-lg"></i
-              ><span class="degoog-docs-nav-item-name"> Autocomplete</span></a
-            >
-            <a href="transports.html" class="degoog-docs-nav-item"
-              ><i class="fa-solid fa-network-wired fa-lg"></i
-              ><span class="degoog-docs-nav-item-name"> Transports</span></a
-            >
-            <a href="store.html" class="degoog-docs-nav-item"
-              ><i class="fa-solid fa-store fa-lg"></i
-              ><span class="degoog-docs-nav-item-name"> Store</span></a
-            >
-            <a href="aliases.html" class="degoog-docs-nav-item"
-              ><i class="fa-solid fa-link fa-lg"></i
-              ><span class="degoog-docs-nav-item-name"> Aliases</span></a
-            >
-            <a href="env.html" class="degoog-docs-nav-item"
-              ><i class="fa-solid fa-lock fa-lg"></i></i
-              ><span class="degoog-docs-nav-item-name">ENV Variables</span></a
-            >
-            <a href="styling.html" class="degoog-docs-nav-item"
-              ><i class="fa-solid fa-swatchbook fa-lg"></i></i
-              ><span class="degoog-docs-nav-item-name"> Styling</span></a
-            >
-            <a href="translations.html" class="degoog-docs-nav-item"
-              ><i class="fa-solid fa-language fa-lg"></i
-              ><span class="degoog-docs-nav-item-name"> Translations</span></a
-            >
-            <a href="api.html" class="degoog-docs-nav-item"
-              ><i class="fa-solid fa-code fa-lg"></i
-              ><span class="degoog-docs-nav-item-name"> API</span></a
-            >
-          </nav>
-          <div class="degoog-docs-sidebar-actions">
-            <button
-              id="doc-theme-toggle"
-              type="button"
-              class="degoog-docs-btn"
-              aria-label="Toggle theme"
-            >
-              <i class="fa-solid fa-circle-half-stroke"></i>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Styling - Degoog docs</title>
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("ade:theme");
+        if (t !== "light" && t !== "dark") {
+          t = window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+        }
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) { }
+    })();
+  </script>
+  <link rel="icon" href="https://github.com/fccview/degoog/raw/main/src/public/images/degoog-logo.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="style.css?cache=burstthefucker" />
+</head>
+
+<body>
+  <div class="degoog-docs-layout">
+    <header class="degoog-docs-mobile-header">
+      <button id="degoog-docs-burger" type="button" class="degoog-docs-btn degoog-docs-btn-burger">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <span class="degoog-docs-mobile-title">Degoog Docs</span>
+    </header>
+    <div class="degoog-docs-content">
+      <aside class="degoog-docs-sidebar">
+        <div class="degoog-docs-sidebar-brand">
+          <img src="https://github.com/fccview/degoog/raw/main/src/public/images/degoog-logo.png" alt="degoog logo"
+            class="degoog-docs-brand-img" onerror="this.style.display = 'none'" />
+          <a href="index.html" class="degoog-docs-brand-name">Degoog Docs</a>
+        </div>
+        <div class="degoog-docs-sidebar-search">
+          <div class="doc-search-wrap">
+            <input type="search" id="doc-search-input" class="degoog-docs-input doc-search" placeholder="Search docs..."
+              autocomplete="off" />
+            <button type="button" class="doc-search-clear degoog-docs-btn" aria-label="Clear search"
+              style="display: none">
+              Clear
             </button>
+            <span class="doc-search-count"></span>
           </div>
-        </aside>
-        <main class="degoog-docs-main">
-          <div class="doc-page-header">
-            <h1><a href="index.html">Degoog</a> Styling</h1>
-            <p class="doc-page-desc">
-              CSS variables and key classes for your themes and plugin outputs.
-            </p>
-          </div>
-
-          <h2>CSS variables</h2>
-          <p>
-            The application exposes several CSS custom properties on the
-            <code>:root</code> element. You can use these in your themes and
-            plugin styles to ensure your colors automatically adapt to light or
-            dark modes (using <code>data-theme="light"</code> or
-            <code>data-theme="dark"</code> on the
-            <code>&lt;html&gt;</code> tag).
+        </div>
+        <nav class="degoog-docs-nav" aria-label="Documentation">
+          <a href="index.html" class="degoog-docs-nav-item"><i class="fa-solid fa-book-open fa-lg"></i></i><span
+              class="degoog-docs-nav-item-name">Overview</span></a>
+          <a href="plugins.html" class="degoog-docs-nav-item"><i class="fa-solid fa-puzzle-piece fa-lg"></i><span
+              class="degoog-docs-nav-item-name"> Plugins</span></a>
+          <a href="themes.html" class="degoog-docs-nav-item"><i class="fa-solid fa-palette fa-lg"></i><span
+              class="degoog-docs-nav-item-name"> Themes</span></a>
+          <a href="engines.html" class="degoog-docs-nav-item"><i class="fa-solid fa-bolt fa-lg"></i><span
+              class="degoog-docs-nav-item-name"> Search engines</span></a>
+          <a href="autocomplete.html" class="degoog-docs-nav-item"><i class="fa-solid fa-keyboard fa-lg"></i><span
+              class="degoog-docs-nav-item-name"> Autocomplete</span></a>
+          <a href="transports.html" class="degoog-docs-nav-item"><i class="fa-solid fa-network-wired fa-lg"></i><span
+              class="degoog-docs-nav-item-name"> Transports</span></a>
+          <a href="store.html" class="degoog-docs-nav-item"><i class="fa-solid fa-store fa-lg"></i><span
+              class="degoog-docs-nav-item-name"> Store</span></a>
+          <a href="aliases.html" class="degoog-docs-nav-item"><i class="fa-solid fa-link fa-lg"></i><span
+              class="degoog-docs-nav-item-name"> Aliases</span></a>
+          <a href="env.html" class="degoog-docs-nav-item"><i class="fa-solid fa-lock fa-lg"></i></i><span
+              class="degoog-docs-nav-item-name">ENV Variables</span></a>
+          <a href="styling.html" class="degoog-docs-nav-item"><i class="fa-solid fa-swatchbook fa-lg"></i></i><span
+              class="degoog-docs-nav-item-name"> Styling</span></a>
+          <a href="translations.html" class="degoog-docs-nav-item"><i class="fa-solid fa-language fa-lg"></i><span
+              class="degoog-docs-nav-item-name"> Translations</span></a>
+          <a href="api.html" class="degoog-docs-nav-item"><i class="fa-solid fa-code fa-lg"></i><span
+              class="degoog-docs-nav-item-name"> API</span></a>
+        </nav>
+        <div class="degoog-docs-sidebar-actions">
+          <button id="doc-theme-toggle" type="button" class="degoog-docs-btn" aria-label="Toggle theme">
+            <i class="fa-solid fa-circle-half-stroke"></i>
+          </button>
+        </div>
+      </aside>
+      <main class="degoog-docs-main">
+        <div class="doc-page-header">
+          <h1><a href="index.html">Degoog</a> Styling</h1>
+          <p class="doc-page-desc">
+            CSS variables and key classes for your themes and plugin outputs.
           </p>
-          <table>
-            <thead>
-              <tr>
-                <th>Variable</th>
-                <th>Use</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>--primary</code></td>
-                <td>Primary accent for links and buttons</td>
-              </tr>
-              <tr>
-                <td><code>--primary-hover</code></td>
-                <td>Hover state for primary elements</td>
-              </tr>
-              <tr>
-                <td><code>--primary-rgb</code></td>
-                <td>Primary color as an RGB tuple</td>
-              </tr>
-              <tr>
-                <td><code>--danger</code></td>
-                <td>Danger or error color</td>
-              </tr>
-              <tr>
-                <td><code>--warning</code></td>
-                <td>Warning color</td>
-              </tr>
-              <tr>
-                <td><code>--success</code></td>
-                <td>Success color</td>
-              </tr>
-              <tr>
-                <td><code>--bg</code></td>
-                <td>Page background</td>
-              </tr>
-              <tr>
-                <td><code>--bg-light</code></td>
-                <td>Lighter background for cards and inputs</td>
-              </tr>
-              <tr>
-                <td><code>--bg-hover</code></td>
-                <td>Hover background</td>
-              </tr>
-              <tr>
-                <td><code>--border</code></td>
-                <td>Border color</td>
-              </tr>
-              <tr>
-                <td><code>--border-light</code></td>
-                <td>Lighter border</td>
-              </tr>
-              <tr>
-                <td><code>--text-primary</code></td>
-                <td>Main text color</td>
-              </tr>
-              <tr>
-                <td><code>--text-secondary</code></td>
-                <td>Secondary or muted text</td>
-              </tr>
-              <tr>
-                <td><code>--text-link</code></td>
-                <td>Link color</td>
-              </tr>
-              <tr>
-                <td><code>--text-link-visited</code></td>
-                <td>Visited link color</td>
-              </tr>
-              <tr>
-                <td><code>--text-cite</code></td>
-                <td>Citation or URL text</td>
-              </tr>
-              <tr>
-                <td><code>--text-snippet</code></td>
-                <td>Snippet or description text</td>
-              </tr>
-              <tr>
-                <td><code>--search-bar-bg</code></td>
-                <td>Search bar background</td>
-              </tr>
-              <tr>
-                <td><code>--search-bar-bg-hover</code></td>
-                <td>Search bar hover state</td>
-              </tr>
-              <tr>
-                <td><code>--btn-bg</code></td>
-                <td>Button background</td>
-              </tr>
-              <tr>
-                <td><code>--btn-text</code></td>
-                <td>Button text color</td>
-              </tr>
-              <tr>
-                <td><code>--overlay-bg</code></td>
-                <td>Overlay background for modals</td>
-              </tr>
-              <tr>
-                <td><code>--white</code></td>
-                <td>Pure white</td>
-              </tr>
-            </tbody>
-          </table>
+        </div>
 
-          <h2>Example theme or plugin CSS</h2>
-          <pre><code>.my-panel {
+        <h2>CSS variables</h2>
+        <p>
+          The application exposes several CSS custom properties on the
+          <code>:root</code> element. You can use these in your themes and
+          plugin styles to ensure your colors automatically adapt to light or
+          dark modes (using <code>data-theme="light"</code> or
+          <code>data-theme="dark"</code> on the
+          <code>&lt;html&gt;</code> tag).
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Variable</th>
+              <th>Use</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>--primary</code></td>
+              <td>Primary accent for links and buttons</td>
+            </tr>
+            <tr>
+              <td><code>--primary-hover</code></td>
+              <td>Hover state for primary elements</td>
+            </tr>
+            <tr>
+              <td><code>--primary-rgb</code></td>
+              <td>Primary color as an RGB tuple</td>
+            </tr>
+            <tr>
+              <td><code>--danger</code></td>
+              <td>Danger or error color</td>
+            </tr>
+            <tr>
+              <td><code>--warning</code></td>
+              <td>Warning color</td>
+            </tr>
+            <tr>
+              <td><code>--success</code></td>
+              <td>Success color</td>
+            </tr>
+            <tr>
+              <td><code>--bg</code></td>
+              <td>Page background</td>
+            </tr>
+            <tr>
+              <td><code>--bg-light</code></td>
+              <td>Lighter background for cards and inputs</td>
+            </tr>
+            <tr>
+              <td><code>--bg-hover</code></td>
+              <td>Hover background</td>
+            </tr>
+            <tr>
+              <td><code>--border</code></td>
+              <td>Border color</td>
+            </tr>
+            <tr>
+              <td><code>--border-light</code></td>
+              <td>Lighter border</td>
+            </tr>
+            <tr>
+              <td><code>--text-primary</code></td>
+              <td>Main text color</td>
+            </tr>
+            <tr>
+              <td><code>--text-secondary</code></td>
+              <td>Secondary or muted text</td>
+            </tr>
+            <tr>
+              <td><code>--text-link</code></td>
+              <td>Link color</td>
+            </tr>
+            <tr>
+              <td><code>--text-link-visited</code></td>
+              <td>Visited link color</td>
+            </tr>
+            <tr>
+              <td><code>--text-cite</code></td>
+              <td>Citation or URL text</td>
+            </tr>
+            <tr>
+              <td><code>--text-snippet</code></td>
+              <td>Snippet or description text</td>
+            </tr>
+            <tr>
+              <td><code>--search-bar-bg</code></td>
+              <td>Search bar background</td>
+            </tr>
+            <tr>
+              <td><code>--search-bar-bg-hover</code></td>
+              <td>Search bar hover state</td>
+            </tr>
+            <tr>
+              <td><code>--btn-bg</code></td>
+              <td>Button background</td>
+            </tr>
+            <tr>
+              <td><code>--btn-text</code></td>
+              <td>Button text color</td>
+            </tr>
+            <tr>
+              <td><code>--overlay-bg</code></td>
+              <td>Overlay background for modals</td>
+            </tr>
+            <tr>
+              <td><code>--white</code></td>
+              <td>Pure white</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>Example theme or plugin CSS</h2>
+        <pre><code>.my-panel {
   background: var(--bg-light);
   color: var(--text-primary);
   border: 1px solid var(--border);
@@ -263,193 +214,456 @@
   color: var(--text-link);
 }</code></pre>
 
-          <h2>Reusable classes</h2>
-          <p>
-            Try to reuse these built in classes in your plugin or theme HTML and
-            CSS. This makes sure your output matches the main UI and benefits
-            from the exact same layout structure. It is always better to use
-            these instead of inventing new classes when the meaning fits
-            perfectly.
-          </p>
+        <h2>Reusable classes</h2>
+        <p>
+          Try to reuse these built in classes in your plugin or theme HTML and
+          CSS. This makes sure your output matches the main UI and benefits
+          from the exact same layout structure. It is always better to use
+          these instead of inventing new classes when the meaning fits
+          perfectly.
+        </p>
 
-          <h3>Generic UI classes (degoog-*)</h3>
-          <p>
-            The main UI is moving toward a small set of generic <code>degoog-*</code>
-            classes. Templates often keep the older specific classes for
-            backwards compatibility, but the styling should be driven by these
-            generic classes and their modifiers.
-          </p>
-          <p>
-            Modifiers follow a BEM-like pattern:
-            <code>.degoog-thing</code> + <code>.degoog-thing--variant</code>.
-          </p>
+        <h3>Generic UI classes (degoog-*)</h3>
+        <p>
+          The main UI is moving toward a small set of generic <code>degoog-*</code>
+          classes. Templates often keep the older specific classes for
+          backwards compatibility, but the styling should be driven by these
+          generic classes and their modifiers.
+        </p>
+        <p>
+          Modifiers follow a BEM-like pattern:
+          <code>.degoog-thing</code> + <code>.degoog-thing--variant</code>.
+        </p>
 
-          <table>
-            <thead>
-              <tr>
-                <th>Class</th>
-                <th>Use</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>.degoog-panel</code></td>
-                <td>Card/panel wrapper (background, border, shadow)</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-panel--accordion</code></td>
-                <td>Accordion wrapper panel (no default padding)</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-panel--slot</code></td>
-                <td>Slot panel wrapper (grid sizing, no default padding)</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-panel--slot-title</code></td>
-                <td>Slot panel title block</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-panel--slot-body</code></td>
-                <td>Slot panel body typography (no padding by default)</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-panel--slot-body-padded</code></td>
-                <td>Slot body padding when the content needs it</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-search-bar</code></td>
-                <td>Search bar shell (icon + input)</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-search-bar--square</code></td>
-                <td>Less-rounded search bar variant</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-dropdown</code></td>
-                <td>Floating dropdown container</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-dropdown--menu</code></td>
-                <td>Menu sizing for dropdowns</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-dropdown--submenu</code></td>
-                <td>Submenu sizing for dropdowns</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-accordion</code></td>
-                <td>Accordion wrapper - adds <code>.open</code> toggle behaviour and chevron rotation</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-accordion-body</code></td>
-                <td>Hidden accordion body, shown when parent has <code>.open</code></td>
-              </tr>
-              <tr>
-                <td><code>.degoog-accordion-body--flex</code></td>
-                <td>Flex variant of the accordion body (for when <code>display: flex</code> is needed on open)</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-accordion-toggle</code></td>
-                <td>Accordion trigger button</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-tab</code></td>
-                <td>Tab button (active state, hover)</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-menu-item</code></td>
-                <td>Button-like list item (hover/focus)</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-menu-item--option</code></td>
-                <td>Option rows (active checkmark)</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-input</code></td>
-                <td>Text input styling</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-input--tools</code></td>
-                <td>Tools dropdown input variant</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-badge</code></td>
-                <td>Small badge/pill</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-icon-btn</code></td>
-                <td>Icon-only button</td>
-              </tr>
-            </tbody>
-          </table>
+        <table>
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Use</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>.degoog-panel</code></td>
+              <td>Card/panel wrapper (background, border, shadow)</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-panel--accordion</code></td>
+              <td>Accordion wrapper panel (no default padding)</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-panel--slot</code></td>
+              <td>Slot panel wrapper (grid sizing, no default padding)</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-panel--slot-title</code></td>
+              <td>Slot panel title block</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-panel--slot-body</code></td>
+              <td>Slot panel body typography (no padding by default)</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-panel--slot-body-padded</code></td>
+              <td>Slot body padding when the content needs it</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-search-bar</code></td>
+              <td>Search bar shell (icon + input)</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-search-bar--square</code></td>
+              <td>Less-rounded search bar variant</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-dropdown</code></td>
+              <td>Floating dropdown container</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-dropdown--menu</code></td>
+              <td>Menu sizing for dropdowns</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-dropdown--submenu</code></td>
+              <td>Submenu sizing for dropdowns</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-accordion</code></td>
+              <td>Accordion wrapper - adds <code>.open</code> toggle behaviour and chevron rotation</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-accordion-body</code></td>
+              <td>Hidden accordion body, shown when parent has <code>.open</code></td>
+            </tr>
+            <tr>
+              <td><code>.degoog-accordion-body--flex</code></td>
+              <td>Flex variant of the accordion body (for when <code>display: flex</code> is needed on open)</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-accordion-toggle</code></td>
+              <td>Accordion trigger button</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-tab</code></td>
+              <td>Tab button (active state, hover)</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-menu-item</code></td>
+              <td>Button-like list item (hover/focus)</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-menu-item--option</code></td>
+              <td>Option rows (active checkmark)</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-input</code></td>
+              <td>Text input styling</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-input--tools</code></td>
+              <td>Tools dropdown input variant</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-badge</code></td>
+              <td>Small badge/pill</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-icon-btn</code></td>
+              <td>Icon-only button</td>
+            </tr>
+          </tbody>
+        </table>
 
-          <p>
-            Note: the app still contains older, more specific classnames (for example
-            <code>.result-*</code>, <code>.glance-*</code>, <code>.btn*</code>) and they may
-            still have styling while the transition is ongoing. They are not considered
-            a stable styling API for themes/plugins. Prefer the <code>degoog-*</code> classes
-            and modifiers above.
-          </p>
+        <p>
+          Note: the app still contains older, more specific classnames (for example
+          <code>.result-*</code>, <code>.glance-*</code>, <code>.btn*</code>) and they may
+          still have styling while the transition is ongoing. They are not considered
+          a stable styling API for themes/plugins. Prefer the <code>degoog-*</code> classes
+          and modifiers above.
+        </p>
 
-          <h3>Theme template migration (append-only)</h3>
-          <p>
-            Theme templates can keep their legacy classes and append the generic
-            <code>degoog-*</code> classes (and modifiers) so they pick up the built-in UI
-            styling without breaking older selectors.
-          </p>
-          <pre><code>DRY_RUN=1 bash scripts/theme-append-degoog-classes.sh data/themes/MyTheme
+        <h3>Theme template migration (append-only)</h3>
+        <p>
+          Theme templates can keep their legacy classes and append the generic
+          <code>degoog-*</code> classes (and modifiers) so they pick up the built-in UI
+          styling without breaking older selectors.
+        </p>
+        <pre><code>DRY_RUN=1 bash scripts/theme-append-degoog-classes.sh data/themes/MyTheme
 bash scripts/theme-append-degoog-classes.sh data/themes/MyTheme</code></pre>
 
-          <h3>Forms and extension settings</h3>
-          <p>
-            If you are rendering settings forms in your plugin UI, these classes
-            will align them perfectly with the standard Settings modals.
-          </p>
-          <table>
-            <thead>
-              <tr>
-                <th>Class</th>
-                <th>Use</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>.degoog-input</code></td>
-                <td>Text inputs and textareas</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-select-wrap</code></td>
-                <td>Select wrappers (adds chevron)</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-toggle-wrap</code></td>
-                <td>Toggle rows</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-toggle</code></td>
-                <td>Toggle slider (pill)</td>
-              </tr>
-              <tr>
-                <td><code>.degoog-panel</code></td>
-                <td>Panels/cards used across settings and modals</td>
-              </tr>
-            </tbody>
-          </table>
+        <h3>Forms and extension settings</h3>
+        <p>
+          If you are rendering settings forms in your plugin UI, these classes
+          will align them perfectly with the standard Settings modals.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Use</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>.degoog-input</code></td>
+              <td>Text inputs and textareas</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-select-wrap</code></td>
+              <td>Select wrappers (adds chevron)</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-toggle-wrap</code></td>
+              <td>Toggle rows</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-toggle</code></td>
+              <td>Toggle slider (pill)</td>
+            </tr>
+            <tr>
+              <td><code>.degoog-panel</code></td>
+              <td>Panels/cards used across settings and modals</td>
+            </tr>
+          </tbody>
+        </table>
 
-          <h3>Layout and chrome</h3>
-          <p>
-            Use the <code>degoog-*</code> classes above for UI elements you want
-            to look consistent with the built-in theme.
-          </p>
-        </main>
-      </div>
-      <div id="degoog-docs-backdrop" class="degoog-docs-backdrop"></div>
+        <h3>Layout and chrome</h3>
+        <p>
+          Use the <code>degoog-*</code> classes above for UI elements you want
+          to look consistent with the built-in theme.
+        </p>
+
+        <h2>Grid-System</h2>
+        <p>A lightweight, CSS-Grid-based 12-column layout system used to build for example widgets (translate boxes,
+          knowledge
+          panels, &quot;at a glance&quot; cards, etc.) in the degoog.</p>
+        <h3>1. Core Concept</h3>
+        <p>The container gets <code>degoog-grid</code>; its <strong>direct children</strong> are placed across the 12
+          columns
+          via <code>col-*</code> classes.</p>
+        <pre><code class="language-html">&lt;section class=&quot;degoog-grid&quot;&gt;
+  &lt;div class=&quot;col-8&quot;&gt;Search results&lt;/div&gt;
+  &lt;div class=&quot;col-4&quot;&gt;Knowledge panel&lt;/div&gt;
+&lt;/section&gt;
+</code></pre>
+        <p><strong>Rules:</strong></p>
+        <ul>
+          <li><code>col-*</code> classes work <strong>only on direct children</strong> of <code>.degoog-grid</code>.
+          </li>
+          <li>Columns per row should add up to <strong>12</strong>; exceeding it wraps to the next row.</li>
+          <li>Default gaps: <code>.75rem</code> horizontal and vertical.</li>
+        </ul>
+        <h3>2. Column Widths (<code>col-1</code>–<code>col-12</code>)</h3>
+        <p>Each column spans N of the 12 tracks (<code>grid-column: span N</code>).</p>
+        <pre><code class="language-html">&lt;!-- Result list beside a side panel --&gt;
+&lt;section class=&quot;degoog-grid&quot;&gt;
+  &lt;div class=&quot;col-8&quot;&gt;Result list&lt;/div&gt;
+  &lt;div class=&quot;col-4&quot;&gt;Wikipedia summary&lt;/div&gt;
+&lt;/section&gt;
+
+&lt;!-- Full-width widget (e.g. translate box on top) --&gt;
+&lt;section class=&quot;degoog-grid&quot;&gt;
+  &lt;div class=&quot;col-12&quot;&gt;Translate widget&lt;/div&gt;
+&lt;/section&gt;
+</code></pre>
+        <p><strong>Auto-wrapping</strong> when totals exceed 12:</p>
+        <pre><code class="language-html">&lt;section class=&quot;degoog-grid&quot;&gt;
+  &lt;div class=&quot;col-8&quot;&gt;Map widget&lt;/div&gt;
+  &lt;div class=&quot;col-8&quot;&gt;Wraps to next row (8 + 8 &gt; 12)&lt;/div&gt;
+&lt;/section&gt;
+</code></pre>
+        <h3>3. Responsive Behavior</h3>
+        <p>Mobile-first breakpoints; a larger breakpoint overrides smaller ones.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Prefix</th>
+              <th>From</th>
+              <th>Target</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>col-*</code></td>
+              <td><code>0px</code></td>
+              <td>Mobile</td>
+            </tr>
+            <tr>
+              <td><code>col-sm-*</code></td>
+              <td><code>≥ 480px</code></td>
+              <td>Large phones</td>
+            </tr>
+            <tr>
+              <td><code>col-md-*</code></td>
+              <td><code>≥ 780px</code></td>
+              <td>Tablets</td>
+            </tr>
+            <tr>
+              <td><code>col-lg-*</code></td>
+              <td><code>≥ 1024px</code></td>
+              <td>Desktop</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>Stack classes to change width per breakpoint:</p>
+        <pre><code class="language-html">&lt;!-- Side panel sits below results on mobile, beside them on desktop --&gt;
+&lt;section class=&quot;degoog-grid&quot;&gt;
+  &lt;main class=&quot;col-12 col-lg-8&quot;&gt;Search results&lt;/main&gt;
+  &lt;aside class=&quot;col-12 col-lg-4&quot;&gt;Knowledge panel&lt;/aside&gt;
+&lt;/section&gt;
+</code></pre>
+        <p>Widget grid that reflows from 1 → 2 → 4 per row:</p>
+        <pre><code class="language-html">&lt;section class=&quot;degoog-grid&quot;&gt;
+  &lt;div class=&quot;col-12 col-sm-6 col-lg-3&quot;&gt;Weather&lt;/div&gt;
+  &lt;div class=&quot;col-12 col-sm-6 col-lg-3&quot;&gt;Currency&lt;/div&gt;
+  &lt;div class=&quot;col-12 col-sm-6 col-lg-3&quot;&gt;Time zone&lt;/div&gt;
+  &lt;div class=&quot;col-12 col-sm-6 col-lg-3&quot;&gt;Calculator&lt;/div&gt;
+&lt;/section&gt;
+</code></pre>
+        <h3>4. Visibility (<code>hidden</code> / <code>show</code>)</h3>
+        <p>Toggle rendering per breakpoint via <code>display</code>.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Effect</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>col-hidden</code></td>
+              <td><code>display: none</code></td>
+            </tr>
+            <tr>
+              <td><code>col-show</code></td>
+              <td><code>display: block</code></td>
+            </tr>
+            <tr>
+              <td><code>col-md-hidden</code></td>
+              <td>Hidden from <code>≥ 780px</code></td>
+            </tr>
+            <tr>
+              <td><code>col-lg-show</code></td>
+              <td>Shown from <code>≥ 1024px</code></td>
+            </tr>
+          </tbody>
+        </table>
+        <pre><code class="language-html">&lt;section class=&quot;degoog-grid&quot;&gt;
+  &lt;!-- Knowledge panel: hidden on mobile, shown from desktop --&gt;
+  &lt;main class=&quot;col-12 col-lg-8&quot;&gt;Results&lt;/main&gt;
+  &lt;aside class=&quot;col-hidden col-lg-show col-lg-4&quot;&gt;Knowledge panel&lt;/aside&gt;
+&lt;/section&gt;
+</code></pre>
+        <blockquote>
+          <p><code>col-show</code> resets to <code>display: block</code> — use it to re-enable an element hidden at a
+            smaller
+            breakpoint.</p>
+        </blockquote>
+        <h3>5. Horizontal Alignment (<code>left</code> / <code>center</code> / <code>right</code>)</h3>
+        <p>Aligns content inside its cell (<code>justify-self</code>) when it's narrower than the column. Responsive
+          variants
+          exist (<code>col-md-right</code>, etc.).</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Alignment</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>col-left</code></td>
+              <td>start</td>
+            </tr>
+            <tr>
+              <td><code>col-center</code></td>
+              <td>center</td>
+            </tr>
+            <tr>
+              <td><code>col-right</code></td>
+              <td>end</td>
+            </tr>
+          </tbody>
+        </table>
+        <pre><code class="language-html">&lt;!-- Translate widget: &quot;swap languages&quot; button centered, action right --&gt;
+&lt;section class=&quot;degoog-grid&quot;&gt;
+  &lt;div class=&quot;col-6 col-center&quot;&gt;↔ Swap languages&lt;/div&gt;
+  &lt;div class=&quot;col-6 col-right&quot;&gt;Listen 🔊&lt;/div&gt;
+&lt;/section&gt;
+</code></pre>
+        <h3>6. Container Modifiers</h3>
+        <h4><code>degoog-grid--no-gap</code> — removes all gaps</h4>
+        <pre><code class="language-html">&lt;!-- Seamless image-result strip --&gt;
+&lt;section class=&quot;degoog-grid degoog-grid--no-gap&quot;&gt;
+  &lt;div class=&quot;col-3&quot;&gt;&lt;img src=&quot;1.jpg&quot; alt=&quot;&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;col-3&quot;&gt;&lt;img src=&quot;2.jpg&quot; alt=&quot;&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;col-3&quot;&gt;&lt;img src=&quot;3.jpg&quot; alt=&quot;&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;col-3&quot;&gt;&lt;img src=&quot;4.jpg&quot; alt=&quot;&quot;&gt;&lt;/div&gt;
+&lt;/section&gt;
+</code></pre>
+        <h4><code>degoog-grid--vertical-align-center</code> — vertically centers columns</h4>
+        <pre><code class="language-html">&lt;!-- Knowledge panel: thumbnail centered against its text --&gt;
+&lt;section class=&quot;degoog-grid degoog-grid--vertical-align-center&quot;&gt;
+  &lt;div class=&quot;col-4&quot;&gt;&lt;img src=&quot;thumb.jpg&quot; alt=&quot;&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;col-8&quot;&gt;Wikipedia summary text&lt;/div&gt;
+&lt;/section&gt;
+</code></pre>
+        <h3>7. Complete Example: Search Results Page</h3>
+        <pre><code class="language-html">&lt;section class=&quot;degoog-grid degoog-grid--vertical-align-center&quot;&gt;
+
+  &lt;!-- Translate widget on top, full width --&gt;
+  &lt;div class=&quot;col-12&quot;&gt;Translate: &quot;hola&quot; → &quot;hello&quot;&lt;/div&gt;
+
+  &lt;!-- Results column + knowledge panel --&gt;
+  &lt;main class=&quot;col-12 col-lg-8&quot;&gt;Search result list&lt;/main&gt;
+  &lt;aside class=&quot;col-hidden col-lg-show col-lg-4&quot;&gt;Knowledge panel&lt;/aside&gt;
+
+  &lt;!-- &quot;At a glance&quot; mini-widgets: 1 → 2 → 4 per row --&gt;
+  &lt;div class=&quot;col-12 col-sm-6 col-lg-3&quot;&gt;Weather&lt;/div&gt;
+  &lt;div class=&quot;col-12 col-sm-6 col-lg-3&quot;&gt;Currency&lt;/div&gt;
+  &lt;div class=&quot;col-12 col-sm-6 col-lg-3&quot;&gt;Sports score&lt;/div&gt;
+  &lt;div class=&quot;col-12 col-sm-6 col-lg-3&quot;&gt;Stock price&lt;/div&gt;
+
+&lt;/section&gt;
+</code></pre>
+        <h3>8. Best Practices &amp; Gotchas</h3>
+        <ul>
+          <li><strong>Always set a base <code>col-*</code></strong> (e.g. <code>col-12</code>) so mobile behavior is
+            explicit.
+          </li>
+          <li><strong>Keep rows summing to 12</strong> for predictable layouts; intentional overflow wraps.</li>
+          <li><strong>Direct children only</strong> — nest a new <code>.degoog-grid</code> for sub-grids inside a
+            widget.</li>
+          <li><strong><code>col-show</code> needs a prior <code>hidden</code></strong> to act as a reveal toggle.</li>
+          <li><strong>Alignment helpers</strong> only matter when content is narrower than its column.</li>
+        </ul>
+        <h3>9. Quick Reference</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Base</th>
+              <th>sm (≥480)</th>
+              <th>md (≥780)</th>
+              <th>lg (≥1024)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Width</td>
+              <td><code>col-1…12</code></td>
+              <td><code>col-sm-1…12</code></td>
+              <td><code>col-md-1…12</code></td>
+              <td><code>col-lg-1…12</code></td>
+            </tr>
+            <tr>
+              <td>Hide</td>
+              <td><code>col-hidden</code></td>
+              <td><code>col-sm-hidden</code></td>
+              <td><code>col-md-hidden</code></td>
+              <td><code>col-lg-hidden</code></td>
+            </tr>
+            <tr>
+              <td>Show</td>
+              <td><code>col-show</code></td>
+              <td><code>col-sm-show</code></td>
+              <td><code>col-md-show</code></td>
+              <td><code>col-lg-show</code></td>
+            </tr>
+            <tr>
+              <td>Align left</td>
+              <td><code>col-left</code></td>
+              <td><code>col-sm-left</code></td>
+              <td><code>col-md-left</code></td>
+              <td><code>col-lg-left</code></td>
+            </tr>
+            <tr>
+              <td>Align center</td>
+              <td><code>col-center</code></td>
+              <td><code>col-sm-center</code></td>
+              <td><code>col-md-center</code></td>
+              <td><code>col-lg-center</code></td>
+            </tr>
+            <tr>
+              <td>Align right</td>
+              <td><code>col-right</code></td>
+              <td><code>col-sm-right</code></td>
+              <td><code>col-md-right</code></td>
+              <td><code>col-lg-right</code></td>
+            </tr>
+          </tbody>
+        </table>
+        <p><strong>Container modifiers:</strong> <code>degoog-grid--no-gap</code>,
+          <code>degoog-grid--vertical-align-center</code>
+        </p>
+
+      </main>
     </div>
-    <script
-      src="https://code.jquery.com/jquery-4.0.0.min.js"
-      crossorigin="anonymous"
-    ></script>
-    <script src="docs.js"></script>
-    <script src="docs-ui.js"></script>
-  </body>
+    <div id="degoog-docs-backdrop" class="degoog-docs-backdrop"></div>
+  </div>
+  <script src="https://code.jquery.com/jquery-4.0.0.min.js" crossorigin="anonymous"></script>
+  <script src="docs.js"></script>
+  <script src="docs-ui.js"></script>
+</body>
+
 </html>
