@@ -290,6 +290,32 @@
             the URL of the first result.
           </p>
 
+          <h2><code>GET /api/extensions</code></h2>
+          <p>
+            Lists the extensions installed on your instance, grouped by kind:
+            <code>engines</code>, <code>plugins</code>, <code>themes</code>,
+            <code>transports</code>, and <code>autocomplete</code>. Each item
+            includes its <code>id</code>, which is the same id you pass to the
+            <code>engines</code> field of <code>/api/search</code>.
+          </p>
+          <p>
+            Pass <code>?type=</code> to fetch a single kind. Accepted values are
+            <code>engine</code>, <code>plugin</code>, <code>theme</code>,
+            <code>transport</code>, and <code>autocomplete</code>. The response
+            keeps the same shape, with only the matching group present. Handy for
+            discovering valid engine ids before restricting a search (for
+            example from the
+            <a href="https://github.com/degoog-org/degoog/tree/main/mcp">degoog-mcp</a>
+            sidecar). An unknown type returns <code>400</code>.
+          </p>
+          <pre><code>curl "http://localhost:4444/api/extensions?type=engine"</code></pre>
+          <pre><code>{
+  "engines": [
+    { "id": "brave", "displayName": "Brave", "...": "..." },
+    { "id": "duckduckgo", "displayName": "DuckDuckGo", "...": "..." }
+  ]
+}</code></pre>
+
           <h2><code>GET /opensearch.xml</code></h2>
           <p>
             OpenSearch descriptor that allows browsers to install Degoog as a
