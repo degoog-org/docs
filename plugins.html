@@ -333,13 +333,38 @@
             <code>key</code>, <code>label</code>, and <code>type</code>. The
             type can be <code>text</code>, <code>password</code>,
             <code>url</code>, <code>toggle</code>, <code>textarea</code>,
-            <code>select</code>, or <code>urllist</code>. You can also add
-            optional flags like <code>required</code>, <code>placeholder</code>,
+            <code>select</code>, <code>urllist</code>, <code>list</code>, or
+            <code>info</code>. You can also add optional flags like
+            <code>required</code>, <code>placeholder</code>,
             <code>description</code>, or <code>secret</code>. Secret fields are
             never sent back to the browser. If you use the
             <code>select</code> type, you will need to add an
             <code>options</code> array containing your string choices.
           </p>
+          <p>
+            The <code>list</code> type lets users manage a repeatable list of
+            structured rows. Add an <code>itemSchema</code> array describing one
+            row (each entry is itself a field with a <code>key</code>,
+            <code>label</code> and <code>type</code> such as <code>text</code> or
+            <code>toggle</code>), and an optional <code>addLabel</code> for the
+            add button. The value is stored and passed to
+            <code>configure(settings)</code> as a JSON array of objects, so parse
+            it with <code>JSON.parse</code>.
+          </p>
+          <pre><code>settingsSchema: [
+  {
+    key: "bangs",
+    label: "Custom bangs",
+    type: "list",
+    addLabel: "+ Add bang",
+    itemSchema: [
+      { key: "name", label: "Name", type: "text" },
+      { key: "shortcut", label: "Shortcut", type: "text" },
+      { key: "url", label: "URL template", type: "text" },
+      { key: "openBase", label: "Open base path", type: "toggle" }
+    ]
+  }
+]</code></pre>
           <h3>How settings work</h3>
           <ol>
             <li>
@@ -368,6 +393,22 @@
           </ol>
           <p><strong>Examples from the official store:</strong></p>
           <ul>
+            <li>
+              <a
+                href="https://github.com/degoog-org/official-extensions/tree/main/plugins/custom-bangs"
+                class="external"
+                target="_blank"
+                rel="noopener"
+                >Custom Bangs</a
+              >
+              lets users define their own bang shortcuts that redirect to any
+              site. It uses a <code>list</code> setting for the bangs and a small
+              client script that rewrites the query. Type
+              <code>!&lt;shortcut&gt; terms</code> (leading or trailing); the
+              <code>{{{s}}}</code> or <code>%s</code> placeholder in the URL
+              template is replaced with the query, and a bare bang can open the
+              base path or snap domain.
+            </li>
             <li>
               <a
                 href="https://github.com/degoog-org/official-extensions/tree/main/plugins/weather"
