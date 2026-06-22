@@ -81,6 +81,10 @@
               ><i class="fa-solid fa-puzzle-piece fa-lg"></i
               ><span class="degoog-docs-nav-item-name"> Plugins</span></a
             >
+            <a href="shortcuts.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-arrow-down-a-z fa-lg"></i></i
+              ><span class="degoog-docs-nav-item-name"> Shortcuts</span></a
+            >
             <a href="themes.html" class="degoog-docs-nav-item"
               ><i class="fa-solid fa-palette fa-lg"></i
               ><span class="degoog-docs-nav-item-name"> Themes</span></a
@@ -160,11 +164,13 @@
             then Store).
           </p>
 
-          <h2>Running Degoog</h2>
+          <h2 id="running-degoog">Running Degoog</h2>
           <p>
             By default the app will run on port <code>4444</code> with user
-            <code>1000:1000</code>. Please check the environment variable
-            documentation for a comprehensive list of configuration options.
+            <code>1000:1000</code>. Put your configuration in a
+            <code>.env</code> file and load it as shown below - see
+            <a href="env.html">Environment variables</a> for the full list of
+            options and other deployment methods.
           </p>
           <p>First, prepare your data directory:</p>
           <pre><code>mkdir -p ./data
@@ -174,6 +180,7 @@ sudo chown -R 1000:1000 ./data</code></pre>
           <pre><code>services:
   degoog:
     image: ghcr.io/degoog-org/degoog:latest
+    env_file: .env
     volumes:
       - ./data:/app/data
     ports:
@@ -181,7 +188,7 @@ sudo chown -R 1000:1000 ./data</code></pre>
     restart: unless-stopped</code></pre>
 
           <h3>Inline podman</h3>
-          <pre><code>podman run -d --name degoog -p 4444:4444 -v ./data:/app/data --security-opt label=disable --restart unless-stopped ghcr.io/degoog-org/degoog:latest</code></pre>
+          <pre><code>podman run -d --name degoog --env-file .env -p 4444:4444 -v ./data:/app/data --security-opt label=disable --restart unless-stopped ghcr.io/degoog-org/degoog:latest</code></pre>
 
           <h3>Podman Quadlet Container File</h3>
           <pre><code>[Unit]
@@ -193,7 +200,7 @@ After=network-online.target
 Image=ghcr.io/degoog-org/degoog:latest
 AutoUpdate=registry
 ContainerName=degoog
-Environment=TZ=&lt;Country/City&gt;
+EnvironmentFile=&lt;Path to .env&gt;
 Environment=PUID=1000
 Environment=PGID=1000
 UIDMap=+%U:@%U
@@ -208,7 +215,26 @@ Restart=always
 WantedBy=default.target</code></pre>
 
           <h3>Inline docker</h3>
-          <pre><code>docker run -d --name degoog -p 4444:4444 -v ./data:/app/data --restart unless-stopped ghcr.io/degoog-org/degoog:latest</code></pre>
+          <pre><code>docker run -d --name degoog --env-file .env -p 4444:4444 -v ./data:/app/data --restart unless-stopped ghcr.io/degoog-org/degoog:latest</code></pre>
+
+          <h3>Release tarball</h3>
+          <p>
+            Download the prebuilt archive from
+            <a
+              href="https://github.com/degoog-org/degoog/releases"
+              class="external"
+              target="_blank"
+              rel="noopener"
+              >GitHub releases</a
+            >. You need bun, git, and curl on the host. Create a
+            <code>.env</code> file in the extracted folder before starting -
+            see <a href="env.html">Environment variables</a> for a full walkthrough
+            and every supported option.
+          </p>
+          <pre><code>tar -xzf degoog_*_prebuild.tar.gz
+cd degoog
+mkdir -p ./data
+bun run src/server/index.ts</code></pre>
 
           <h3>Run natively</h3>
           <p>

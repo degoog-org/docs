@@ -4,6 +4,7 @@
   var DOC_PAGES = [
     "index.html",
     "plugins.html",
+    "shortcuts.html",
     "themes.html",
     "engines.html",
     "store.html",
