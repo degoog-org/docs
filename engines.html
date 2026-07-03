@@ -259,6 +259,62 @@ export const type = ["web", "karakeep"]  // shows in Web tab AND Karakeep tab</c
             A runtime override always takes precedence over the exported <code>type</code>.
           </p>
 
+          <h2>Image filters</h2>
+          <p>
+            Image engines (engines whose <code>type</code> includes
+            <code>"images"</code>) can declare exactly which filters they
+            support by exporting a <code>filters</code> object. Each key is a
+            filter group and each value is the list of option values your engine
+            actually translates into an upstream request. degoog renders the
+            image filter bar from the <strong>union</strong> of the declared
+            filters across every <em>enabled</em> image engine, so users only
+            ever see options that will really take effect.
+          </p>
+          <p>
+            <strong>Exclusion:</strong> when a filter is active, any engine that
+            does not declare that exact value is <em>dropped from that search</em>
+            (rather than returning unfiltered results that pollute the grid). So
+            if the user picks <code>color: red</code>, only engines that list
+            <code>red</code> under <code>color</code> run; everything else sits
+            that search out. Declare a group honestly, only list values you map.
+            This is why an engine that exports no <code>filters</code> at all is
+            excluded the moment any filter is active.
+          </p>
+          <p>
+            Requires degoog <code>0.23.0</code> or newer. Set
+            <code>minDegoogVersion</code> accordingly in your store manifest.
+          </p>
+          <pre><code>export const type = "images"
+export const filters = {
+  size: ["small", "medium", "large", "wallpaper"],
+  color: ["red", "blue", "green", "transparent"],
+  type: ["photo", "clipart", "lineart", "animated"],
+  layout: ["square", "wide", "tall"],
+  nsfw: ["on", "moderate", "off"],
+}</code></pre>
+          <p>
+            The recognised groups are <code>size</code>, <code>color</code>,
+            <code>type</code>, <code>layout</code> and <code>nsfw</code>
+            (shown in the UI as <strong>Safe mode</strong>, defaulting to
+            <code>moderate</code>). Only declare the values you map; e.g. an
+            engine that supports nothing but a mature toggle can export
+            <code>{ nsfw: ["off"] }</code>.
+          </p>
+          <p>
+            <code>transparent</code> is just another value. Some engines treat
+            it as a colour (Google), others as a type (Bing, DuckDuckGo). Put it
+            under whichever group your engine implements it in, and degoog will
+            show it there. If two enabled engines place it in different groups,
+            it simply appears in both dropdowns, and each engine applies the one
+            it understands.
+          </p>
+          <p>
+            The user's selection arrives on <code>context.imageFilter</code> as a
+            plain object keyed by group, e.g.
+            <code>{ color: "red", nsfw: "moderate" }</code>. Read only the keys
+            you declared; anything you do not map is safely ignored.
+          </p>
+
           <h2>Language &amp; time filters</h2>
           <p>
             When someone selects a language or time filter in the UI, those
