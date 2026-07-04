@@ -81,6 +81,10 @@
               ><i class="fa-solid fa-puzzle-piece fa-lg"></i
               ><span class="degoog-docs-nav-item-name"> Plugins</span></a
             >
+            <a href="shortcuts.html" class="degoog-docs-nav-item"
+              ><i class="fa-solid fa-arrow-down-a-z fa-lg"></i></i
+              ><span class="degoog-docs-nav-item-name"> Shortcuts</span></a
+            >
             <a href="themes.html" class="degoog-docs-nav-item"
               ><i class="fa-solid fa-palette fa-lg"></i
               ><span class="degoog-docs-nav-item-name"> Themes</span></a
@@ -371,6 +375,15 @@
               <a href="plugins.html#declaring-client-exposure">Declaring client exposure</a>.
             </li>
           </ul>
+          <p>
+            Set <code>needsAppRestart = true</code> if your transport cannot
+            work correctly until the Degoog server process restarts, for example
+            because it registers boot-time server behavior. When installed or
+            updated via the Store, Degoog will show a restart required warning on
+            the extension and in the admin Server tab until the instance owner
+            restarts.
+          </p>
+          <pre><code>export const needsAppRestart = true;</code></pre>
 
           <h2>Setup</h2>
           <p>
