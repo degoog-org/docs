@@ -384,6 +384,18 @@
                 <td><code>.degoog-icon-btn</code></td>
                 <td>Icon-only button</td>
               </tr>
+              <tr>
+                <td><code>.degoog-drag-handle</code></td>
+                <td>Grab handle for drag-to-reorder lists (see helper below)</td>
+              </tr>
+              <tr>
+                <td><code>.degoog-dragging</code></td>
+                <td>Added by the helper to the item being dragged</td>
+              </tr>
+              <tr>
+                <td><code>.degoog-drag-active</code></td>
+                <td>Added by the helper to the list while a drag is in progress</td>
+              </tr>
             </tbody>
           </table>
 
@@ -434,6 +446,14 @@ bash scripts/theme-append-degoog-classes.sh data/themes/MyTheme</code></pre>
                 <td>Toggle slider (pill)</td>
               </tr>
               <tr>
+                <td><code>.degoog-checkbox-wrap</code></td>
+                <td>Checkbox rows, for dense multi-option lists (see below)</td>
+              </tr>
+              <tr>
+                <td><code>.degoog-checkbox</code></td>
+                <td>Checkbox square</td>
+              </tr>
+              <tr>
                 <td><code>.degoog-panel</code></td>
                 <td>Panels/cards used across settings and modals</td>
               </tr>
@@ -444,6 +464,79 @@ bash scripts/theme-append-degoog-classes.sh data/themes/MyTheme</code></pre>
           <p>
             Use the <code>degoog-*</code> classes above for UI elements you want
             to look consistent with the built-in theme.
+          </p>
+
+          <h2>Drag-to-reorder helper</h2>
+          <p>
+            The app exposes a small, dependency-free drag-to-reorder helper on
+            <code>window.__degoogDrag</code>. It is the same helper used by the
+            built-in plugins list and the tab-order dialog, so your lists get the
+            exact same feel (finger-following on touch, smooth slide animations,
+            no text selection while dragging). It works on desktop and mobile
+            because it is built on Pointer Events.
+          </p>
+          <p>
+            You provide a list element, a selector for the items inside it, a
+            selector for the grab handle, and an <code>onReorder</code> callback.
+            The helper reorders the DOM live; when the user drops an item it calls
+            <code>onReorder</code> with the list and the moved item so you can
+            persist the new order.
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Option</th>
+                <th>Use</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>itemSelector</code></td>
+                <td>Selector matching each reorderable child of the list</td>
+              </tr>
+              <tr>
+                <td><code>handleSelector</code></td>
+                <td>Selector for the grab handle inside each item (drag only starts from here)</td>
+              </tr>
+              <tr>
+                <td><code>onReorder(list, item)</code></td>
+                <td>Called after a drop; DOM order is already final. Read it and persist.</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            Give your handle the <code>degoog-drag-handle</code> class so it picks
+            up the standard grip styling (and the <code>touch-action</code> needed
+            for reliable mobile dragging). The helper adds
+            <code>degoog-dragging</code> to the active item and
+            <code>degoog-drag-active</code> to the list while dragging.
+          </p>
+          <pre><code>&lt;ul id="my-list"&gt;
+  &lt;li class="my-row" data-id="a"&gt;
+    Item A
+    &lt;span class="degoog-drag-handle" data-drag-handle&gt;
+      &lt;i class="fa-solid fa-grip-vertical"&gt;&lt;/i&gt;
+    &lt;/span&gt;
+  &lt;/li&gt;
+  &lt;!-- more rows... --&gt;
+&lt;/ul&gt;
+
+&lt;script&gt;
+  const list = document.getElementById("my-list");
+  window.__degoogDrag.init(list, {
+    itemSelector: ".my-row",
+    handleSelector: "[data-drag-handle]",
+    onReorder: (el) =&gt; {
+      const order = Array.from(el.querySelectorAll(".my-row"))
+        .map((row) =&gt; row.dataset.id);
+      // persist `order` however your plugin stores it
+    },
+  });
+&lt;/script&gt;</code></pre>
+          <p>
+            Note: <code>window.__degoogDrag</code> is available on the main search
+            page (where plugin and theme scripts run). Call
+            <code>init</code> once per list after it is in the DOM.
           </p>
         </main>
       </div>
