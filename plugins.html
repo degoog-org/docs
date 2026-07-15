@@ -336,24 +336,46 @@
             For your <code>settingsSchema</code>, each field requires a
             <code>key</code>, <code>label</code>, and <code>type</code>. The
             type can be <code>text</code>, <code>password</code>,
-            <code>url</code>, <code>toggle</code>, <code>textarea</code>,
-            <code>select</code>, <code>urllist</code>, <code>list</code>, or
-            <code>info</code>. You can also add optional flags like
-            <code>required</code>, <code>placeholder</code>,
+            <code>url</code>, <code>number</code>, <code>toggle</code>,
+            <code>textarea</code>, <code>select</code>, <code>hex</code>,
+            <code>range</code>, <code>file</code>, <code>urllist</code>,
+            <code>list</code>, or <code>info</code>. You can also add optional
+            flags like <code>required</code>, <code>placeholder</code>,
             <code>description</code>, or <code>secret</code>. Secret fields are
             never sent back to the browser. If you use the
             <code>select</code> type, you will need to add an
             <code>options</code> array containing your string choices.
           </p>
           <p>
+            The <code>hex</code> type shows a colour picker paired with a text
+            input and stores a <code>#rrggbb</code> string. The
+            <code>range</code> type renders a slider; set <code>min</code>,
+            <code>max</code> and <code>step</code> and it stores the chosen
+            number as a string. The <code>file</code> type lets users upload a
+            file; restrict it with <code>accept</code> (a comma-separated list of
+            MIME types or extensions such as <code>"image/*,.png"</code>) and
+            <code>maxSizeKb</code> / <code>minSizeKb</code>. The file is stored
+            inside your plugin's own <code>uploads/</code> folder and the setting
+            value is the served path (for example
+            <code>/plugins/&lt;folderName&gt;/uploads/logo-abc123.png</code>),
+            ready to use directly or via <code>ctx.readFile</code>.
+          </p>
+          <p>
+            Group related fields by giving them the same <code>fieldset</code>
+            string; matching fields render together under one titled fieldset in
+            the Configure modal, in first-seen order.
+          </p>
+          <p>
             The <code>list</code> type lets users manage a repeatable list of
             structured rows. Add an <code>itemSchema</code> array describing one
             row (each entry is itself a field with a <code>key</code>,
-            <code>label</code> and <code>type</code> such as <code>text</code> or
-            <code>toggle</code>), and an optional <code>addLabel</code> for the
-            add button. The value is stored and passed to
-            <code>configure(settings)</code> as a JSON array of objects, so parse
-            it with <code>JSON.parse</code>.
+            <code>label</code> and <code>type</code> such as <code>text</code>,
+            <code>toggle</code>, <code>hex</code>, <code>range</code> or
+            <code>file</code>), and an optional <code>addLabel</code> for the
+            add button. Rows can be reordered by drag and drop (or the keyboard
+            arrow keys on the grip handle); the stored order is the row position.
+            The value is stored and passed to <code>configure(settings)</code> as
+            a JSON array of objects, so parse it with <code>JSON.parse</code>.
           </p>
           <pre><code>settingsSchema: [
   {
@@ -500,6 +522,7 @@
             <li>
               <strong>position</strong>: Choose between
               <code>above-results</code>, <code>below-results</code>,
+              <code>full-width-above-results</code>,
               <code>above-sidebar</code>, <code>below-sidebar</code>,
               <code>knowledge-panel</code>, or <code>at-a-glance</code>. Please
               use the specific sidebar positions instead of the old deprecated
@@ -552,6 +575,17 @@
             appears. If you leave it empty or omit it, the slot simply uses your
             fixed <code>position</code> value.
           </p>
+          <h3 id="full-width-above-results-slot">Full width above results slot</h3>
+          <p>
+            Setting your position to <code>full-width-above-results</code>
+            renders your panel above the whole results layout, spanning the full
+            content width across both the results column and the sidebar. Degoog
+            only gives this slot the shared width and horizontal padding so it
+            lines up with the rest of the page. It applies no background, border,
+            radius, or inner padding, so the look is entirely up to you. This is
+            the recommended position for large media-style panels that need more
+            room than the results column allows.
+          </p>
           <h3>Sidebar positions</h3>
           <p>
             Using <code>above-sidebar</code> renders right at the top of the
@@ -578,6 +612,17 @@
             with the query and results. Your
             <code>execute(query, context)</code> function will always receive
             <code>context.results</code> for these types of slots.
+          </p>
+          <h3 id="targeting-a-slot">Targeting a slot from CSS</h3>
+          <p>
+            Every injected slot panel carries a
+            <code>data-slot</code> attribute set to your extension id on its top
+            parent element, so you can target a specific slot from your
+            <code>style.css</code> without relying on the generic wrapper
+            classes. For example, a slot with the id <code>tmdb-slot</code> can be
+            styled with <code>[data-slot="tmdb-slot"] { ... }</code>. This applies
+            to the results and sidebar positions as well as
+            <code>full-width-above-results</code>.
           </p>
           <p><strong>Examples from the official store:</strong></p>
           <ul>
