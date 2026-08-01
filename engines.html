@@ -165,6 +165,137 @@
             a <strong>name</strong> and <strong>executeSearch</strong>.
           </p>
 
+          <h2>Compatibility layers</h2>
+          <p>
+            Compatibility layers let Degoog load engines written for another
+            search-engine runtime and expose them as normal Degoog engines.
+            These engines still run through Degoog's engine registry, settings
+            list, bang shortcuts, configured transports, and result pipeline.
+          </p>
+          <p>
+            Compatibility engines are marked in Settings then Engines with a
+            small badge showing the layer name, for example <code>searx</code>.
+          </p>
+
+          <h3>SearXNG Python engines</h3>
+          <p>
+            Degoog can run SearXNG-style Python engine files as normal Degoog
+            engines. It does not run a SearXNG instance. Degoog asks the Python
+            engine to build the request and parse the response, and performs
+            every HTTP fetch itself through its own transports, proxies and
+            timeouts.
+          </p>
+
+          <h4>Installing them</h4>
+          <p>
+            Go to Settings then Engines and use
+            <strong>Add from SearXNG</strong>. The modal lists the
+            <strong>80</strong> engines currently verified to return results
+            through the layer. Installing pulls the file from upstream into
+            <code>data/searx/engines/</code> and refreshes the engine list
+            straight away, so no restart is needed.
+          </p>
+          <p>
+            Files can also be dropped into <code>data/searx/engines/</code> by
+            hand, or into <code>DEGOOG_SEARX_ENGINES_DIR</code> when that
+            environment variable is set. A hand-dropped file needs a restart, and
+            it still has to be on the verified list to load.
+          </p>
+          <p>
+            The filename becomes the bang shortcut, so <code>ebay.py</code>
+            becomes <code>!ebay</code>.
+          </p>
+
+          <h4>Shared files</h4>
+          <p>
+            Some SearXNG engines are built on top of another engine's code.
+            <code>google_cse.py</code> imports from <code>google.py</code>, and
+            <code>apple_maps.py</code> reaches into OpenStreetMap, Wikidata and
+            Wikipedia. Degoog resolves these automatically: the install modal
+            shows a <code>+N shared files</code> badge, asks for confirmation,
+            and downloads everything the engine needs alongside it.
+          </p>
+          <p>
+            Shared files that are not themselves offered as engines
+            (<code>bing</code>, <code>google</code>, <code>json_engine</code>,
+            <code>openstreetmap</code>, <code>wikidata</code>,
+            <code>wikipedia</code>, <code>yahoo</code>) are loaded as libraries
+            only. They never appear as engines, never run searches, and are
+            removed again once no installed engine depends on them.
+          </p>
+
+          <h4>What behaves exactly like a native engine</h4>
+          <p>
+            SearXNG engines are registered in the same list as everything else,
+            so the following work with no special handling:
+          </p>
+          <ul>
+            <li>
+              <strong>Score</strong> and result aggregation. They run through the
+              identical scoring and de-duplication pipeline, so a custom score
+              weights them the same way it weights a store engine.
+            </li>
+            <li>
+              <strong>Safe Search</strong>. Each one gets the same
+              <code>safeSearch</code> dropdown described below, defaulting to
+              <code>moderate</code> for image and video engines and
+              <code>off</code> for the rest.
+            </li>
+            <li>
+              <strong>Proxies and VPN routing</strong>. Every outbound request
+              goes through <code>context.fetch</code>, including the extra
+              token and metadata calls some engines make while building a
+              request. Global proxies and per-engine proxy overrides both apply.
+            </li>
+            <li>
+              <strong>Transports, timeouts and custom user agents</strong>, plus
+              the engine type override, enable and disable toggles, and bang
+              shortcuts.
+            </li>
+            <li>
+              <strong>Paging</strong>. Engines that declare no paging support are
+              skipped past page one rather than repeating their first page.
+            </li>
+            <li>
+              <strong>Time filters</strong>. Sent only to engines that declare
+              support. A custom date range collapses onto the nearest bucket
+              SearXNG understands (day, week, month or year).
+            </li>
+          </ul>
+
+          <h4>Known trade-offs</h4>
+          <p>
+            This is a compatibility layer over code written for a different
+            application, so it is not a perfect match:
+          </p>
+          <ul>
+            <li>
+              <strong>Image filters</strong> beyond Safe Search (size, colour,
+              type, layout) are not translated. A SearXNG image engine drops out
+              of the results while one of those filters is active, rather than
+              returning unfiltered images.
+            </li>
+            <li>
+              <strong>Failure reporting is coarser.</strong> HTTP blocks and rate
+              limits are classified correctly, but an error raised inside the
+              Python parser is reported as a generic network failure.
+            </li>
+            <li>
+              <strong>Upstream bugs come along for the ride.</strong> These files
+              track SearXNG's master branch and are not patched by Degoog. An
+              engine can break when the site it scrapes changes.
+            </li>
+            <li>
+              Each search spawns a short-lived Python process, so these engines
+              carry slightly more overhead than a native one.
+            </li>
+          </ul>
+          <p>
+            Engines that fail to load are logged at boot with the underlying
+            Python error, separately from the list of engines skipped on
+            purpose.
+          </p>
+
           <h2>Engine contract</h2>
           <p><strong>What you need:</strong></p>
           <ul>
