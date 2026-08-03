@@ -1,0 +1,109 @@
+<div class="doc-page-header">
+  <h1><a href="developer.html">Degoog</a> Bang command aliases</h1>
+  <p class="doc-page-desc">
+    Map your custom <code>!alias</code> shortcuts to existing
+    <code>!command</code> triggers.
+  </p>
+</div>
+
+<h2>Setup</h2>
+<ol>
+  <li>
+    Create a file at <code>data/aliases.json</code> or point
+    <code>DEGOOG_ALIASES_FILE</code> to your preferred location.
+  </li>
+  <li>Add your custom shortcuts to the file like this:</li>
+</ol>
+<pre><code>{
+  "jelly": "jellyfin",
+  "search": "meili",
+  "id": "uuid"
+}</code></pre>
+<p>
+  The <strong>key</strong> is your new shortcut (what you type after
+  <code>!</code>) and the <strong>value</strong> is the command it triggers. For
+  example, typing <code>!jelly</code> will now run <code>!jellyfin</code>.
+</p>
+<ol start="3">
+  <li>Restart your server to load your new shortcuts.</li>
+</ol>
+
+<h2>Rules</h2>
+<ul>
+  <li>You cannot override existing command triggers or built in aliases.</li>
+  <li>
+    Your custom aliases will appear in the <code>!help</code> menu right next to
+    the target command.
+  </li>
+</ul>
+
+<h2>Included command aliases</h2>
+<p>We have included a few default aliases right out of the box:</p>
+<table>
+  <thead>
+    <tr>
+      <th>Command</th>
+      <th>Aliases</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>!jellyfin</code></td>
+      <td><code>!jf</code></td>
+    </tr>
+    <tr>
+      <td><code>!meili</code></td>
+      <td><code>!ms</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Engine shortcuts</h2>
+<p>
+  Search engines can use a <code>bangShortcut</code> so you can easily search
+  that specific engine:
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Shortcut</th>
+      <th>Engine</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>!g</code></td>
+      <td>Google</td>
+    </tr>
+    <tr>
+      <td><code>!b</code></td>
+      <td>Bing</td>
+    </tr>
+    <tr>
+      <td><code>!ddg</code></td>
+      <td>DuckDuckGo</td>
+    </tr>
+    <tr>
+      <td><code>!brave</code></td>
+      <td>Brave Search</td>
+    </tr>
+    <tr>
+      <td><code>!w</code></td>
+      <td>Wikipedia</td>
+    </tr>
+    <tr>
+      <td><code>!r</code></td>
+      <td>Reddit</td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  For example, typing <code>!g linux kernel</code> will search only Google for
+  "linux kernel".
+</p>
+
+<h2>Custom path</h2>
+<p>
+  You can set <code>DEGOOG_ALIASES_FILE</code> to load your shortcuts from a
+  totally different location, like <code>/etc/degoog/aliases.json</code>.
+</p>

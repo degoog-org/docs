@@ -1,0 +1,170 @@
+<div class="doc-page-header">
+  <h1><a href="index.html">Degoog</a> Store and extensions</h1>
+  <p class="doc-page-desc">
+    Add a repository, install what you want, keep it updated, and understand
+    what you are trusting.
+  </p>
+</div>
+
+<h2 id="how-it-works">How the Store works</h2>
+<p>
+  There is no central marketplace and no server between you and the extensions.
+  A <strong>store repository</strong> is just a git repository whose
+  <code>package.json</code> lists what it publishes. You add its URL, Degoog
+  clones it, and its catalogue appears.
+</p>
+<p>
+  That means anyone can publish a store, including you. It also means nobody is
+  vetting the code on your behalf.
+</p>
+
+<figure class="doc-screenshot-image-wrapper">
+  <img class="doc-screenshot-image" src="images/screenshots/store-page.png"
+    data-screenshot-target="images/screenshots/store-page.png"
+    alt="The Store tab: repositories on top, catalogue underneath." />
+  <figcaption>
+    The Store tab, with repositories on top and the catalogue underneath.
+  </figcaption>
+</figure>
+
+<h2 id="repositories">Adding a repository</h2>
+<ol>
+  <li>Open <em>Settings, Store</em>.</li>
+  <li>
+    Paste a git URL into <strong>Add repository</strong> and press
+    <strong>Add</strong>.
+  </li>
+  <li>
+    The catalogue below fills in with everything that repository publishes.
+  </li>
+</ol>
+<p>The two you probably want:</p>
+<ul>
+  <li>
+    <strong>Official:</strong>
+    <code>https://github.com/degoog-org/official-extensions</code>. The only
+    store curated and maintained by the Degoog team. These get automatically added to your store
+    when you first install Degoog.
+  </li>
+  <li>
+    <strong>Community:</strong> browse the
+    <a href="https://degoog-org.github.io/community-extensions/" class="external" target="_blank"
+      rel="noopener">community extensions list</a>
+    for repositories published by other people.
+  </li>
+</ul>
+<p>
+  Each repository row shows when it was last refreshed and has a
+  <strong>Refresh</strong> button; <strong>Refresh all</strong> does the lot.
+  <strong>Remove</strong> deletes a repository, but only once you have
+  uninstalled everything you installed from it.
+</p>
+
+<h2 id="browsing">Finding things</h2>
+<p>
+  The catalogue has a search box and two filters: extension type (Plugins,
+  Themes, Engines, Transports, Autocomplete) and, for plugins, a sub-type filter
+  (Bang, Slot, Search tab, Search bar). Extensions with screenshots get a
+  gallery you can open in a lightbox.
+</p>
+<p>The four plugin sub-types, in plain terms:</p>
+<ul>
+  <li>
+    <strong>Bang</strong> adds a <code>!command</code>. See
+    <a href="bangs-and-commands.html">Bangs and commands</a>.
+  </li>
+  <li>
+    <strong>Slot</strong> adds a panel above your results, below them, or in the
+    sidebar, shown only when your query matches. The AI Summary, TMDb, Math,
+    GitHub, and RSS plugins all work this way.
+  </li>
+  <li>
+    <strong>Search tab</strong> adds a whole extra tab to the results page.
+  </li>
+  <li>
+    <strong>Search bar</strong> adds a control next to the search box itself.
+  </li>
+</ul>
+<p>
+  Plugins can also be <em>interceptors</em> (which rewrite your query before
+  searching, like the Spell Check plugin), <em>middleware</em> (which can gate
+  the whole settings area, like the OIDC single sign-on plugin), or
+  <em>routes</em> (which add HTTP endpoints).
+</p>
+
+<h2 id="installing">Installing, updating, removing</h2>
+<p>
+  <strong>Install</strong> is one button. Installing a plugin shows a
+  confirmation first, because plugins run code on your server.
+</p>
+<p>
+  When newer versions exist, the Store shows an update count and an
+  <strong>Update all</strong> button. Individual items get their own
+  <strong>Update</strong>.
+</p>
+<p>
+  After installing, go to the matching tab to switch it on. Engines,
+  autocomplete providers, and themes all need enabling or selecting; some need
+  configuration before they do anything. A "Needs configuration" badge tells you
+  which.
+</p>
+<p>
+  Some extensions need a server restart to load properly. Degoog shows a banner
+  in <em>Settings, General</em> with a button that does it.
+</p>
+
+<h2 id="themes">Themes</h2>
+<p>
+  A theme restyles the entire UI: templates, CSS, fonts, and assets. Degoog
+  ships one built-in theme and the official store adds several more, including one styled after
+  this very sexy documentation site.
+</p>
+<p>
+  For a smaller tweak than a whole theme,
+  <em>Settings, Server, Custom CSS</em> injects your own CSS into every page. It
+  loads after theme and plugin styles, so it wins by default.
+</p>
+
+<h2 id="safety">The boring safety shit</h2>
+<div class="block-note">
+  <p>
+    <strong>Extensions run code on your server.</strong> Not sandboxed, not
+    reviewed by anyone in the middle. A store repository is a git URL, and
+    whoever controls that URL controls what runs on your machine.
+  </p>
+</div>
+<p>Practical advice, none of it dramatic:</p>
+<ul>
+  <li>
+    Community extensions are only <em>initially</em> vetted when they are added
+    to the community list. Nobody watches them afterwards. What you install is
+    your responsibility.
+  </li>
+  <li>
+    <strong>If your instance is reachable from the internet, put a password on
+      settings.</strong>
+    An unlocked instance lets anyone who can reach it install extensions, which
+    means anyone can run code on your server. Set
+    <code>DEGOOG_SETTINGS_PASSWORDS</code>, or run with
+    <code>DEGOOG_PUBLIC_INSTANCE=true</code>, ideally both.
+  </li>
+  <li>
+    Read the exposure note on an extension card. "Browser may contact external
+    services directly" means your own browser, not just the server, will talk to
+    third parties.
+  </li>
+  <li>
+    <code>DEGOOG_OUTGOING_ALLOWED_HOSTS</code> restricts every outgoing request
+    to a hostname allowlist, which is a solid extra layer on an exposed
+    instance.
+  </li>
+</ul>
+
+<h2 id="beta">Tracking pre-release extensions</h2>
+<p>
+  Setting <code>DEGOOG_BETA_STORE=1</code> makes Degoog prefer the
+  <code>develop</code> branch of every store repository over
+  <code>main</code> or <code>master</code>, falling back silently when that
+  branch does not exist. It is for extension developers and people who enjoy
+  living slightly ahead of everyone else.
+</p>

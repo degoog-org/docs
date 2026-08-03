@@ -1,0 +1,374 @@
+<div class="doc-page-header">
+  <h1><a href="index.html">Degoog</a> API reference</h1>
+  <p class="doc-page-desc">
+    The endpoints worth calling from outside the browser, and how to
+    authenticate against them.
+  </p>
+</div>
+
+<h2 id="basics">Basics</h2>
+<p>
+  Everything lives on the same host and port as the UI,
+  <code>http://localhost:4444</code> by default. Responses are JSON unless
+  noted. Most of Degoog's HTTP surface is internal plumbing for the web UI; what
+  follows is the part that is genuinely useful to call yourself.
+</p>
+<p>
+  The <a href="server-settings.html#rate-limit">rate limits</a> you set in
+  Server settings apply to API callers exactly as they do to browsers.
+</p>
+
+<h2 id="api-key">Authentication</h2>
+<p>
+  By default the search and suggestion endpoints are open. In
+  <em>Settings, Server, API Key</em> you can require authentication on either
+  group independently:
+</p>
+<ul>
+  <li>
+    <strong>Protect search routes</strong> covers <code>/api/search</code>,
+    <code>/api/search/stream</code>, and <code>/api/search/retry</code>.
+  </li>
+  <li>
+    <strong>Protect suggestion routes</strong> covers
+    <code>/api/suggest</code> and <code>/api/suggest/opensearch</code>.
+  </li>
+</ul>
+<p>
+  When protection is on, an unauthenticated request gets <code>401</code> with:
+</p>
+<pre><code>{ "error": "You shall not pass!" }</code></pre>
+<p>
+  External callers authenticate with the instance's API key as a bearer token.
+  Reveal or regenerate it in the same settings section. That section only
+  appears once <code>DEGOOG_SETTINGS_PASSWORDS</code> is set, since otherwise
+  nothing would be protecting the key itself.
+</p>
+<pre><code>curl -H "Authorization: Bearer YOUR_API_KEY" \
+  "http://localhost:4444/api/search?q=hello"</code></pre>
+<p>
+  The web UI does not use that header. It receives a short-lived signed nonce
+  with the page and sends it as <code>x-search-nonce</code> and
+  <code>x-search-sig</code> headers (or <code>searchNonce</code> and
+  <code>searchSig</code> query parameters). Either mechanism satisfies the
+  guard, so turning protection on does not break normal browsing.
+</p>
+
+<h2 id="search">GET /api/search</h2>
+<p>Runs a search and returns merged, scored, deduplicated results.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>q</code></td>
+      <td>Required. The query.</td>
+    </tr>
+    <tr>
+      <td><code>type</code></td>
+      <td>
+        Search type. Defaults to <code>web</code>. Valid values depend entirely
+        on which engines you have installed.
+        <code>GET /api/search-tabs</code> lists the ones your instance can
+        serve.
+      </td>
+    </tr>
+    <tr>
+      <td><code>page</code></td>
+      <td>Starts at 1, capped at 10.</td>
+    </tr>
+    <tr>
+      <td><code>time</code></td>
+      <td>
+        <code>any</code>, <code>hour</code>, <code>day</code>,
+        <code>week</code>, <code>month</code>, <code>year</code>, or
+        <code>custom</code>. With <code>custom</code>, pass
+        <code>dateFrom</code> and <code>dateTo</code> as
+        <code>YYYY-MM-DD</code>.
+      </td>
+    </tr>
+    <tr>
+      <td><code>lang</code></td>
+      <td>
+        Language code. Overrides <code>DEGOOG_DEFAULT_SEARCH_LANGUAGE</code> for
+        this request.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>imgSize</code>, <code>imgColor</code>, <code>imgType</code>,
+        <code>imgLayout</code>
+      </td>
+      <td>
+        Image filters. Ignored unless the engines you are querying support them.
+      </td>
+    </tr>
+    <tr>
+      <td><code>safeMode</code></td>
+      <td>
+        Safe search level. <code>imgNsfw</code> is accepted as a legacy alias.
+      </td>
+    </tr>
+    <tr>
+      <td>Engine ids</td>
+      <td>
+        Pass any engine id as a parameter set to <code>true</code> or
+        <code>false</code> to override which engines run. Omit them all to use
+        the instance defaults. Ids come from
+        <code>GET /api/extensions?type=engine</code>.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<pre><code>curl "http://localhost:4444/api/search?q=rust+lifetimes"</code></pre>
+<p>Response:</p>
+<pre><code>{
+  "results": [
+    {
+      "title": "...",
+      "url": "https://...",
+      "snippet": "...",
+      "content": "...",
+      "source": "Brave",
+      "score": 92,
+      "sources": ["Brave", "DuckDuckGo"]
+    }
+  ],
+  "query": "rust lifetimes",
+  "type": "web",
+  "totalTime": 812,
+  "engineTimings": [{ "name": "Brave", "time": 540, "resultCount": 10 }],
+  "relatedSearches": ["rust lifetime elision"]
+}</code></pre>
+<p>
+  <code>content</code> mirrors <code>snippet</code>. It exists so that Open
+  WebUI, which expects that field name, works without a custom tool.
+</p>
+
+<h3 id="searx-shape">SearXNG-shaped responses</h3>
+<p>
+  Turn on <strong>Serve the SearXNG API shape</strong> in
+  <em>Settings, Server</em> and <code>/api/search</code> starts honouring a
+  <code>format=json</code> parameter, answering those requests with a
+  SearXNG-shaped document. Requests without the parameter are completely
+  unchanged.
+</p>
+<p>
+  This is what makes clients such as Open WebUI and local-deep-research work
+  with no glue code: they already send <code>format=json</code>.
+</p>
+<div class="block-note">
+  <p>
+    The toggle is off by default. If a SearXNG-compatible client is getting the
+    wrong response shape from Degoog, this is the switch you are missing.
+  </p>
+</div>
+
+<h2 id="search-post">POST /api/search</h2>
+<p>
+  Same behaviour with a JSON body, which is easier when you want to restrict a
+  long list of engines. Form-encoded bodies are also accepted.
+</p>
+<pre><code>curl -X POST http://localhost:4444/api/search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "rust lifetimes",
+    "type": "web",
+    "page": 1,
+    "lang": "en",
+    "engines": ["degoog-org-official-extensions-brave-engine"]
+  }'</code></pre>
+<p>
+  <code>engines</code> is a list of engine ids to enable; anything not listed is
+  disabled for that request. Omit it entirely to use the instance defaults.
+</p>
+
+<h2 id="stream">GET /api/search/stream</h2>
+<p>
+  The server-sent events variant. Same query parameters as
+  <code>GET /api/search</code>. It emits two event types:
+</p>
+<ul>
+  <li>
+    <code>engine-result</code> fires as each engine answers. Its payload carries
+    <code>engine</code>, that engine's <code>timing</code>, the running merged
+    <code>results</code> list, and retry metadata. Because
+    <code>results</code> is the full merged list each time, a lazy consumer can
+    simply keep the last one.
+  </li>
+  <li>
+    <code>done</code> is the final event, with <code>totalTime</code>,
+    <code>engineTimings</code>, and <code>relatedSearches</code>.
+  </li>
+</ul>
+<pre><code>curl -N "http://localhost:4444/api/search/stream?q=hello"</code></pre>
+
+<h2 id="retry">GET and POST /api/search/retry</h2>
+<p>
+  Re-runs a single engine for a query that already ran. Requires
+  <code>q</code> and <code>engine</code> (or <code>query</code> and
+  <code>engine</code> in a JSON body), and accepts the same type, page, time,
+  and language parameters. This is what the retry links in the results sidebar
+  call.
+</p>
+
+<h2 id="suggest">GET /api/suggest</h2>
+<p>
+  Autocomplete suggestions merged from every enabled provider. Returns an array
+  of objects, not plain strings:
+</p>
+<pre><code>[
+  { "text": "rust lifetimes", "source": "Google Autocomplete" },
+  { "text": "rust lifetime elision", "source": "Google Autocomplete" }
+]</code></pre>
+<p>
+  A <code>rich</code> object is included when the provider supplies an entity
+  card and rich suggestions are enabled for it.
+  <code>POST /api/suggest</code> takes <code>{ "query": "..." }</code> and
+  behaves identically.
+</p>
+<p>
+  Returns an empty array when no autocomplete provider is installed, which is
+  the default state.
+</p>
+
+<h2 id="suggest-opensearch">GET /api/suggest/opensearch</h2>
+<p>
+  The same suggestions in the OpenSearch format browsers expect, served as
+  <code>application/x-suggestions+json</code>:
+</p>
+<pre><code>["rust", ["rust lifetimes", "rust lifetime elision"]]</code></pre>
+
+<h2 id="lucky">GET /api/lucky</h2>
+<p>
+  Runs a web search for <code>q</code> and redirects straight to the first
+  result. Returns <code>404</code> with a JSON error if nothing was found.
+</p>
+
+<h2 id="extensions">GET /api/extensions</h2>
+<p>
+  Lists what is installed, grouped into <code>engines</code>,
+  <code>plugins</code>, <code>themes</code>, <code>transports</code>,
+  <code>autocomplete</code>, and <code>shortcuts</code>. Each entry includes the
+  <code>id</code> you would use to restrict a search.
+</p>
+<p>
+  Add <code>?type=</code> to fetch one group: <code>engine</code>,
+  <code>plugin</code>, <code>theme</code>, <code>transport</code>,
+  <code>autocomplete</code>, or <code>shortcut</code>. An unknown type returns
+  <code>400</code>.
+</p>
+<pre><code>curl "http://localhost:4444/api/extensions?type=engine"</code></pre>
+<p>
+  Extension settings are redacted from the response unless the caller is
+  authenticated to the settings area, so you will see the extensions but not
+  their configured API keys.
+</p>
+
+<h2 id="discovery">Other useful endpoints</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Endpoint</th>
+      <th>What it returns</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>GET /api/search-tabs</code></td>
+      <td>
+        The result tabs this instance can serve, which is the authoritative list
+        of valid <code>type</code> values.
+      </td>
+    </tr>
+    <tr>
+      <td><code>GET /api/tab-search?tab=&amp;q=&amp;page=</code></td>
+      <td>Results for one specific tab.</td>
+    </tr>
+    <tr>
+      <td><code>GET /api/engines</code></td>
+      <td>The engine list in the shape the UI uses.</td>
+    </tr>
+    <tr>
+      <td><code>GET /api/commands</code></td>
+      <td>
+        Every available bang command with its triggers, aliases, natural
+        language phrases, and category.
+      </td>
+    </tr>
+    <tr>
+      <td><code>GET /api/command?q=!uuid</code></td>
+      <td>Executes a bang command and returns its rendered output.</td>
+    </tr>
+    <tr>
+      <td><code>GET /opensearch.xml</code></td>
+      <td>
+        The OpenSearch descriptor browsers use to add Degoog as a search engine.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>GET /health</code>, <code>/healthz</code>, <code>/ready</code>,
+        <code>/readyz</code>
+      </td>
+      <td>Liveness and readiness checks. All four exist for the lolz.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="open-webui">Wiring Degoog into Open WebUI</h2>
+<ol>
+  <li>
+    In Degoog, enable <strong>Serve the SearXNG API shape</strong> in
+    <em>Settings, Server</em>.
+  </li>
+  <li>
+    In Open WebUI, open the <strong>Admin Panel</strong>, then
+    <strong>Settings</strong>, then <strong>Web Search</strong>, and enable it.
+  </li>
+  <li>Set <strong>Web Search Engine</strong> to <code>searxng</code>.</li>
+  <li>
+    Set the <strong>SearxNG Query URL</strong> to your instance followed by
+    <code>/api/search</code>, for example
+    <code>http://127.0.0.1:4444/api/search</code>.
+  </li>
+</ol>
+<p>
+  No custom tool required. If you enabled API key protection for search routes,
+  your client needs to send the <code>Authorization: Bearer</code> header, so
+  check it supports custom headers before turning that on.
+</p>
+
+<h2 id="mcp">Model Context Protocol</h2>
+<p>
+  <code>degoog-mcp</code> is a small Go sidecar that exposes Degoog to
+  MCP-capable clients over Streamable HTTP at <code>/mcp</code>, listening on
+  port <code>4443</code> by default. It offers two tools:
+</p>
+<ul>
+  <li>
+    <strong><code>search</code></strong> returns model-readable results plus
+    structured URLs, snippets, engine timings, and source overlap.
+  </li>
+  <li>
+    <strong><code>scrape</code></strong> fetches URLs concurrently and returns
+    clean Markdown, with explicit error rows for failures. It accepts only
+    <code>http</code> and <code>https</code>, resolves DNS before dialing, and
+    blocks private and local IP ranges, rechecking on redirects.
+  </li>
+</ul>
+<p>
+  It is configured entirely through <code>DEGOOG_MCP_*</code> environment
+  variables, including an optional inbound bearer token, per-call result caps,
+  and an engine allowlist. The <code>mcp.yml</code> compose example runs it
+  alongside Degoog. Full details are in the
+  <a href="https://github.com/degoog-org/degoog/tree/main/mcp" class="external" target="_blank"
+    rel="noopener">degoog-mcp README</a>.
+</p>
+<div class="block-note">
+  <p>degoog-mcp is still in beta and not intended for production use yet.</p>
+</div>

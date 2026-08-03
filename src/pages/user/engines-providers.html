@@ -1,0 +1,317 @@
+<div class="doc-page-header">
+  <h1><a href="index.html">Degoog</a> Engines, autocomplete and transports</h1>
+  <p class="doc-page-desc">
+    Where your results come from, where your suggestions come from, and how your
+    server reaches either.
+  </p>
+</div>
+
+<h2 id="engines">Engines</h2>
+<p>
+  An engine is one source of results. Degoog runs every enabled engine for the
+  current tab in parallel, then merges what comes back. A page found by three
+  engines becomes one row that credits all three, and that overlap pushes it up
+  the ranking.
+</p>
+<p>
+  None ship with the app. Install them from the
+  <a href="plugins-themes-store.html">Store</a> first.
+</p>
+
+<figure class="doc-screenshot-image-wrapper">
+  <img class="doc-screenshot-image" src="images/screenshots/settings-engines.png"
+    data-screenshot-target="images/screenshots/settings-engines.png"
+    alt="The Engines tab, with engines grouped by search type." />
+  <figcaption>The Engines tab, with engines grouped by search type.</figcaption>
+</figure>
+
+<h3 id="engine-types">Types and tabs</h3>
+<p>
+  Every engine declares one or more <strong>search types</strong>: web, images,
+  videos, news, files, or anything a developer invents. The Engines tab groups
+  your engines by their primary type, and those same groups become the tabs on
+  your results page. Web always sorts first; the rest sort alphabetically until
+  you reorder them.
+</p>
+<p>
+  An engine that serves more than one type shows an
+  <strong>Extra types</strong> badge listing the others.
+</p>
+<p>
+  <strong>Order tabs</strong> at the top of the Engines tab opens a
+  drag-and-drop list so you can put Images before News, or whatever suits how
+  you search.
+</p>
+
+<h3 id="engine-config">Configuring an engine</h3>
+<p>
+  <strong>Configure</strong> on an engine card opens its settings. What is
+  inside varies by engine (safe search, results format, API keys, instance
+  URLs), but three options are added by Degoog to every engine, under
+  <strong>Advanced</strong>:
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Option</th>
+      <th>What it does</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Score</strong></td>
+      <td>
+        A ranking multiplier for this engine's results. Raise it for an engine
+        you trust; lower it for one that returns noise.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Outgoing HTTP client</strong></td>
+      <td>
+        Which <a href="#transports">transport</a> this engine uses to reach the
+        internet. This is the setting that fixes most "blocked" failures.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Timeout (ms)</strong></td>
+      <td>
+        How long to wait for this engine before giving up. Leave blank for the
+        default.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>Cards also carry small status badges:</p>
+<ul>
+  <li>
+    <strong>Configured</strong> or <strong>Needs configuration</strong>, so you
+    can spot the engine that is silently doing nothing because it wants an API
+    key.
+  </li>
+  <li>
+    <strong>Requires a newer version of Degoog</strong>, when an extension
+    declares a minimum version you have not reached.
+  </li>
+  <li>
+    <strong>Server restart required</strong>, when the extension cannot fully
+    load until you restart.
+  </li>
+  <li>
+    An exposure note: either "Browser requests go through the server" or
+    "Browser may contact external services directly". Worth reading if you care
+    about what your own browser is talking to.
+  </li>
+</ul>
+
+<h3 id="engine-defaults">Your engines versus the instance's</h3>
+<p>
+  Which engines are enabled is stored in <strong>your browser</strong>. The
+  Engines tab has <strong>Save as instance defaults</strong> and
+  <strong>Reset to instance defaults</strong> for publishing your selection as
+  the starting point for new visitors, or throwing yours away and adopting
+  theirs.
+</p>
+
+<h3 id="searx">SearX compatibility layer</h3>
+<p>
+  Degoog can run SearXNG's own engine files directly, inside Degoog, with no
+  separate SearXNG instance. Enable it in
+  <em>Settings, Server, SearX compatibility layer</em> and a
+  <strong>SearX engines</strong> section appears in the Engines tab with an
+  <strong>Add from SearX</strong> button.
+</p>
+<p>
+  It is marked experimental for good reasons, and the UI is upfront about them:
+</p>
+<ul>
+  <li>
+    Score, safe search, proxies, transports, and bangs all behave like a
+    normally installed engine.
+  </li>
+  <li>
+    The engine code comes from SearXNG upstream and is not maintained by Degoog.
+    Use at your own risk.
+  </li>
+  <li>
+    Image filters beyond safe search are not ported. Applying them to a SearX
+    engine will usually return nothing.
+  </li>
+  <li>
+    Some SearXNG engines borrow code from other engines. Degoog tells you which
+    extra files it needs to download and asks before doing it. Those files stay
+    behind the scenes and never show up as engines of their own.
+  </li>
+</ul>
+<p>
+  Only engines known to be compatible are listed. Running these requires Python
+  on the host; the binary can be pointed elsewhere with
+  <code>DEGOOG_PYTHON_BIN</code>.
+</p>
+
+<h2 id="autocomplete">Autocomplete providers</h2>
+<p>
+  These power the suggestion dropdown under the search box. They are separate
+  from engines, and like engines, none are installed by default.
+</p>
+<p>
+  The official store publishes providers for Google, DuckDuckGo, Brave, Bing,
+  Yahoo, and Qwant. The tab itself is deliberately simple: one toggle per
+  provider, plus a Configure button when the provider has options.
+</p>
+<p>
+  The notable option is <strong>Rich suggestions</strong>, available on
+  providers that support it. Turn it on and you get entity cards with a
+  thumbnail and short description at the top of the dropdown, instead of plain
+  text. Off by default.
+</p>
+<p>
+  Suggestions from all enabled providers are merged, so enabling six of them
+  mostly gets you six copies of the same suggestion. One or two is usually
+  plenty.
+</p>
+<p>
+  The <strong>Autocomplete delay</strong> in
+  <a href="server-settings.html">Server settings</a> controls how long Degoog
+  waits after you stop typing before asking for suggestions.
+</p>
+
+<h2 id="transports">Transports</h2>
+<p>
+  A transport is how your server makes an outgoing HTTP request. This matters
+  because most search engines actively try to detect and block requests that do
+  not come from a real browser.
+</p>
+<p>
+  You choose a transport <strong>per engine</strong>, in
+  <em>Configure, Advanced, Outgoing HTTP client</em>. Four are built in:
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Transport</th>
+      <th>What it is</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Fetch</strong></td>
+      <td>
+        Bun's native fetch, with SOCKS and HTTP proxy support. Always available.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Curl</strong></td>
+      <td>
+        Shells out to the <code>curl</code> binary. A useful TLS fallback.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Curl Fallback</strong></td>
+      <td>
+        Tries native fetch, then automatically retries with curl on 403, 429,
+        502, and 503.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Curl Impersonate</strong></td>
+      <td>
+        Uses curl-impersonate to mimic Firefox's TLS fingerprint. Only offered
+        when the binary is on <code>PATH</code>.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  The Store adds heavier options: FlareSolverr for Cloudflare challenges,
+  Browserless and the stealth browsers CloakBrowser and Camoufox, and the two
+  4play transports that borrow a real browser session.
+</p>
+<p>
+  The Transports tab has a <strong>Test Connection</strong> button on transports
+  that support it, which saves a lot of guessing when you are wiring up a
+  service on another host.
+</p>
+<div class="block-note">
+  <p>
+    Which transport an engine needs is not something you have to work out
+    yourself. <a href="tips-and-tricks.html">Tips and tricks</a> has the known
+    pairings, including the ones Google's engine settings explicitly ask for.
+  </p>
+</div>
+
+<h2 id="proxy">Proxies</h2>
+<p>
+  Separately from transports, Degoog can send all server-side search requests
+  through a list of proxy URLs, rotating between them. That is configured once
+  for the whole instance in
+  <a href="server-settings.html#proxy">Server settings</a>, and there is a
+  <strong>Test proxy connection</strong> button that compares your direct exit
+  IP against the proxied one and tells you plainly whether it is actually
+  working.
+</p>
+
+<h2 id="aggregation">How aggregation works</h2>
+<p>
+  Each engine returns its own list. Degoog gives every result points based on
+  where it appeared in that engine's list, then merges matching URLs together.
+</p>
+<pre><code>points = position points * engine score</code></pre>
+<table>
+  <thead>
+    <tr>
+      <th>Engine position</th>
+      <th>Position points</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1st</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <td>2nd</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <td>3rd</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <td>10th and lower</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  Engine score is the <strong>Score</strong> setting in
+  <em>Configure, Advanced</em>. The default is <code>1</code>. A score of
+  <code>2</code> doubles that engine's points. A score of <code>0.5</code>
+  halves them.
+</p>
+<p>
+  If two engines return the same URL, Degoog merges them into one result. The
+  points are added together, and each extra engine gives a small
+  <code>+5</code> agreement bonus.
+</p>
+<pre><code>DuckDuckGo returns a URL 1st, score 1:
+10 * 1 = 10
+
+Brave returns the same URL 4th, score 2:
+7 * 2 = 14
+
+Same URL from two engines:
+10 + 14 + 5 = 29</code></pre>
+<p>
+  After that, Server domain scores are added or removed as plain points. So if
+  <code>example.com|20</code> matches that <code>29</code>-point result, it ends
+  at <code>49</code>. If <code>spam.example|-15</code> matches, it ends at
+  <code>14</code>.
+</p>
+<p>
+  In short: higher engine position helps, trusted engines can count more,
+  overlap helps, and domain scores are the final nudge.
+</p>

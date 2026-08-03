@@ -1,0 +1,405 @@
+<div class="doc-page-header">
+  <h1><a href="index.html">Degoog</a> Tips and tricks</h1>
+  <p class="doc-page-desc">
+    Known engine quirks, and the transports that get you past them.
+  </p>
+</div>
+
+<div class="block-note">
+  <p>
+    Short version: most search engines do not want a server scraping them. When
+    an engine keeps failing, the fix is almost never "pick a different engine",
+    it is "give that engine a different way to reach the internet". That is what
+    a transport is for.
+  </p>
+</div>
+
+<h2 id="reading-failures">Start by reading the failure</h2>
+<p>
+  The sidebar tells you which engine failed and why. The reason narrows the fix
+  down considerably:
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Reason shown</th>
+      <th>What it usually means</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Blocked by the engine</td>
+      <td>
+        HTTP 403. The engine recognised you as not-a-browser. Try a stronger
+        transport.
+      </td>
+    </tr>
+    <tr>
+      <td>Rate limited</td>
+      <td>
+        HTTP 429. You are querying too fast from one IP. Slow down, add a proxy,
+        or enable caching.
+      </td>
+    </tr>
+    <tr>
+      <td>CAPTCHA challenge</td>
+      <td>
+        An interstitial challenge page came back. Cloudflare is the usual
+        culprit.
+      </td>
+    </tr>
+    <tr>
+      <td>Blocked by an interstitial page</td>
+      <td>
+        A JavaScript or consent wall instead of results. Very common with
+        Google.
+      </td>
+    </tr>
+    <tr>
+      <td>Could not read the response</td>
+      <td>
+        The page loaded but the parser did not recognise it. Often means the
+        engine changed its HTML and the extension needs an update.
+      </td>
+    </tr>
+    <tr>
+      <td>Timed out</td>
+      <td>
+        The engine was too slow. Raise that engine's timeout in
+        <em>Configure, Advanced</em>, or leave it disabled.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  Every failure has a <strong>retry</strong> link next to it that re-runs just
+  that engine, which is much faster than reloading the whole search while you
+  experiment.
+</p>
+
+<h2 id="google">Google</h2>
+<p>
+  Big G is the single most awkward engine to self-host against, and the Google
+  engine gives you a choice about how hard to try (If I were you, I'd just
+  settle for the Google CSE store version and leave it at that, it works and I
+  wouldn't question it lol)
+</p>
+<p>
+  In <em>Settings, Engines, Google, Configure</em>, the
+  <strong>Results format</strong> option decides everything:
+</p>
+<ul>
+  <li>
+    <strong>Lite results</strong> (the default) fetch a lightweight mobile page.
+    It works over any transport, including plain <code>fetch</code> or
+    <code>curl</code>, and needs no extra infrastructure. Titles and snippets
+    are thinner than the real thing, but it is reliable and it is the right
+    starting point.
+  </li>
+  <li>
+    <strong>HTML results</strong> fetch the full desktop results page. Much
+    better titles and snippets, but Google will only serve it to something that
+    looks like a genuine browser session. Without one you get the "Blocked by an
+    interstitial page" failure. This mode expects the
+    <strong>4play (lolcat)</strong> transport.
+  </li>
+</ul>
+<p>
+  The engine's default outgoing transport is <code>curl</code>, and its bang
+  shortcut is <code>!g</code>.
+</p>
+
+<h2 id="cloudflare">Cloudflare-fronted engines</h2>
+<p>
+  <strong>Ecosia</strong> will happily return a Cloudflare challenge page to a
+  server-side request; the engine detects this and reports it as a CAPTCHA
+  challenge rather than pretending it found nothing.
+  <strong>Startpage</strong> can do the same. If you want these engines to work
+  consistently, route them through <strong>FlareSolverr</strong>, or one of the
+  stealth-browser transports below.
+</p>
+<p>
+  Startpage also has an <strong>Anonymous View</strong> toggle, which makes
+  result links open through Startpage's own proxy so the destination site never
+  sees your IP. Nice touch if privacy is why you are here.
+</p>
+
+<h2 id="transports">Choosing a transport</h2>
+<p>
+  You pick a transport per engine, in
+  <em>Settings, Engines, Configure, Advanced, Outgoing HTTP client</em>. Working
+  roughly from "no setup" to "most convincing":
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Transport</th>
+      <th>Where it comes from</th>
+      <th>What it gives you</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Fetch</strong></td>
+      <td>Built in</td>
+      <td>
+        Bun's native fetch, with SOCKS and HTTP proxy support. Fastest, least
+        convincing.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Curl</strong></td>
+      <td>Built in</td>
+      <td>
+        Shells out to the <code>curl</code> binary. A useful TLS fallback when
+        native fetch gets rejected.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Curl Fallback</strong></td>
+      <td>Built in</td>
+      <td>
+        Tries native fetch first, automatically retries with curl on 403, 429,
+        502, and 503. A sensible default when you cannot decide.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Curl Impersonate</strong></td>
+      <td>Built in, needs the binary</td>
+      <td>
+        Uses
+        <a href="https://github.com/lexiforest/curl-impersonate" class="external" target="_blank"
+          rel="noopener">curl-impersonate</a>
+        to mimic Firefox's TLS fingerprint. For sites that block on the TLS
+        handshake rather than on headers. Only appears as an option when the
+        binary is on <code>PATH</code>.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>FlareSolverr</strong></td>
+      <td>Store</td>
+      <td>
+        Routes through a FlareSolverr instance to clear Cloudflare challenges.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Browserless</strong></td>
+      <td>Store</td>
+      <td>
+        Fetches through a self-hosted Browserless Chromium and returns rendered
+        HTML. Good for engines that need JavaScript to run.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>CloakBrowser</strong></td>
+      <td>Store</td>
+      <td>
+        Self-hosted stealth Chromium that patches bot-detection signals
+        (<code>navigator.webdriver</code>, canvas, CDP leaks) at the C++ level.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Camoufox</strong></td>
+      <td>Store</td>
+      <td>The same idea with stealth Firefox.</td>
+    </tr>
+    <tr>
+      <td><strong>4play (lolcat)</strong> and <strong>degoog-4play</strong></td>
+      <td>Store</td>
+      <td>
+        A real browser on your own machine, lending its session to the server.
+        The strongest option, and the one Google's HTML and JSON modes expect.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="curl-impersonate">Installing curl-impersonate</h3>
+<p>On macOS:</p>
+<pre><code>brew tap shakacode/brew
+brew install curl-impersonate</code></pre>
+<p>On Linux, drop a release binary onto your <code>PATH</code>:</p>
+<pre><code>curl -fsSL https://github.com/lexiforest/curl-impersonate/releases/download/v1.2.2/curl-impersonate-v1.2.2.x86_64-linux-gnu.tar.gz \
+  | tar -xz -C /usr/local/bin curl_firefox133
+chmod +x /usr/local/bin/curl_firefox133</code></pre>
+<p>
+  The Degoog image is Alpine-based, so inside Docker you need the
+  <code>-linux-musl</code> release, and <code>bash</code> installed first
+  because the curl-impersonate binaries are bash wrappers:
+</p>
+<pre><code>services:
+  degoog:
+    image: ghcr.io/degoog-org/degoog:latest
+    entrypoint: >
+      sh -c "apk add --no-cache bash && curl -fsSL https://github.com/lexiforest/curl-impersonate/releases/download/v1.2.2/curl-impersonate-v1.2.2.x86_64-linux-musl.tar.gz
+      | tar -xz -C /usr/local/bin || true && exec /entrypoint.sh"
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "4444:4444"
+    restart: unless-stopped</code></pre>
+
+<h2 id="4play">The 4play transport</h2>
+<p>
+  Borrows a real browser session using a browser extension to grab page
+  information and data straight from browser tabs.
+</p>
+<p>
+  All credit for the original idea and browser extension goes to
+  <a href="https://git.lolcat.ca/lolcat/4play" class="external" target="_blank" rel="noopener">lolcat</a>, author of
+  4get and 4play.
+</p>
+
+<h3>4play (lolcat)</h3>
+<p>
+  Uses the official 4play protocol to connect the
+  <a href="https://addons.mozilla.org/en-US/firefox/addon/4play/">official 4play Firefox extension</a>
+  to Degoog. Degoog runs the WebSocket server itself on its own main port, so
+  there is no second service and no extra port to expose.
+</p>
+<ul>
+  <li>
+    <strong>Use a clean Firefox profile.</strong> The extension manages tabs and
+    containers globally, so pointing it at your daily driver profile is a bad
+    time.
+  </li>
+  <li>
+    Container isolation is on by default, and is forced on when you configure a
+    proxy. You can tune the container pool size and TTL.
+  </li>
+  <li>
+    Background warmup can re-warm known origins on a schedule (for example every
+    72 hours) so sessions are ready before you search. Set it at or below the
+    warmup TTL or you leave a cold gap.
+  </li>
+  <li>
+    With <code>DEGOOG_VALKEY_URL</code> set, warmed sessions survive a Degoog
+    restart. Without Valkey the cache is in memory and resets.
+  </li>
+  <li>
+    The WebSocket URL to paste into the extension is shown at the top of
+    <em>Settings, Transports, 4play (lolcat), Configure</em>. If you set a
+    password there, append it as a path segment. The extension badge turns green
+    when connected.
+  </li>
+</ul>
+
+<div class="block-note">
+  <p>
+    <strong>The 4play transport mean your browser talks to external sites during
+      warmup, and your Degoog server receives those cookies.</strong>
+    That is the deliberate trade: real browser sessions in exchange for a more
+    privileged server. The WebSocket is plain <code>ws://</code> and
+    unencrypted, so if you bind it to anything other than localhost, set the
+    transport password and treat that port accordingly. Please make sure to run
+    everything behind proxies or having this setup will totally defy the purpose
+    of having a private meta search aggregator.
+  </p>
+</div>
+
+<h2 id="gandalf">What to do when you see Gandalf</h2>
+<figure class="doc-screenshot-image-wrapper">
+  <img class="doc-screenshot-image" src="images/screenshots/gandalf.png"
+    data-screenshot-target="images/screenshots/gandalf.png" alt="Gandalf the Grey blocking your access." />
+  <figcaption>
+    Gandalf the Grey says you shall not pass.
+  </figcaption>
+</figure>
+<p>
+  If the homepage shows ASCII art of Gandalf instead of the search box, you have
+  been banned by the honeypot. Your instance is not compromised. Gandalf is
+  Degoog's way of telling a banned IP to go away, and it is working as designed.
+</p>
+<p>
+  The honeypot serves bait paths that look like exposed secrets
+  (<code>.env</code>, <code>admin.php</code>, WordPress login, and similar). No
+  real visitor requests them. Bots do, and the IP that requested the trap gets
+  added to the blocklist. Check your logs for lines like
+  <code>WARN [honeypot] trap hit: /admin.php from …</code> to confirm.
+</p>
+<p>
+  The common surprise is running behind a reverse proxy (Traefik, nginx, Caddy,
+  Pangolin, and so on) without telling Degoog to trust forwarded headers. By
+  default Degoog ignores <code>X-Forwarded-For</code>, so every request looks
+  like it comes from the proxy's internal address. A bot hits the trap, that
+  shared address gets banned, and suddenly you see Gandalf even though you never
+  touched those paths yourself. The same misconfiguration also makes rate limits
+  apply to everyone at once; see
+  <a href="troubleshooting.html#rate-limited-yourself">Everyone is getting rate limited</a>.
+</p>
+<p>To get back in:</p>
+<ol>
+  <li>
+    <strong>Unban yourself.</strong> From another device or network, open
+    <em>Settings, Server, Bot Control</em> and remove your IP from
+    <strong>Blocked IPs</strong>. You can also edit
+    <code>data/blocklist.json</code> directly if settings are unreachable.
+  </li>
+  <li>
+    <strong>Fix proxy IP detection.</strong> If Degoog sits behind a reverse
+    proxy you control, set <code>DEGOOG_DISTRUST_PROXY=0</code> in your compose
+    file or environment so Degoog sees each visitor's real IP. Only do this when
+    the proxy strips or rewrites incoming forwarded headers; leave the default
+    if Degoog is exposed directly to the internet. Details are in
+    <a href="environment-variables.html">Environment variables</a> and
+    <a href="server-settings.html#bot-control">Bot control</a>.
+  </li>
+  <li>
+    <strong>Disable the honeypot if you do not need it.</strong> On a personal
+    or LAN-only instance, turn off honeypot traps in
+    <em>Settings, Server, Bot Control</em>. That stops Gandalf entirely.
+  </li>
+</ol>
+<div class="block-note">
+  <p>
+    Recent Degoog versions no longer ban private and localhost addresses when a
+    trap fires; they log a warning instead. If Gandalf keeps coming back after
+    you set <code>DEGOOG_DISTRUST_PROXY=0</code>, double-check that the variable
+    is in the right service block, pull the latest image, and read the release
+    notes when you upgrade.
+  </p>
+</div>
+
+<h2 id="general-tips">Smaller things worth knowing</h2>
+<ul>
+  <li>
+    <strong>Fewer engines is often better.</strong> Every enabled engine is a
+    request on every search. Three good engines beat nine flaky ones, and your
+    sidebar timings will tell you which is which.
+  </li>
+  <li>
+    <strong>Per-engine scores tilt the ranking.</strong> Each engine has a
+    <em>Score</em> multiplier in <em>Configure, Advanced</em>. Raise engines you
+    trust, lower engines that return junk. The full math is in
+    <a href="engines-providers.html#aggregation">How aggregation works</a>.
+  </li>
+  <li>
+    <strong>Per-engine timeouts stop one slow engine ruining everything.</strong>
+    Same panel.
+  </li>
+  <li>
+    <strong>Domain scoring is the blunt instrument for result quality.</strong>
+    It adds or removes plain points after Degoog has merged results. Use it to
+    push favourite documentation sites up and content farms down.
+  </li>
+  <li>
+    <strong>Streaming makes searches feel faster</strong> because results appear
+    as each engine answers instead of waiting for the slowest. It is not
+    compatible with the POST search method, and you cannot have both.
+  </li>
+  <li>
+    <strong>Valkey is worth it if you run more than one replica</strong>, or a
+    public instance. It shares the search cache and propagates settings changes
+    instantly.
+  </li>
+  <li>
+    <strong>The indexer quietly improves over time.</strong> If the same pages
+    keep proving useful, letting the <a href="indexer.html">indexer</a> remember
+    them means they resurface even when an upstream engine is having a bad day.
+  </li>
+  <li>
+    <strong>Restart when Degoog asks.</strong> Some extensions show a "Server
+    restart required" warning. The banner in <em>Settings, General</em> has a
+    button that does it for you.
+  </li>
+</ul>

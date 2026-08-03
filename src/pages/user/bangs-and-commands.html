@@ -1,0 +1,236 @@
+<div class="doc-page-header">
+  <h1><a href="index.html">Degoog</a> Bangs and commands</h1>
+  <p class="doc-page-desc">
+    Short prefixes that send a query somewhere specific, or run something useful
+    instead of searching.
+  </p>
+</div>
+
+<h2 id="syntax">The syntax</h2>
+<p>
+  A bang is <code>!</code> followed by a trigger word. Degoog accepts it at
+  either end of your query, so both of these are the same thing:
+</p>
+<pre><code>!weather london
+weather london !weather</code></pre>
+<p>
+  The leading form takes everything after the trigger as the argument. The
+  trailing form takes everything before it. Triggers are case-insensitive, so
+  <code>!IP</code> and <code>!ip</code> both work.
+</p>
+<p>
+  Not sure what you have? Type <code>!help</code>. It lists every command your
+  instance can currently run, grouped into <strong>Built-in</strong>,
+  <strong>Plugins</strong>, and <strong>Engine shortcuts</strong>, with a search
+  box on top. Commands that are disabled or still missing required configuration
+  are left out, so what you see is what will actually work.
+</p>
+
+<figure class="doc-screenshot-image-wrapper">
+  <img class="doc-screenshot-image" src="images/screenshots/help-bang.png"
+    data-screenshot-target="images/screenshots/help-bang.png" alt="The !help command output" />
+  <figcaption>The <code>!help</code> command output.</figcaption>
+</figure>
+
+<h2 id="built-in">The four built-in commands</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Command</th>
+      <th>What it does</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>!help</code></td>
+      <td>
+        Lists every available command, searchable and grouped by category.
+      </td>
+    </tr>
+    <tr>
+      <td><code>!ip</code></td>
+      <td>
+        Looks up an IP address: city, region, country, ISP, organisation, and
+        coordinates. Give it an address (<code>!ip 8.8.8.8</code>) or leave it
+        blank and it detects your own public address from the browser first.
+        Lookups go through <code>ip-api.com</code>.
+      </td>
+    </tr>
+    <tr>
+      <td><code>!speedtest</code></td>
+      <td>
+        Runs a download, upload, and latency test from your browser and shows
+        the numbers inline.
+      </td>
+    </tr>
+    <tr>
+      <td><code>!uuid</code></td>
+      <td>
+        Generates random v4 UUIDs with a copy button on each. Ten by default;
+        pass a number for more, up to 100.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  There are also two built-in panels that are not commands and appear on their
+  own: <strong>At a glance</strong> pulls a readable excerpt from the top result
+  and shows it above your results, and <strong>Wikipedia</strong> puts a summary
+  card in the sidebar when your query matches an article. Both can be turned off
+  or configured in <em>Settings, Plugins</em>. Wikipedia can be pointed at any
+  <code>*.wikipedia.org</code> domain, so <code>fr.wikipedia.org</code> works if
+  you would rather read French.
+</p>
+
+<h2 id="engine-shortcuts">Engine shortcuts</h2>
+<p>
+  An engine can claim its own bang. When it does, that bang runs your search
+  against <strong>only</strong> that engine. Google's is <code>!g</code>, so:
+</p>
+<pre><code>!g why is my dns broken</code></pre>
+<p>
+  searches Google alone, skipping everything else you have enabled. Which
+  shortcuts exist depends entirely on which engines you installed.
+  <code>!help</code> lists them all under "Engine shortcuts".
+</p>
+
+<h2 id="natural-language">Natural language mode</h2>
+<p>
+  Some commands recognise plain phrases as well as bangs. <code>!ip</code> knows
+  "what's my ip" and "my ip". <code>!speedtest</code> knows "speed test" and
+  "test my internet speed". Store plugins add their own: "what's the weather",
+  "what time is it in", "qr code for", and so on.
+</p>
+<p>
+  This is off by default. Each command that supports it gets a
+  <strong>Natural language</strong> toggle in
+  <em>Settings, Plugins, Configure</em>. Turn it on and typing the phrase
+  without a <code>!</code> runs the command and shows your normal search results
+  underneath it, so you do not lose the search by asking a question.
+</p>
+
+<h2 id="aliases">Aliases</h2>
+<p>
+  Aliases are extra names for a command you already have. Many store plugins
+  ship with their own (<code>!jf</code> for <code>!jellyfin</code>,
+  <code>!pw</code> for <code>!password</code>, <code>!def</code> for
+  <code>!define</code>), and you can add as many of your own as you like.
+</p>
+<p>
+  Create <code>data/aliases.json</code>, or point
+  <code>DEGOOG_ALIASES_FILE</code> somewhere else, and map new names to existing
+  triggers:
+</p>
+<pre><code>{
+  "jelly": "jellyfin",
+  "search": "meili",
+  "id": "uuid"
+}</code></pre>
+<p>
+  The key is what you type after <code>!</code>; the value is the command it
+  runs. Restart the server to pick up changes. Aliases cannot shadow an existing
+  trigger, so you will not accidentally break <code>!help</code>. Your aliases
+  show up in <code>!help</code> next to the command they point at.
+</p>
+
+<h2 id="store-commands">Commands from the Store</h2>
+<p>
+  The official extensions repository adds a good number of these. A sample of
+  what is there:
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Command</th>
+      <th>What it does</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>!weather</code></td>
+      <td>
+        Forecasts from Open-Meteo. Also <code>!forecast</code>,
+        <code>!wttr</code>.
+      </td>
+    </tr>
+    <tr>
+      <td><code>!define</code></td>
+      <td>
+        Word definitions from the Free Dictionary API. Also <code>!def</code>,
+        <code>!d</code>, <code>!meaning</code>.
+      </td>
+    </tr>
+    <tr>
+      <td><code>!time</code></td>
+      <td>
+        Current time in a timezone or city. Also <code>!tz</code>,
+        <code>!clock</code>.
+      </td>
+    </tr>
+    <tr>
+      <td><code>!qr</code></td>
+      <td>Generates a QR code for a URL.</td>
+    </tr>
+    <tr>
+      <td><code>!password</code></td>
+      <td>
+        Random password generator. Also <code>!pw</code>, <code>!pass</code>,
+        <code>!genpass</code>.
+      </td>
+    </tr>
+    <tr>
+      <td><code>!colors</code></td>
+      <td>
+        Five-colour palette generator. Space shuffles, click locks a colour.
+      </td>
+    </tr>
+    <tr>
+      <td><code>!history</code></td>
+      <td>Paginated, deletable search history stored on your server.</td>
+    </tr>
+    <tr>
+      <td><code>!jellyfin</code>, <code>!romm</code>, <code>!meili</code></td>
+      <td>
+        Search your own Jellyfin media library, RomM game library, or
+        Meilisearch indexes.
+      </td>
+    </tr>
+    <tr>
+      <td><code>!custom-bangs</code></td>
+      <td>
+        Define your own redirect bangs that send a query to any site through a
+        URL template.
+      </td>
+    </tr>
+    <tr>
+      <td><code>!!</code></td>
+      <td>
+        The DuckDuckGo bang redirect plugin. <code>!!</code> followed by any
+        DuckDuckGo bang runs it. Note that this routes through DuckDuckGo rather
+        than staying on your instance.
+      </td>
+    </tr>
+    <tr>
+      <td><code>!4play</code></td>
+      <td>
+        Live status of the 4play transport: warmed sessions, containers, and a
+        way to clear them. Pairs with the transports covered in
+        <a href="tips-and-tricks.html">Tips and tricks</a>.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  Browse the full catalogue in <em>Settings, Store</em>, or in the
+  <a href="https://degoog-org.github.io/community-extensions/" class="external" target="_blank" rel="noopener">community
+    extensions list</a>.
+</p>
+
+<div class="block-note">
+  <p>
+    Plugins run code on your server. Install them from repositories you actually
+    trust, and read
+    <a href="plugins-themes-store.html#safety">the safety notes</a> before
+    adding a repository you found in a forum post.
+  </p>
+</div>

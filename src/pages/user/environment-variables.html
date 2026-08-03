@@ -1,0 +1,553 @@
+<div class="doc-page-header">
+  <h1><a href="index.html">Degoog</a> Environment variables</h1>
+  <p class="doc-page-desc">
+    Everything you configure before Degoog starts, rather than from the settings
+    page.
+  </p>
+</div>
+
+<h2 id="how-to-set">How to set them</h2>
+<p>
+  Degoog reads its configuration from the process environment at startup. The
+  usual way to supply it is a <code>.env</code> file: one
+  <code>KEY=value</code> per line, no <code>export</code> prefix,
+  <code>#</code> for comments.
+</p>
+<p>
+  Some things can <strong>only</strong> be set this way.
+  <code>DEGOOG_SETTINGS_PASSWORDS</code> in particular is read exclusively from
+  the environment; there is no settings UI and no on-disk file for it. If your
+  instance is reachable from the internet, set it before the first start. An
+  unlocked instance lets anyone install extensions, and extensions run code on
+  your server.
+</p>
+<pre><code># .env
+DEGOOG_PORT=4444
+DEGOOG_SETTINGS_PASSWORDS=your-secure-password
+LOG_LEVEL=info
+
+# Optional: listen on a Unix socket instead of a port
+# DEGOOG_UNIX_SOCKET=/run/degoog/degoog.sock</code></pre>
+
+<h3>Docker and Podman</h3>
+<p>
+  Put <code>.env</code> next to your compose file and add
+  <code>env_file: .env</code> to the service, or pass
+  <code>--env-file .env</code> to <code>docker run</code> /
+  <code>podman run</code>. Container images also honour <code>PUID</code> and
+  <code>PGID</code> so ownership on mounted volumes matches your host user.
+</p>
+<pre><code>services:
+  degoog:
+    image: ghcr.io/degoog-org/degoog:latest
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "4444:4444"</code></pre>
+
+<h3>Native install or release tarball</h3>
+<p>
+  Save <code>.env</code> in the project root next to <code>package.json</code>;
+  Bun loads it automatically when you start from that directory. Always start
+  Degoog from that directory, because paths like
+  <code>data/plugins</code> resolve relative to the working directory.
+</p>
+<p>
+  Prebuilt archives are attached to each
+  <a
+    href="https://github.com/degoog-org/degoog/releases"
+    class="external"
+    target="_blank"
+    rel="noopener"
+    >GitHub release</a
+  >. You also need
+  <a href="https://bun.sh" class="external" target="_blank" rel="noopener"
+    >bun</a
+  >,
+  <a href="https://git-scm.com" class="external" target="_blank" rel="noopener"
+    >git</a
+  >, and
+  <a href="https://curl.se" class="external" target="_blank" rel="noopener"
+    >curl</a
+  >
+  on the host.
+</p>
+
+<h3>systemd</h3>
+<pre><code>[Service]
+WorkingDirectory=/opt/degoog
+EnvironmentFile=/opt/degoog/.env
+ExecStart=/usr/local/bin/bun run src/server/index.ts
+Restart=on-failure</code></pre>
+
+<h3 id="viewing-server-logs">Viewing server logs</h3>
+<p><code>LOG_LEVEL</code> controls how much gets printed. Where to read it:</p>
+<ul>
+  <li><strong>Docker Compose:</strong> <code>docker compose logs -f</code></li>
+  <li><strong>Podman:</strong> <code>podman logs -f degoog</code></li>
+  <li><strong>systemd:</strong> <code>journalctl -u degoog -f</code></li>
+  <li>
+    <strong>Tarball or native:</strong> the terminal you started it in. Redirect
+    stdout and stderr to a file if you run detached.
+  </li>
+</ul>
+
+<h2 id="server">Server and networking</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>DEGOOG_PORT</code></td>
+      <td>The port the server listens on.</td>
+      <td><code>4444</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_UNIX_SOCKET</code></td>
+      <td>
+        Listen on a Unix domain socket instead of a TCP port, for example
+        <code>/run/degoog/degoog.sock</code>. Degoog detects and removes a stale
+        socket left behind by an unclean shutdown.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_BASE_URL</code></td>
+      <td>
+        Base path when serving behind a reverse proxy at a sub-path, for example
+        <code>/degoog</code>. A full URL is accepted and only its path is used,
+        so a bare domain with no sub-path has no effect. The OpenSearch
+        descriptor always uses just the path portion so its URLs stay valid.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_DISTRUST_PROXY</code></td>
+      <td>
+        Whether to ignore <code>X-Forwarded-For</code>, <code>X-Real-IP</code>,
+        and <code>X-Forwarded-Proto</code> when determining the client IP and
+        protocol. Defaults to distrusting them, which is correct when Degoog is
+        exposed directly, since otherwise any client could spoof its source IP.
+        Set to <code>0</code> or <code>false</code> only behind a reverse proxy
+        you control that strips those headers on the way in.
+      </td>
+      <td><code>1</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_OUTGOING_ALLOWED_HOSTS</code></td>
+      <td>
+        Comma-separated allowlist of hostnames Degoog may reach for outgoing
+        requests. Wildcards such as <code>*.example.com</code> are accepted.
+        Unset means no hostname restriction. A good hardening layer on an
+        exposed instance.
+      </td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="access">Access and settings gate</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>DEGOOG_SETTINGS_PASSWORDS</code></td>
+      <td>
+        Comma-separated list of passwords for the settings page. If unset and
+        the gate is not explicitly disabled, Degoog generates a one-off password
+        for that run and prints it in the startup logs.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_DANGEROUSLY_NO_PASSWORD</code></td>
+      <td>
+        Set to <code>true</code> to remove the settings gate entirely. Degoog
+        logs a loud warning at startup when this is on. Only sensible on a
+        trusted local network.
+      </td>
+      <td><code>false</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_PUBLIC_INSTANCE</code></td>
+      <td>
+        Set to <code>true</code> or <code>1</code> to run in public mode.
+        Visitors get a cut-down settings page (appearance, search options,
+        engine toggles) and every server-side mutation API returns Unauthorized.
+        The admin panel moves to <code>/admin</code>, and is only reachable if a
+        password is configured too.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_SETTINGS_PATH</code></td>
+      <td>
+        Moves the admin settings panel to a custom path. Defaults to
+        <code>settings</code> on a normal instance and <code>admin</code> on a
+        public one. Leading slashes are stripped. On a public instance the panel
+        at this path returns 404 with no hint that it exists unless a password
+        is also configured.
+      </td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="behaviour">Behaviour and localisation</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>DEGOOG_DEFAULT_SEARCH_LANGUAGE</code></td>
+      <td>
+        Language applied to searches when the user has not picked one. Only the
+        primary subtag is used, so <code>en-US</code> becomes <code>en</code>.
+        Unset means no language is sent and each engine uses its own default.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_I18N</code></td>
+      <td>
+        Forces the UI locale for every request, overriding
+        <code>Accept-Language</code>. For example <code>en-US</code>,
+        <code>fr-FR</code>, <code>it</code>, <code>he</code>.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_WIZARD</code></td>
+      <td>
+        Set to <code>false</code> to suppress the first-run setup wizard
+        regardless of persisted state. Useful when provisioning instances
+        automatically.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_BETA_STORE</code></td>
+      <td>
+        Set to <code>1</code> to prefer the <code>develop</code> branch of every
+        store repository over <code>main</code> or <code>master</code>, falling
+        back silently when it does not exist. For extension developers and
+        nightly testers.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>LOG_LEVEL</code></td>
+      <td>
+        Console verbosity, from most to least severe: <code>fatal</code>,
+        <code>error</code>, <code>warn</code>, <code>info</code>,
+        <code>log</code>, <code>debug</code>. Each level includes the more
+        severe ones. <code>debug</code> also prints plugin execution times.
+      </td>
+      <td><code>info</code></td>
+    </tr>
+    <tr>
+      <td><code>LOG_TRANSLATION</code></td>
+      <td>
+        Set to <code>true</code> for translation-specific logging: missing keys,
+        locale resolution, broken locale files. Independent of
+        <code>LOG_LEVEL</code>.
+      </td>
+      <td><code>false</code></td>
+    </tr>
+    <tr>
+      <td><code>NO_COLOR</code></td>
+      <td>
+        Set to any value to strip ANSI colour from all console output. Follows
+        the
+        <a
+          href="https://no-color.org"
+          class="external"
+          target="_blank"
+          rel="noopener"
+          >no-color</a
+        >
+        convention.
+      </td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="cache">Cache</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>DEGOOG_VALKEY_URL</code></td>
+      <td>
+        Connection URL for Valkey, or any RESP-compatible server (Redis, KeyDB,
+        Dragonfly). When set, Degoog uses it as a shared cache and cross-process
+        invalidation bus, so replicas share search and autocomplete results and
+        react to settings changes instantly. Without it, all caching is
+        per-process and in memory. Example: <code>redis://valkey:6379</code>.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_CACHE_TTL_MS</code></td>
+      <td>
+        Default lifetime for cached search responses and autocomplete
+        suggestions, in milliseconds.
+      </td>
+      <td><code>43200000</code> (12 hours)</td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_CACHE_SHORT_TTL_MS</code></td>
+      <td>
+        Shorter lifetime used when a search came back with failed engines, so
+        the next attempt refetches sooner. Also used by short-lived extension
+        caches.
+      </td>
+      <td><code>120000</code> (2 minutes)</td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_CACHE_MAX_ENTRIES</code></td>
+      <td>
+        Maximum entries per in-memory cache namespace. The least recently used
+        entry is evicted on insert once the cap is reached. Only bounds the
+        in-process cache; a shared Valkey cache is governed by Valkey's own
+        <code>maxmemory</code> policy.
+      </td>
+      <td><code>1000</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="docker">Docker</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>PUID</code></td>
+      <td>
+        User ID the container process runs as. Match it to your host user so the
+        mounted <code>data</code> directory stays writable.
+      </td>
+      <td><code>1000</code></td>
+    </tr>
+    <tr>
+      <td><code>PGID</code></td>
+      <td>Group ID the container process runs as.</td>
+      <td><code>1000</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="paths">Data directories and files</h2>
+<p>
+  Everything below defaults to somewhere inside the data directory, so
+  overriding <code>DEGOOG_DATA_DIR</code> alone usually gets you what you want.
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>DEGOOG_DATA_DIR</code></td>
+      <td>Root directory for all on-disk state.</td>
+      <td><code>data</code> (relative to the working directory)</td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_PLUGINS_DIR</code></td>
+      <td>Installed plugins.</td>
+      <td><code>data/plugins</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_ENGINES_DIR</code></td>
+      <td>Installed search engines.</td>
+      <td><code>data/engines</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_THEMES_DIR</code></td>
+      <td>Installed themes.</td>
+      <td><code>data/themes</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_TRANSPORTS_DIR</code></td>
+      <td>Installed transports.</td>
+      <td><code>data/transports</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_AUTOCOMPLETE_DIR</code></td>
+      <td>Installed autocomplete providers.</td>
+      <td><code>data/autocomplete</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_SHORTCUTS_DIR</code></td>
+      <td>Installed keyboard shortcuts.</td>
+      <td><code>data/shortcuts</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_PLUGIN_SETTINGS_FILE</code></td>
+      <td>
+        Per-extension settings for plugins, themes, engines, autocomplete
+        providers, and transports.
+      </td>
+      <td><code>data/plugin-settings.json</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_SERVER_SETTINGS_FILE</code></td>
+      <td>
+        Instance-level settings: honeypot, streaming, rate limits, API secret,
+        wizard state, and the per-instance identifier used to namespace the
+        shared cache.
+      </td>
+      <td><code>data/server-settings.json</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_DEFAULT_ENGINES_FILE</code></td>
+      <td>The instance's default enabled and disabled engines.</td>
+      <td><code>data/default-engines.json</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_SEARCH_LISTS_FILE</code></td>
+      <td>
+        Domain blocking, replacement, and scoring lists. Edit this directly when
+        a list grows too large for the UI to render.
+      </td>
+      <td><code>data/search/search-lists.json</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_ALIASES_FILE</code></td>
+      <td>Your custom bang command aliases.</td>
+      <td><code>data/aliases.json</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_BLOCKLIST_FILE</code></td>
+      <td>Banned IP addresses.</td>
+      <td><code>data/blocklist.json</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_SETTINGS_TOKENS_FILE</code></td>
+      <td>Active settings session tokens.</td>
+      <td><code>data/settings-tokens.json</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="indexer">Indexer</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>DEGOOG_POSTGRES</code></td>
+      <td>
+        Postgres connection URL. When set, the
+        <a href="indexer.html">indexer</a> uses Postgres instead of SQLite,
+        which scales concurrent writes and full-text search far better on a busy
+        instance.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_INDEXER_DIR</code></td>
+      <td>Directory holding the index databases and its config.</td>
+      <td><code>data/indexer</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_INDEXER_DB</code></td>
+      <td>Path to the main SQLite index file.</td>
+      <td><code>data/indexer/index.db</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_INDEXER_CONFIG_FILE</code></td>
+      <td>
+        Indexer filters and limits. Edit directly when a list is too large for
+        the UI.
+      </td>
+      <td><code>data/indexer/indexer-config.json</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="searx">SearX compatibility layer</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>DEGOOG_SEARX_ENGINES_DIR</code></td>
+      <td>Where downloaded SearXNG engine files are kept.</td>
+      <td><code>data/searx/engines</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_SEARX_EXTRA_ENGINES</code></td>
+      <td>
+        Comma-separated SearXNG engine codes to treat as supported in addition
+        to the built-in compatibility list. For trying engines that have not
+        been verified yet.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_PYTHON_BIN</code></td>
+      <td>Python interpreter used to run SearXNG engine files.</td>
+      <td><code>python3</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="block-note">
+  <p>
+    The <code>degoog-mcp</code> sidecar has its own
+    <code>DEGOOG_MCP_*</code> variables, documented in the
+    <a
+      href="https://github.com/degoog-org/degoog/tree/main/mcp"
+      class="external"
+      target="_blank"
+      rel="noopener"
+      >MCP README</a
+    >
+    rather than here, since it is a separate process.
+  </p>
+</div>

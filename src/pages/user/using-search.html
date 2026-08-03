@@ -1,0 +1,266 @@
+<div class="doc-page-header">
+  <h1><a href="index.html">Degoog</a> Using search</h1>
+  <p class="doc-page-desc">
+    The results page, one part at a time: tabs, filters, the sidebar, result
+    actions, and the keyboard.
+  </p>
+</div>
+
+<figure class="doc-screenshot-image-wrapper">
+  <img class="doc-screenshot-image" src="images/screenshots/autocomplete-preview.png"
+    data-screenshot-target="images/screenshots/autocomplete-preview.png" alt="Autocomplete preview" />
+  <figcaption>Autocomplete preview.</figcaption>
+</figure>
+
+<h2 id="autocomplete">Autocomplete</h2>
+<p>
+  Suggestions appear under the search box as you type, but only if you have
+  installed an
+  <a href="engines-providers.html#autocomplete">autocomplete provider</a>. None
+  ship with Degoog. If the dropdown never appears, that is almost always why.
+</p>
+<p>
+  Some providers support <strong>rich suggestions</strong>: an entity card with
+  a thumbnail and a short description at the top of the list. It is a
+  per-provider toggle in <em>Settings, Autocomplete, Configure</em>, off by
+  default.
+</p>
+
+<h2 id="tabs">Result tabs</h2>
+<p>
+  The tabs across the top are not a fixed list. Each engine declares which
+  <strong>search types</strong> it handles, and Degoog builds one tab per type
+  it can actually serve. Install only a web engine and you get one tab. Add Bing
+  Images and an Images tab shows up. Add an engine that invents its own type,
+  like a file search or a media library, and you get a tab for that too.
+</p>
+<p>
+  Switching tab runs a fresh search against just the engines that serve that
+  type, so an empty Images tab means "no image engine returned anything", not
+  "no results exist".
+</p>
+<p>
+  You can reorder the tabs from <em>Settings, Engines, Order tabs</em>, and drag
+  them into whatever sequence suits you.
+</p>
+
+<h2 id="filters">Filters</h2>
+<p>
+  The <strong>Filter</strong> button next to the tabs opens a small panel with
+  two controls:
+</p>
+<ul>
+  <li>
+    <strong>Time.</strong> Any time, past hour, past 24 hours, week, month,
+    year, or a custom range with a start and end date.
+  </li>
+  <li>
+    <strong>Language.</strong> A searchable list. By default roughly 90
+    languages are offered; whoever runs the instance can trim that to a shorter
+    list in <a href="server-settings.html#languages">Server settings</a>.
+  </li>
+</ul>
+<p>
+  Filters are passed through to each engine. Engines that do not support a
+  filter simply ignore it, which is why a time filter sometimes tightens one
+  engine's results and not another's.
+</p>
+
+<h3 id="image-filters">Image filters</h3>
+<p>
+  On an images tab you get a second, richer filter panel: <strong>size</strong>,
+  <strong>colour</strong>, <strong>type</strong> (photo, clipart, line art,
+  animated), <strong>layout</strong> (square, wide, tall), and
+  <strong>safe mode</strong> (strict, moderate, off).
+</p>
+<div class="block-note">
+  <p>
+    The options you see are the union of what your enabled image engines
+    actually support. Install a second image engine and new options can appear.
+    Disable one and options can disappear. Nothing is broken; the panel just
+    reflects reality.
+  </p>
+</div>
+
+<h2 id="sidebar">The sidebar</h2>
+<p>
+  The right-hand column is where Degoog is honest with you about what happened:
+</p>
+<ul>
+  <li>
+    <strong>Engine Performance.</strong> Every engine that ran, how long it
+    took, and how many results it contributed. Handy for spotting the one engine
+    adding two seconds to every search.
+  </li>
+  <li>
+    <strong>Failures, with a reason.</strong> When an engine comes back empty,
+    Degoog says why: blocked by the engine, rate limited, CAPTCHA challenge,
+    could not read the response, timed out, network error, blocked by an
+    interstitial page, or no usable response. There is a
+    <strong>retry</strong> link next to each failure that re-runs only that
+    engine.
+  </li>
+  <li>
+    <strong>People also search for.</strong> Related queries, when engines
+    supply them.
+  </li>
+  <li>
+    <strong>Plugin panels.</strong> The built-in Wikipedia card lands here, and
+    so do slot plugins configured for the sidebar.
+  </li>
+</ul>
+<p>
+  Those failure reasons are the single most useful debugging tool in the app.
+  "Blocked by the engine" or "Blocked by an interstitial page" on Google means
+  you need a different transport, not a different engine.
+  <a href="tips-and-tricks.html">Tips and tricks</a> explains which one.
+</p>
+
+<h2 id="results">Reading a result</h2>
+<ul>
+  <li>
+    <strong>Sources.</strong> When several engines return the same page, Degoog
+    merges them into one row and lists every engine that found it. Overlap
+    pushes a result up the ranking.
+  </li>
+  <li>
+    <strong>Insecure badge.</strong> Marks a site served over plain
+    <code>http://</code>.
+  </li>
+  <li>
+    <strong>From your index.</strong> Shows when a result came from the
+    <a href="indexer.html">Degoog Indexer</a> rather than a live engine.
+  </li>
+  <li>
+    <strong>Domain actions.</strong> If the instance allows it and you are
+    signed in to settings, a kebab menu on each row lets you <em>block</em> that
+    domain, <em>replace</em> it with another (for example send every
+    <code>reddit.com</code> link to your preferred front end), or
+    <em>score</em> it to push that domain up or down in future rankings. These
+    are instance-wide rules and are hidden entirely on public or unauthenticated
+    instances. The switches live in
+    <a href="server-settings.html#domain-rules">Server settings</a>.
+  </li>
+</ul>
+
+<h2 id="media">Images and videos</h2>
+<p>
+  Image results open in a lightbox you can zoom with the scroll wheel (up to
+  eight times) and drag around. Videos and other media open in a preview panel.
+  In both, <kbd>&larr;</kbd> and <kbd>&rarr;</kbd> move between items and
+  <kbd>Esc</kbd> closes.
+</p>
+<p>
+  Animated GIFs play inline by default. If that is distracting,
+  <em>Settings, General, Search Options</em> has "Disable GIF animation in image
+  results".
+</p>
+
+<h2 id="pagination">Pages</h2>
+<p>
+  Results paginate up to <strong>page 10</strong>. That is a hard ceiling in the
+  server, not a UI limit, and it exists because most engines stop being useful
+  (or stop answering politely) well before then.
+</p>
+
+<h2 id="lucky">I'm Feeling Lucky</h2>
+<p>
+  Runs a normal web search and redirects you straight to the first result. The
+  button's label shuffles through variants when you hover it, purely for fun.
+  Every variant does the same thing.
+</p>
+
+<h2 id="search-options">Search options worth knowing</h2>
+<p>
+  <em>Settings, General, Search Options</em> holds eight toggles that change how
+  the results page behaves. They are stored in your browser, so they are yours
+  alone:
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Option</th>
+      <th>Default</th>
+      <th>What it does</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Open result links in new tab</td>
+      <td>Off</td>
+      <td>Adds <code>target="_blank"</code> to every result link.</td>
+    </tr>
+    <tr>
+      <td>Display engine performance</td>
+      <td>On</td>
+      <td>Shows or hides the timings block in the sidebar.</td>
+    </tr>
+    <tr>
+      <td>Display related search queries</td>
+      <td>On</td>
+      <td>Shows or hides "People also search for".</td>
+    </tr>
+    <tr>
+      <td>Disable GIF animation in image results</td>
+      <td>Off</td>
+      <td>Freezes animated GIFs in the image grid.</td>
+    </tr>
+    <tr>
+      <td>Use POST method for search requests</td>
+      <td>Off</td>
+      <td>
+        Sends your query in a request body instead of the URL, so it never lands
+        in browser history or proxy logs. Not compatible with streaming results.
+      </td>
+    </tr>
+    <tr>
+      <td>Keep the results sidebar sticky</td>
+      <td>Off</td>
+      <td>The sidebar follows you as you scroll.</td>
+    </tr>
+    <tr>
+      <td>Center search results</td>
+      <td>Off</td>
+      <td>Centres the results column instead of aligning it left.</td>
+    </tr>
+    <tr>
+      <td>Hide query parameters in result URLs</td>
+      <td>Off</td>
+      <td>Trims tracking junk off the displayed URL.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="keyboard">Keyboard shortcuts</h2>
+<p>
+  One shortcut is built in: <kbd>/</kbd> focuses the search box. Everything else
+  is an installable shortcut extension, and all of them are rebindable in
+  <em>Settings, Shortcuts</em>. The official store publishes:
+</p>
+<ul>
+  <li>Next tab and previous tab</li>
+  <li>
+    Switch tab by number (hold your chosen modifier, press <kbd>1</kbd> to
+    <kbd>9</kbd>)
+  </li>
+  <li>Go home and go to settings</li>
+  <li>
+    Highlight next result, highlight previous result, and open the highlighted
+    result
+  </li>
+</ul>
+<p>
+  To rebind one, click it in <em>Settings, Shortcuts</em> and press the key
+  combination you want. <kbd>Esc</kbd> cancels the recording. Shortcuts are off
+  entirely unless keyboard shortcuts are enabled for the instance in
+  <a href="server-settings.html">Server settings</a>.
+</p>
+
+<h2 id="doc-search">Searching these docs</h2>
+<p>
+  The box in the sidebar of this site does two things at once. It highlights
+  matches on the page you are reading and counts them, and it searches every
+  other docs page in a dropdown. Press <kbd>/</kbd> to focus it and
+  <kbd>Esc</kbd> to clear it. Following a result carries your query across and
+  highlights it on the destination page.
+</p>

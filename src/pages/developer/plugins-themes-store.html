@@ -1,0 +1,169 @@
+<div class="doc-page-header">
+  <h1><a href="developer.html">Degoog</a> Store repositories</h1>
+  <p class="doc-page-desc">
+    Git repositories you can add in Settings then Store to easily install
+    plugins, themes, and engines.
+  </p>
+</div>
+
+<h2>What a store repo is</h2>
+<p>
+  A <strong>store repo</strong> is a Git repository you can link to Degoog by
+  going to <strong>Settings</strong> then <strong>Store</strong>. Once you add
+  it, you can browse and install plugins, themes, engines, and transports
+  directly from the Store tab without having to copy files manually.
+</p>
+
+<h2>Repo structure</h2>
+<p>Your repository needs to follow this layout:</p>
+<pre><code>my-degoog-repo/
+  package.json
+  plugins/
+    my-plugin/
+      index.js
+      template.html
+      style.css
+  themes/
+    my-theme/
+      theme.json
+      style.css
+  engines/
+    my-engine/
+      index.js
+  transports/
+    my-transport/
+      index.js</code></pre>
+<p>
+  Your plugin, theme, engine, and transport folders use the exact same format as
+  they do when installed directly in your
+  <code>data</code> folders. You do not need any extra packaging.
+</p>
+
+<h2>package.json (required)</h2>
+<p>
+  At the root of your repository, you need to add a
+  <code>package.json</code> file that lists every item you want to show up in
+  the Store:
+</p>
+<pre><code>{
+  "name": "my-degoog-repo",
+  "description": "Short description of your collection",
+  "author": "YourName",
+  "plugins": [
+    {
+      "path": "plugins/my-plugin",
+      "name": "My Plugin",
+      "description": "What it does",
+      "version": "1.0.0",
+      "type": "command"
+    }
+  ],
+  "themes": [
+    {
+      "path": "themes/my-theme",
+      "name": "My Theme",
+      "description": "Short description",
+      "version": "1.0.0"
+    }
+  ],
+  "engines": [],
+  "transports": [],
+  "repo-image": "logo.png"
+}</code></pre>
+<ul>
+  <li>
+    <strong>repo-image</strong> (optional): The path to an image file in your
+    repository root like <code>logo.png</code> or a full URL. This displays
+    right next to your repository in Settings then Store.
+  </li>
+  <li><strong>path</strong>: The folder path inside your repository.</li>
+  <li>
+    <strong>name</strong>, <strong>description</strong>, and
+    <strong>version</strong>: These details are displayed on the Store card.
+  </li>
+  <li>
+    <strong>type</strong> (plugins only): You can use <code>command</code>,
+    <code>slot</code>, <code>searchBar</code>, or
+    <code>search-result-tab</code>. This is optional and helps with the Store
+    display.
+  </li>
+  <li>
+    <strong>dependencies</strong> (optional): An array of URLs for things like
+    required engines. When someone installs your item, these dependencies are
+    offered to them automatically.
+  </li>
+</ul>
+<p>
+  Only the items you explicitly list here will appear in the Store. Make sure
+  your paths match your actual folders.
+</p>
+
+<h2>Optional author.json and screenshots</h2>
+<p>
+  Inside any plugin, theme, engine, or transport folder you can include a few
+  extra details:
+</p>
+<ul>
+  <li>
+    <strong>author.json</strong>: This file overrides the main repository author
+    for a specific item.
+  </li>
+</ul>
+<pre><code>{
+  "name": "Author Name",
+  "url": "https://github.com/username",
+  "avatar": "https://example.com/avatar.png"
+}</code></pre>
+<ul>
+  <li>
+    <strong>screenshots/</strong>: A folder containing image files like
+    <code>1.png</code> or <code>preview.png</code>. The very first image acts as
+    the Store card thumbnail, and all of them are visible in the lightbox when a
+    user clicks the image.
+  </li>
+</ul>
+
+<h2>Publish and share</h2>
+<ol>
+  <li>Push your repository to GitHub or any other Git host.</li>
+  <li>Copy the clone URL.</li>
+  <li>
+    Tell your users to go to <strong>Settings</strong> then
+    <strong>Store</strong> then <strong>Add</strong> and paste your URL.
+  </li>
+</ol>
+<p>
+  Users only need to add your repository once. After that, they can easily
+  install, uninstall, and refresh items directly from the Store. When someone
+  refreshes a repository, their installed items are automatically updated to the
+  latest version.
+</p>
+<p>
+  <strong>Official example:</strong> The
+  <a
+    href="https://github.com/degoog-org/official-extensions"
+    class="external"
+    target="_blank"
+    rel="noopener"
+    >official extensions repository</a
+  >
+  uses the clone URL
+  <code>https://github.com/degoog-org/official-extensions.git</code>. Just add
+  it to your Store to install the Weather plugin, fresh themes, and other great
+  extensions.
+</p>
+
+<h2>Community extensions</h2>
+<p>
+  We want to give a massive thank you to our community for building and sharing
+  their own plugins and engines. You can discover all of these over at the
+  <a
+    href="https://degoog-org.github.io/community-extensions/"
+    class="external"
+    target="_blank"
+    rel="noopener"
+    >community extensions page</a
+  >. Please remember that because these are created by other users, we do not
+  officially vet them or take any responsibility for them. Always make sure you
+  double check what you are installing on your system before adding it.
+</p>

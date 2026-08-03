@@ -1,0 +1,13 @@
+node_modules/
+/*.html
+/style.css
+/docs.js
+/docs-ui.js
+/search-index.json
+/search-index.js
+/images/
+/fontawesome/
+/placeholders/
+/_site/
+/dist/
+.DS_Store

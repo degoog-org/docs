@@ -1,0 +1,357 @@
+<div class="doc-page-header">
+  <h1><a href="index.html">Degoog</a> Server settings</h1>
+  <p class="doc-page-desc">
+    The instance-wide tab. Everything here affects every visitor, not just you.
+  </p>
+</div>
+
+<p>
+  <em>Settings, Server</em> is where you shape the instance itself: how fast
+  people can query it, how it reaches the internet, what it does about bots, and
+  what it remembers. Most of these have sensible defaults, but I encourage you all to
+  test out and fine tune your instance to your liking. Degoog is HEAVILY customisable.
+</p>
+
+<figure class="doc-screenshot-image-wrapper">
+  <img class="doc-screenshot-image" src="images/screenshots/settings-server.png"
+    data-screenshot-target="images/screenshots/settings-server.png" alt="The Server tab." />
+  <figcaption>The Server tab.</figcaption>
+</figure>
+
+<h2 id="presets">Server presets</h2>
+<p>
+  If you do not want to reason about every switch individually, start here. A
+  preset applies a one-shot template of settings that suit a particular kind of
+  deployment, shows you exactly which values it will change before you commit,
+  and warns you about what it cannot do for you.
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Preset</th>
+      <th>For</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Personal / Local Only</strong></td>
+      <td>
+        A single-user LAN or homelab box where convenience matters and the
+        network is trusted. Do not expose this one to the web as-is.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Family / Semi-Lax</strong></td>
+      <td>
+        A small trusted group behind auth, a VPN, or a private reverse proxy.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Public Web Instance</strong></td>
+      <td>
+        A normal public-facing instance with streaming, honeypot checks, and
+        sensible public rate limits.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Hardened Public Instance</strong></td>
+      <td>
+        An exposed instance that expects abuse. Stricter limits and API key
+        enforcement turned on.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Indexer / Discovery Mode</strong></td>
+      <td>
+        Prioritises discovery features and local result recording while keeping
+        basic public safeguards.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Compatibility / Low Resource Mode</strong></td>
+      <td>
+        Older browsers, buffering proxies, small VPSes. Streaming off, simpler
+        request behaviour.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<div class="block-note">
+  <p>
+    A preset overrides the settings it lists and nothing else. It cannot set
+    environment variables, and it will not replace your custom lists. In
+    particular, no preset can set <code>DEGOOG_SETTINGS_PASSWORDS</code> for
+    you, and the public presets say so explicitly.
+  </p>
+</div>
+
+<h2 id="streaming">Streaming results</h2>
+<p>
+  With streaming on, results appear as each engine responds instead of waiting
+  for all of them to finish. It makes a multi-engine search feel dramatically
+  faster, particularly when one engine is slow. That said the page does end up being
+  slightly chaotic with results moving around as new one pop in. I personally
+  live in chaos, so it's how I have my own instance configured.
+</p>
+<ul>
+  <li>
+    <strong>Auto-retry failed engines</strong> retries an engine that came back
+    empty, up to <strong>Max retries per engine</strong>. I'd keep this low at around 2/3 times max
+    so to not hammer engines that decide you are being rate limited. It'll just make the situation worse.
+  </li>
+  <li>
+    Streaming is <strong>not compatible</strong> with the POST search method. If you turn on POST in your search
+    options, streaming will stop applying to you.
+  </li>
+</ul>
+
+<h2 id="rate-limit">Rate limiting</h2>
+<p>
+  Limits requests per IP to protect both your instance and the upstream engines
+  you are querying. There are two independent groups, each with a short burst
+  window and a longer sustained window:
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Group</th>
+      <th>Defaults</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Search</strong></td>
+      <td>15 requests per 20 seconds, 150 per 10 minutes, per IP.</td>
+    </tr>
+    <tr>
+      <td><strong>Autocomplete</strong></td>
+      <td>60 requests per 20 seconds, 120 per minute, per IP.</td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  <strong>Autocomplete delay (ms)</strong> lives in the same section. It is how
+  long Degoog waits after you stop typing before asking providers for
+  suggestions. Raising it cuts requests noticeably.
+</p>
+<div class="block-note">
+  <p>
+    Rate limiting is per client IP, so it only works if Degoog can see the real
+    one. Behind a poorly configured reverse proxy that means setting
+    <code>DEGOOG_DISTRUST_PROXY=0</code>, and only when you control that proxy
+    and it strips incoming <code>X-Forwarded-For</code> headers. Left at the
+    default, Degoog ignores those headers, which is the safe choice when it is
+    exposed directly.
+  </p>
+</div>
+
+<h2 id="bot-control">Bot control</h2>
+<p>Two independent defences, both on by default:</p>
+<ul>
+  <li>
+    <strong>Honeypot traps.</strong> Degoog serves bait paths that look like
+    carelessly exposed secrets: a <code>.env</code> file, a PHP admin panel, a
+    WordPress login, an API endpoint, a JavaScript source file. No legitimate
+    visitor ever requests them. Anything that does gets banned.
+  </li>
+  <li>
+    <strong>Browser verification (CSS HMAC).</strong> Injects a signed token
+    into a stylesheet on every page. A real browser can't help but fetching that stylesheet, a scraper reading only the
+    HTML does not. Requests that never fetch it accumulate strikes until they are banned.
+  </li>
+</ul>
+<p>
+  <strong>Ban duration</strong> is in hours and defaults to 72. Set it to
+  <code>0</code> for permanent bans (frankly that'd make you a piece of shit given IP rotate, but you do you).
+  Expired bans are cleaned up automatically on the next request.
+</p>
+<p>
+  Below that you'll find the live <strong>Blocked IPs</strong> list, showing when each
+  was banned and when it expires. You can unban entries, or add an address
+  manually with <strong>Ban IP</strong>. Banned visitors get a themed 403 page
+  rather than a bare error.
+</p>
+
+<h2 id="proxy">Proxy</h2>
+<p>
+  Routes server-side search requests through proxies. One URL per line, requests
+  rotate through the list. These can be overridden per-engine in the <a href="engines-providers.html">Engines tab</a>.
+</p>
+<p>
+  <strong>Test proxy connection</strong> fetches your exit IP directly and
+  through the proxy, then compares them, and tells you which of four things
+  happened: the proxy is working and here are both IPs, the IPs match so the
+  proxy may not be doing anything, the proxy could not be contacted at all, or
+  the IP check service itself was unreachable. Much better than guessing.
+</p>
+
+<h3 id="image-proxy">Image proxy</h3>
+<p>
+  Result thumbnails are fetched by your server and re-served, so clients
+  never contacts the image host directly. By default the image proxy refuses
+  private and local addresses, which is the correct default and stops it being
+  used to probe your internal network.
+</p>
+<p>
+  If you run engines against your own services (a Jellyfin library, a
+  Meilisearch index) you will need those thumbnails. Turn on
+  <strong>Allow local network images</strong> and add regex patterns for the
+  hosts you actually trust. Leaving the allow list empty permits every local
+  address, which the UI describes as being at your own risk, and it means it.
+</p>
+
+<h2 id="domain-rules">Domain blocking, replacement and scoring</h2>
+<p>Three separate lists that reshape results after engines return them.</p>
+
+<h3>Blocking</h3>
+<p>
+  One domain per line. Subdomains are included automatically. Wrap a line in
+  slashes for a regular expression, which is matched against the hostname only,
+  not the full URL, and takes no flags:
+</p>
+<pre><code>example.com
+/(^|\.)instagram\.com$/
+/^www\.instagram\.com$/</code></pre>
+<p>
+  The first regex blocks <code>instagram.com</code> and every subdomain; the
+  second blocks only <code>www.instagram.com</code>.
+</p>
+
+<h3>Replacement</h3>
+<p>
+  Rewrites domains in result URLs, one rule per line, preserving the path.
+  Subdomains match automatically:
+</p>
+<pre><code>reddit.com -> old.reddit.com
+twitter.com -> nitter.net</code></pre>
+
+<h3>Scoring</h3>
+<p>
+  Add one domain and one number per row. Positive numbers move that domain up;
+  negative numbers move it down. Subdomains match automatically.
+</p>
+<pre><code>example.com|20
+spam.example|-15</code></pre>
+<p>
+  Think of it as a final nudge after Degoog has already merged the search
+  engines. If a result has <code>29</code> points and you add
+  <code>example.com|20</code>, it becomes <code>49</code>. If you add
+  <code>spam.example|-15</code>, it becomes <code>14</code>.
+</p>
+<p>
+  It is not a percentage. It is just plus or minus points. Use small numbers like
+  <code>5</code> or <code>-5</code> for a gentle nudge, and bigger numbers when
+  you really trust or dislike a domain.
+</p>
+<p>
+  For context, a first-place result from a normal engine starts at
+  <code>10</code> points. If two engines return the same URL, Degoog adds their
+  points together and gives it a small extra bonus. The full result math is in
+  <a href="engines-providers.html#aggregation">How aggregation works</a>.
+</p>
+<p>
+  Domain rules run in order: block first, replace second, score last.
+</p>
+
+<h3>Acting from the results page</h3>
+<p>
+  Each list has an <strong>Allow ... from search results</strong> toggle. Turn
+  it on and signed-in users get a kebab menu on every result row to block,
+  replace, or score that domain on the spot. These menus are hidden entirely on
+  public or unauthenticated instances regardless of the setting.
+</p>
+<div class="block-note">
+  <p>
+    If a list grows past what the UI can sensibly render, Degoog stops rendering
+    it and tells you to edit
+    <code>data/search/search-lists.json</code> directly. That is a deliberate
+    guard rail, not a bug.
+  </p>
+</div>
+
+<h2 id="languages">Search language</h2>
+<p>
+  By default the language dropdown on the results page offers roughly 90
+  built-in languages. Turn on <strong>Change search languages</strong> and
+  provide your own list of codes, one per line, to trim it to the handful your
+  users actually need.
+</p>
+<p>
+  The fallback language when nobody picks one comes from
+  <code>DEGOOG_DEFAULT_SEARCH_LANGUAGE</code>.
+</p>
+
+<h2 id="custom-css">Custom CSS</h2>
+<p>
+  Injects your own CSS into every page. It loads after theme and plugin styles,
+  so it overrides them by default; reach for <code>!important</code> only when
+  you are fighting a more specific selector.
+</p>
+
+<h2 id="api-key">API key</h2>
+<p>
+  Degoog generates a server key you can use to protect the public API endpoints.
+  The section is hidden until a password is configured via
+  <code>DEGOOG_SETTINGS_PASSWORDS</code>, since there would be nothing
+  protecting the key itself.
+</p>
+<p>
+  You can reveal, copy, and regenerate the key, and there are two independent
+  switches:
+</p>
+<ul>
+  <li>
+    <strong>Protect search routes</strong> covers <code>/api/search</code>,
+    <code>/api/search/stream</code>, and <code>/api/search/retry</code>.
+  </li>
+  <li>
+    <strong>Protect suggestion routes</strong> covers
+    <code>/api/suggest</code> and <code>/api/suggest/opensearch</code>.
+  </li>
+</ul>
+<p>
+  External callers send the key as a bearer token. The web UI does not use it;
+  it gets a short-lived signed nonce with the page instead, so turning this on
+  does not break your own browsing. Full details in the
+  <a href="api.html#api-key">API reference</a>.
+</p>
+
+<h2 id="cache">Cache</h2>
+<p>
+  Flushes stored cache entries. Search and autocomplete are kept separately, and
+  extensions register their own caches (the wiki panel and AI summary plugin
+  each have one), so you get four buttons: clear search, clear autocomplete,
+  clear extensions, or clear all.
+</p>
+<p>
+  Without <code>DEGOOG_VALKEY_URL</code>, all caching is per-process and in
+  memory, and disappears on restart. With Valkey configured, the cache is shared
+  across replicas and settings changes propagate instantly.
+</p>
+
+<h2 id="other-toggles">The remaining switches</h2>
+<ul>
+  <li>
+    <strong>Degoog Indexer.</strong> Turns on local result recording and makes
+    the Indexer tab appear. See <a href="indexer.html">Indexer</a>.
+  </li>
+  <li>
+    <strong>SearX compatibility layer.</strong> Adds the SearX section to the
+    Engines tab. See
+    <a href="engines-providers.html#searx">SearX compatibility layer</a>.
+  </li>
+  <li>
+    <strong>Serve the SearXNG API shape.</strong> Makes
+    <code>/api/search</code> honour the <code>format=json</code> parameter that
+    SearXNG clients such as Open WebUI already send, and answer them with a
+    SearXNG-shaped response. Requests without that parameter are unaffected.
+  </li>
+  <li>
+    <strong>Keyboard shortcuts.</strong> Enables the shortcuts system for the
+    instance. When off, the Shortcuts tab is hidden and no shortcuts are active.
+  </li>
+  <li>
+    <strong>Restart server.</strong> Restarts the Degoog process. Searches in
+    flight may be briefly interrupted.
+  </li>
+</ul>

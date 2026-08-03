@@ -1,0 +1,700 @@
+<div class="doc-page-header">
+  <h1><a href="developer.html">Degoog</a> Styling</h1>
+  <p class="doc-page-desc">
+    CSS variables and key classes for your themes and plugin outputs.
+  </p>
+</div>
+
+<h2>CSS variables</h2>
+<p>
+  The application exposes several CSS custom properties on the
+  <code>:root</code> element. You can use these in your themes and plugin styles
+  to ensure your colors automatically adapt to light or dark modes (using
+  <code>data-theme="light"</code> or <code>data-theme="dark"</code> on the
+  <code>&lt;html&gt;</code> tag).
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>Use</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>--primary</code></td>
+      <td>Primary accent for links and buttons</td>
+    </tr>
+    <tr>
+      <td><code>--primary-hover</code></td>
+      <td>Hover state for primary elements</td>
+    </tr>
+    <tr>
+      <td><code>--primary-rgb</code></td>
+      <td>Primary color as an RGB tuple</td>
+    </tr>
+    <tr>
+      <td><code>--danger</code></td>
+      <td>Danger or error color</td>
+    </tr>
+    <tr>
+      <td><code>--warning</code></td>
+      <td>Warning color</td>
+    </tr>
+    <tr>
+      <td><code>--success</code></td>
+      <td>Success color</td>
+    </tr>
+    <tr>
+      <td><code>--bg</code></td>
+      <td>Page background</td>
+    </tr>
+    <tr>
+      <td><code>--bg-light</code></td>
+      <td>Lighter background for cards and inputs</td>
+    </tr>
+    <tr>
+      <td><code>--bg-hover</code></td>
+      <td>Hover background</td>
+    </tr>
+    <tr>
+      <td><code>--border</code></td>
+      <td>Border color</td>
+    </tr>
+    <tr>
+      <td><code>--border-light</code></td>
+      <td>Lighter border</td>
+    </tr>
+    <tr>
+      <td><code>--text-primary</code></td>
+      <td>Main text color</td>
+    </tr>
+    <tr>
+      <td><code>--text-secondary</code></td>
+      <td>Secondary or muted text</td>
+    </tr>
+    <tr>
+      <td><code>--text-link</code></td>
+      <td>Link color</td>
+    </tr>
+    <tr>
+      <td><code>--text-link-visited</code></td>
+      <td>Visited link color</td>
+    </tr>
+    <tr>
+      <td><code>--text-cite</code></td>
+      <td>Citation or URL text</td>
+    </tr>
+    <tr>
+      <td><code>--text-snippet</code></td>
+      <td>Snippet or description text</td>
+    </tr>
+    <tr>
+      <td><code>--search-bar-bg</code></td>
+      <td>Search bar background</td>
+    </tr>
+    <tr>
+      <td><code>--search-bar-bg-hover</code></td>
+      <td>Search bar hover state</td>
+    </tr>
+    <tr>
+      <td><code>--btn-bg</code></td>
+      <td>Button background</td>
+    </tr>
+    <tr>
+      <td><code>--btn-text</code></td>
+      <td>Button text color</td>
+    </tr>
+    <tr>
+      <td><code>--overlay-bg</code></td>
+      <td>Overlay background for modals</td>
+    </tr>
+    <tr>
+      <td><code>--white</code></td>
+      <td>Pure white</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Example theme or plugin CSS</h2>
+<pre><code>.my-panel {
+  background: var(--bg-light);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+.my-panel a {
+  color: var(--text-link);
+}</code></pre>
+
+<h2>Reusable classes</h2>
+<p>
+  Try to reuse these built in classes in your plugin or theme HTML and CSS. This
+  makes sure your output matches the main UI and benefits from the exact same
+  layout structure. It is always better to use these instead of inventing new
+  classes when the meaning fits perfectly.
+</p>
+
+<h3>Generic UI classes (degoog-*)</h3>
+<p>
+  The main UI is moving toward a small set of generic <code>degoog-*</code>
+  classes. Templates often keep the older specific classes for backwards
+  compatibility, but the styling should be driven by these generic classes and
+  their modifiers.
+</p>
+<p>
+  Modifiers follow a BEM-like pattern:
+  <code>.degoog-thing</code> + <code>.degoog-thing--variant</code>.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Class</th>
+      <th>Use</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>.degoog-panel</code></td>
+      <td>Card/panel wrapper (background, border, shadow)</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-panel--accordion</code></td>
+      <td>Accordion wrapper panel (no default padding)</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-panel--slot</code></td>
+      <td>Slot panel wrapper (grid sizing, no default padding)</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-panel--slot-title</code></td>
+      <td>Slot panel title block</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-panel--slot-body</code></td>
+      <td>Slot panel body typography (no padding by default)</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-panel--slot-body-padded</code></td>
+      <td>Slot body padding when the content needs it</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-search-bar</code></td>
+      <td>Search bar shell (icon + input)</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-search-bar--square</code></td>
+      <td>Less-rounded search bar variant</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-dropdown</code></td>
+      <td>Floating dropdown container</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-dropdown--menu</code></td>
+      <td>Menu sizing for dropdowns</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-dropdown--submenu</code></td>
+      <td>Submenu sizing for dropdowns</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-accordion</code></td>
+      <td>
+        Accordion wrapper - adds <code>.open</code> toggle behaviour and chevron
+        rotation
+      </td>
+    </tr>
+    <tr>
+      <td><code>.degoog-accordion-body</code></td>
+      <td>Hidden accordion body, shown when parent has <code>.open</code></td>
+    </tr>
+    <tr>
+      <td><code>.degoog-accordion-body--flex</code></td>
+      <td>
+        Flex variant of the accordion body (for when
+        <code>display: flex</code> is needed on open)
+      </td>
+    </tr>
+    <tr>
+      <td><code>.degoog-accordion-toggle</code></td>
+      <td>Accordion trigger button</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-tab</code></td>
+      <td>Tab button (active state, hover)</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-menu-item</code></td>
+      <td>Button-like list item (hover/focus)</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-menu-item--option</code></td>
+      <td>Option rows (active checkmark)</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-input</code></td>
+      <td>Text input styling</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-input--tools</code></td>
+      <td>Tools dropdown input variant</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-badge</code></td>
+      <td>Small badge/pill</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-icon-btn</code></td>
+      <td>Icon-only button</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-drag-handle</code></td>
+      <td>Grab handle for drag-to-reorder lists (see helper below)</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-dragging</code></td>
+      <td>Added by the helper to the item being dragged</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-drag-active</code></td>
+      <td>Added by the helper to the list while a drag is in progress</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  Note: the app still contains older, more specific classnames (for example
+  <code>.result-*</code>, <code>.glance-*</code>, <code>.btn*</code>) and they
+  may still have styling while the transition is ongoing. They are not
+  considered a stable styling API for themes/plugins. Prefer the
+  <code>degoog-*</code> classes and modifiers above.
+</p>
+
+<h3>Theme template migration (append-only)</h3>
+<p>
+  Theme templates can keep their legacy classes and append the generic
+  <code>degoog-*</code> classes (and modifiers) so they pick up the built-in UI
+  styling without breaking older selectors.
+</p>
+<pre><code>DRY_RUN=1 bash scripts/theme-append-degoog-classes.sh data/themes/MyTheme
+bash scripts/theme-append-degoog-classes.sh data/themes/MyTheme</code></pre>
+
+<h3>Forms and extension settings</h3>
+<p>
+  If you are rendering settings forms in your plugin UI, these classes will
+  align them perfectly with the standard Settings modals.
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Class</th>
+      <th>Use</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>.degoog-input</code></td>
+      <td>Text inputs and textareas</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-select-wrap</code></td>
+      <td>Select wrappers (adds chevron)</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-toggle-wrap</code></td>
+      <td>Toggle rows</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-toggle</code></td>
+      <td>Toggle slider (pill)</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-checkbox-wrap</code></td>
+      <td>Checkbox rows, for dense multi-option lists (see below)</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-checkbox</code></td>
+      <td>Checkbox square</td>
+    </tr>
+    <tr>
+      <td><code>.degoog-panel</code></td>
+      <td>Panels/cards used across settings and modals</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Layout and chrome</h3>
+<p>
+  Use the <code>degoog-*</code> classes above for UI elements you want to look
+  consistent with the built-in theme.
+</p>
+
+<h2>Grid-System</h2>
+<p>
+  A lightweight, CSS-Grid-based 12-column layout system used to build for
+  example widgets (translate boxes, knowledge panels, &quot;at a glance&quot;
+  cards, etc.) in the degoog.
+</p>
+<h3>1. Core Concept</h3>
+<p>
+  The container gets <code>degoog-grid</code>; its
+  <strong>direct children</strong> are placed across the 12 columns via
+  <code>col-*</code> classes.
+</p>
+<pre><code class="language-html">&lt;section class=&quot;degoog-grid&quot;&gt;
+  &lt;div class=&quot;col-8&quot;&gt;Search results&lt;/div&gt;
+  &lt;div class=&quot;col-4&quot;&gt;Knowledge panel&lt;/div&gt;
+&lt;/section&gt;
+</code></pre>
+<p><strong>Rules:</strong></p>
+<ul>
+  <li>
+    <code>col-*</code> classes work <strong>only on direct children</strong> of
+    <code>.degoog-grid</code>.
+  </li>
+  <li>
+    Columns per row should add up to <strong>12</strong>; exceeding it wraps to
+    the next row.
+  </li>
+  <li>Default gaps: <code>.75rem</code> horizontal and vertical.</li>
+</ul>
+<h3>2. Column Widths (<code>col-1</code>–<code>col-12</code>)</h3>
+<p>Each column spans N of the 12 tracks (<code>grid-column: span N</code>).</p>
+<pre><code class="language-html">&lt;!-- Result list beside a side panel --&gt;
+&lt;section class=&quot;degoog-grid&quot;&gt;
+  &lt;div class=&quot;col-8&quot;&gt;Result list&lt;/div&gt;
+  &lt;div class=&quot;col-4&quot;&gt;Wikipedia summary&lt;/div&gt;
+&lt;/section&gt;
+
+&lt;!-- Full-width widget (e.g. translate box on top) --&gt;
+&lt;section class=&quot;degoog-grid&quot;&gt;
+  &lt;div class=&quot;col-12&quot;&gt;Translate widget&lt;/div&gt;
+&lt;/section&gt;
+</code></pre>
+<p><strong>Auto-wrapping</strong> when totals exceed 12:</p>
+<pre><code class="language-html">&lt;section class=&quot;degoog-grid&quot;&gt;
+  &lt;div class=&quot;col-8&quot;&gt;Map widget&lt;/div&gt;
+  &lt;div class=&quot;col-8&quot;&gt;Wraps to next row (8 + 8 &gt; 12)&lt;/div&gt;
+&lt;/section&gt;
+</code></pre>
+<h3>3. Responsive Behavior</h3>
+<p>Mobile-first breakpoints; a larger breakpoint overrides smaller ones.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Prefix</th>
+      <th>From</th>
+      <th>Target</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>col-*</code></td>
+      <td><code>0px</code></td>
+      <td>Mobile</td>
+    </tr>
+    <tr>
+      <td><code>col-sm-*</code></td>
+      <td><code>≥ 480px</code></td>
+      <td>Large phones</td>
+    </tr>
+    <tr>
+      <td><code>col-md-*</code></td>
+      <td><code>≥ 780px</code></td>
+      <td>Tablets</td>
+    </tr>
+    <tr>
+      <td><code>col-lg-*</code></td>
+      <td><code>≥ 1024px</code></td>
+      <td>Desktop</td>
+    </tr>
+  </tbody>
+</table>
+<p>Stack classes to change width per breakpoint:</p>
+<pre><code class="language-html">&lt;!-- Side panel sits below results on mobile, beside them on desktop --&gt;
+&lt;section class=&quot;degoog-grid&quot;&gt;
+  &lt;main class=&quot;col-12 col-lg-8&quot;&gt;Search results&lt;/main&gt;
+  &lt;aside class=&quot;col-12 col-lg-4&quot;&gt;Knowledge panel&lt;/aside&gt;
+&lt;/section&gt;
+</code></pre>
+<p>Widget grid that reflows from 1 → 2 → 4 per row:</p>
+<pre><code class="language-html">&lt;section class=&quot;degoog-grid&quot;&gt;
+  &lt;div class=&quot;col-12 col-sm-6 col-lg-3&quot;&gt;Weather&lt;/div&gt;
+  &lt;div class=&quot;col-12 col-sm-6 col-lg-3&quot;&gt;Currency&lt;/div&gt;
+  &lt;div class=&quot;col-12 col-sm-6 col-lg-3&quot;&gt;Time zone&lt;/div&gt;
+  &lt;div class=&quot;col-12 col-sm-6 col-lg-3&quot;&gt;Calculator&lt;/div&gt;
+&lt;/section&gt;
+</code></pre>
+<h3>4. Visibility (<code>hidden</code> / <code>show</code>)</h3>
+<p>Toggle rendering per breakpoint via <code>display</code>.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Class</th>
+      <th>Effect</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>col-hidden</code></td>
+      <td><code>display: none</code></td>
+    </tr>
+    <tr>
+      <td><code>col-show</code></td>
+      <td><code>display: block</code></td>
+    </tr>
+    <tr>
+      <td><code>col-md-hidden</code></td>
+      <td>Hidden from <code>≥ 780px</code></td>
+    </tr>
+    <tr>
+      <td><code>col-lg-show</code></td>
+      <td>Shown from <code>≥ 1024px</code></td>
+    </tr>
+  </tbody>
+</table>
+<pre><code class="language-html">&lt;section class=&quot;degoog-grid&quot;&gt;
+  &lt;!-- Knowledge panel: hidden on mobile, shown from desktop --&gt;
+  &lt;main class=&quot;col-12 col-lg-8&quot;&gt;Results&lt;/main&gt;
+  &lt;aside class=&quot;col-hidden col-lg-show col-lg-4&quot;&gt;Knowledge panel&lt;/aside&gt;
+&lt;/section&gt;
+</code></pre>
+<blockquote>
+  <p>
+    <code>col-show</code> resets to <code>display: block</code> — use it to
+    re-enable an element hidden at a smaller breakpoint.
+  </p>
+</blockquote>
+<h3>
+  5. Horizontal Alignment (<code>left</code> / <code>center</code> /
+  <code>right</code>)
+</h3>
+<p>
+  Aligns content inside its cell (<code>justify-self</code>) when it's narrower
+  than the column. Responsive variants exist (<code>col-md-right</code>, etc.).
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Class</th>
+      <th>Alignment</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>col-left</code></td>
+      <td>start</td>
+    </tr>
+    <tr>
+      <td><code>col-center</code></td>
+      <td>center</td>
+    </tr>
+    <tr>
+      <td><code>col-right</code></td>
+      <td>end</td>
+    </tr>
+  </tbody>
+</table>
+<pre><code class="language-html">&lt;!-- Translate widget: &quot;swap languages&quot; button centered, action right --&gt;
+&lt;section class=&quot;degoog-grid&quot;&gt;
+  &lt;div class=&quot;col-6 col-center&quot;&gt;↔ Swap languages&lt;/div&gt;
+  &lt;div class=&quot;col-6 col-right&quot;&gt;Listen 🔊&lt;/div&gt;
+&lt;/section&gt;
+</code></pre>
+<h3>6. Container Modifiers</h3>
+<h4><code>degoog-grid--no-gap</code> — removes all gaps</h4>
+<pre><code class="language-html">&lt;!-- Seamless image-result strip --&gt;
+&lt;section class=&quot;degoog-grid degoog-grid--no-gap&quot;&gt;
+  &lt;div class=&quot;col-3&quot;&gt;&lt;img src=&quot;1.jpg&quot; alt=&quot;&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;col-3&quot;&gt;&lt;img src=&quot;2.jpg&quot; alt=&quot;&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;col-3&quot;&gt;&lt;img src=&quot;3.jpg&quot; alt=&quot;&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;col-3&quot;&gt;&lt;img src=&quot;4.jpg&quot; alt=&quot;&quot;&gt;&lt;/div&gt;
+&lt;/section&gt;
+</code></pre>
+<h4>
+  <code>degoog-grid--vertical-align-center</code> — vertically centers columns
+</h4>
+<pre><code class="language-html">&lt;!-- Knowledge panel: thumbnail centered against its text --&gt;
+&lt;section class=&quot;degoog-grid degoog-grid--vertical-align-center&quot;&gt;
+  &lt;div class=&quot;col-4&quot;&gt;&lt;img src=&quot;thumb.jpg&quot; alt=&quot;&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;col-8&quot;&gt;Wikipedia summary text&lt;/div&gt;
+&lt;/section&gt;
+</code></pre>
+<h3>7. Complete Example: Search Results Page</h3>
+<pre><code class="language-html">&lt;section class=&quot;degoog-grid degoog-grid--vertical-align-center&quot;&gt;
+
+  &lt;!-- Translate widget on top, full width --&gt;
+  &lt;div class=&quot;col-12&quot;&gt;Translate: &quot;hola&quot; → &quot;hello&quot;&lt;/div&gt;
+
+  &lt;!-- Results column + knowledge panel --&gt;
+  &lt;main class=&quot;col-12 col-lg-8&quot;&gt;Search result list&lt;/main&gt;
+  &lt;aside class=&quot;col-hidden col-lg-show col-lg-4&quot;&gt;Knowledge panel&lt;/aside&gt;
+
+  &lt;!-- &quot;At a glance&quot; mini-widgets: 1 → 2 → 4 per row --&gt;
+  &lt;div class=&quot;col-12 col-sm-6 col-lg-3&quot;&gt;Weather&lt;/div&gt;
+  &lt;div class=&quot;col-12 col-sm-6 col-lg-3&quot;&gt;Currency&lt;/div&gt;
+  &lt;div class=&quot;col-12 col-sm-6 col-lg-3&quot;&gt;Sports score&lt;/div&gt;
+  &lt;div class=&quot;col-12 col-sm-6 col-lg-3&quot;&gt;Stock price&lt;/div&gt;
+
+&lt;/section&gt;
+</code></pre>
+<h3>8. Best Practices &amp; Gotchas</h3>
+<ul>
+  <li>
+    <strong>Always set a base <code>col-*</code></strong> (e.g.
+    <code>col-12</code>) so mobile behavior is explicit.
+  </li>
+  <li>
+    <strong>Keep rows summing to 12</strong> for predictable layouts;
+    intentional overflow wraps.
+  </li>
+  <li>
+    <strong>Direct children only</strong> — nest a new
+    <code>.degoog-grid</code> for sub-grids inside a widget.
+  </li>
+  <li>
+    <strong><code>col-show</code> needs a prior <code>hidden</code></strong> to
+    act as a reveal toggle.
+  </li>
+  <li>
+    <strong>Alignment helpers</strong> only matter when content is narrower than
+    its column.
+  </li>
+</ul>
+<h3>9. Quick Reference</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Category</th>
+      <th>Base</th>
+      <th>sm (≥480)</th>
+      <th>md (≥780)</th>
+      <th>lg (≥1024)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Width</td>
+      <td><code>col-1…12</code></td>
+      <td><code>col-sm-1…12</code></td>
+      <td><code>col-md-1…12</code></td>
+      <td><code>col-lg-1…12</code></td>
+    </tr>
+    <tr>
+      <td>Hide</td>
+      <td><code>col-hidden</code></td>
+      <td><code>col-sm-hidden</code></td>
+      <td><code>col-md-hidden</code></td>
+      <td><code>col-lg-hidden</code></td>
+    </tr>
+    <tr>
+      <td>Show</td>
+      <td><code>col-show</code></td>
+      <td><code>col-sm-show</code></td>
+      <td><code>col-md-show</code></td>
+      <td><code>col-lg-show</code></td>
+    </tr>
+    <tr>
+      <td>Align left</td>
+      <td><code>col-left</code></td>
+      <td><code>col-sm-left</code></td>
+      <td><code>col-md-left</code></td>
+      <td><code>col-lg-left</code></td>
+    </tr>
+    <tr>
+      <td>Align center</td>
+      <td><code>col-center</code></td>
+      <td><code>col-sm-center</code></td>
+      <td><code>col-md-center</code></td>
+      <td><code>col-lg-center</code></td>
+    </tr>
+    <tr>
+      <td>Align right</td>
+      <td><code>col-right</code></td>
+      <td><code>col-sm-right</code></td>
+      <td><code>col-md-right</code></td>
+      <td><code>col-lg-right</code></td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  <strong>Container modifiers:</strong> <code>degoog-grid--no-gap</code>,
+  <code>degoog-grid--vertical-align-center</code>
+</p>
+
+<h2>Drag-to-reorder helper</h2>
+<p>
+  The app exposes a small, dependency-free drag-to-reorder helper on
+  <code>window.__degoogDrag</code>. It is the same helper used by the built-in
+  plugins list and the tab-order dialog, so your lists get the exact same feel
+  (finger-following on touch, smooth slide animations, no text selection while
+  dragging). It works on desktop and mobile because it is built on Pointer
+  Events.
+</p>
+<p>
+  You provide a list element, a selector for the items inside it, a selector for
+  the grab handle, and an <code>onReorder</code> callback. The helper reorders
+  the DOM live; when the user drops an item it calls <code>onReorder</code> with
+  the list and the moved item so you can persist the new order.
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Option</th>
+      <th>Use</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>itemSelector</code></td>
+      <td>Selector matching each reorderable child of the list</td>
+    </tr>
+    <tr>
+      <td><code>handleSelector</code></td>
+      <td>
+        Selector for the grab handle inside each item (drag only starts from
+        here)
+      </td>
+    </tr>
+    <tr>
+      <td><code>onReorder(list, item)</code></td>
+      <td>
+        Called after a drop; DOM order is already final. Read it and persist.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  Give your handle the <code>degoog-drag-handle</code> class so it picks up the
+  standard grip styling (and the <code>touch-action</code> needed for reliable
+  mobile dragging). The helper adds <code>degoog-dragging</code> to the active
+  item and <code>degoog-drag-active</code> to the list while dragging.
+</p>
+<pre><code>&lt;ul id="my-list"&gt;
+  &lt;li class="my-row" data-id="a"&gt;
+    Item A
+    &lt;span class="degoog-drag-handle" data-drag-handle&gt;
+      &lt;i class="fa-solid fa-grip-vertical"&gt;&lt;/i&gt;
+    &lt;/span&gt;
+  &lt;/li&gt;
+  &lt;!-- more rows... --&gt;
+&lt;/ul&gt;
+
+&lt;script&gt;
+  const list = document.getElementById("my-list");
+  window.__degoogDrag.init(list, {
+    itemSelector: ".my-row",
+    handleSelector: "[data-drag-handle]",
+    onReorder: (el) =&gt; {
+      const order = Array.from(el.querySelectorAll(".my-row"))
+        .map((row) =&gt; row.dataset.id);
+      // persist `order` however your plugin stores it
+    },
+  });
+&lt;/script&gt;</code></pre>
+<p>
+  Note: <code>window.__degoogDrag</code> is available on the main search page
+  (where plugin and theme scripts run). Call <code>init</code> once per list
+  after it is in the DOM.
+</p>

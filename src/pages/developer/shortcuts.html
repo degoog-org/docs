@@ -1,0 +1,112 @@
+<h1>Shortcuts</h1>
+<p>
+  Shortcuts are keyboard-triggered extension modules. The core app keeps
+  <code>/</code> for search focus; the rest of the default shortcuts are
+  installed through the extension store so they can be updated, removed, and
+  distributed like other extension types.
+</p>
+
+<h2>Where shortcuts live</h2>
+<p>
+  Local shortcuts live in <code>data/shortcuts</code>. A local file can be a
+  flat JavaScript file such as
+  <code>data/shortcuts/my-action-shortcut.js</code>, or a store package can
+  install a shortcut directory under the same root. Store repositories declare
+  shortcuts with a top-level <code>shortcuts</code> array in
+  <code>package.json</code>.
+</p>
+<pre><code>{
+  "shortcuts": [
+    {
+      "name": "Next tab",
+      "description": "Switch to the next visible results tab.",
+      "path": "shortcuts/next-tab",
+      "version": "1.0.0"
+    }
+  ]
+}</code></pre>
+
+<h2>Shortcut module shape</h2>
+<p>
+  A shortcut module exports an object with a name, optional description, a
+  default binding, and a <code>run</code> function. The
+  <code>run</code> function receives a browser-side context for DOM
+  manipulation.
+</p>
+<pre><code>export default {
+  name: "Focus first result",
+  description: "Move focus to the first visible result link.",
+  defaultBinding: { key: "j", alt: true },
+  run({ document }) {
+    document.querySelector("#results-list a.result-title")?.focus();
+  },
+};</code></pre>
+
+<p>
+  Numeric shortcuts use <code>kind: "numeric"</code>. Their binding stores only
+  modifiers, and the engine registers one binding per digit, mapping the
+  recorded modifier plus <code>1</code> through <code>9</code> to the same
+  shortcut. The digit that was pressed is read from
+  <code>event.key</code> inside <code>run</code>, so a single numeric shortcut
+  covers all nine keys. The trigger range is fixed to
+  <code>1</code>&ndash;<code>9</code>.
+</p>
+<pre><code>export default {
+  name: "Switch tab by number",
+  kind: "numeric",
+  defaultBinding: { alt: true },
+  run({ document, event }) {
+    const n = Number(event.key);
+    document.querySelectorAll(".results-tab")[n - 1]?.click();
+  },
+};</code></pre>
+
+<h2>Bindings and settings</h2>
+<p>
+  User-selected bindings are stored in <code>plugin-settings.json</code> under
+  the <code>shortcuts</code> settings id. The stored values are only the mapping
+  overrides; shortcut source code remains in <code>data/shortcuts</code> or in
+  installed store extension folders.
+</p>
+<p>
+  To rebind a shortcut, click its recorder button in the Shortcuts tab and press
+  the new combination. For numeric shortcuts the recorder prompts for a modifier
+  plus any key, and only the modifiers are saved. Press
+  <code>Escape</code> while recording to cancel, and use the reset action to
+  return a shortcut to its default binding.
+</p>
+<p>
+  Modifier labels are rendered per platform: macOS shows the standard symbols
+  (<code>&#8984;</code>, <code>&#8997;</code>, <code>&#8963;</code>,
+  <code>&#8679;</code>), Windows shows <code>Win</code> for the meta key, and
+  Linux shows <code>Super</code>. The extension store catalog also renders a
+  shortcut's default binding as CSS keycaps in place of a screenshot.
+</p>
+
+<h2>Creating shortcuts in the UI</h2>
+<p>
+  Settings includes a Shortcuts tab with an add shortcut action. The editor
+  scaffolds the module syntax, supports syntax highlighting, and handles Tab and
+  Shift+Tab indentation inside the code area. Saving writes a local editable
+  shortcut file to
+  <code>data/shortcuts</code> and reloads the shortcut registry.
+</p>
+
+<h2>Enabling and disabling shortcuts</h2>
+<p>
+  Each store-installed or locally created shortcut has an on/off toggle on its
+  card in the Shortcuts tab. Toggling writes the
+  <code>disabled</code> setting for that shortcut, the same value exposed on the
+  Extensions tab, so the two stay in sync. A disabled shortcut is skipped when
+  the page registers shortcuts, so it stops firing on the next page load. The
+  built-in <code>/</code> search focus action is part of the core app rather
+  than an extension, so it can be rebound or reset but not disabled.
+</p>
+
+<h2>Deleting shortcuts</h2>
+<p>
+  The Shortcuts tab can delete editable local shortcut files created in
+  <code>data/shortcuts</code>. Store-installed shortcuts are managed through the
+  store install or uninstall flow, so deleting from the Shortcuts tab does not
+  remove store package files.
+</p>

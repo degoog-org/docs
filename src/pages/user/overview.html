@@ -1,0 +1,179 @@
+<div class="doc-page-header">
+  <h1>Degoog</h1>
+  <p class="doc-page-desc">
+    A search aggregator you run yourself. One search box, as many engines as you
+    want behind it. Brought to you by <a href="https://fccview.dev">fccview</a>.
+  </p>
+</div>
+
+<figure class="doc-screenshot-image-wrapper">
+  <img class="doc-screenshot-image" src="images/screenshots/user-overview-home-page.png"
+    data-screenshot-target="images/screenshots/user-overview-home-page.png"
+    alt="The Degoog home page with the search box, settings entry point, and extension areas visible." />
+  <figcaption>The Degoog home page.</figcaption>
+</figure>
+
+<h2 id="what-degoog-is">What Degoog actually is</h2>
+<p>
+  You type one query. Degoog asks every search engine you have enabled, at the
+  same time, from your server. It merges what comes back by aggregating unique URLs, scores it, and hands you one list.
+  Nothing you type goes to any evil corp, and no account follows you around.
+</p>
+<p>
+  The core is deliberately small. Almost everything interesting is an extension:
+  search engines, autocomplete providers, transports, themes, plugins, and
+  keyboard shortcuts all live outside the core and get installed from git
+  repositories through the Store.
+</p>
+
+<div class="block-note">
+  <p>
+    <strong>Degoog ships with zero search engines installed.</strong> That is
+    intentional, not a bug. A fresh install returns nothing until you add at
+    least one engine. The <a href="getting-started.html">setup wizard</a> walks
+    you through it on first run.
+  </p>
+</div>
+
+<h2 id="the-pieces">Extensions</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Extension</th>
+      <th>What it does</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Engine</strong></td>
+      <td>
+        The place search results come from. Google, Brave, Wikipedia, your Jellyfin
+        library, whatever you install or build yourself. Each engine declares a type (web, images,
+        videos, news, files, anything goes really, I've seen "weeb" declared too), and those types become the
+        tabs on your results page. You can customise/reorder types from the settings page, but I am getting ahead of
+        myself.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Autocomplete provider</strong></td>
+      <td>
+        Supplies the live suggestions under the search box as you type. Separate
+        from engines they live in their own extension type. This allows for separate rate limiting and other
+        customisation.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Transport</strong></td>
+      <td>
+        How your server makes outgoing requests. Plain fetch, curl, curl wearing
+        a browser's TLS fingerprint, a headless browser, or a real Firefox
+        session. You pick one per engine when the default gets blocked. This is where degoog really shines.
+        If you like tinkering you'll most definitely find ways to stick it to the man!
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Plugin</strong></td>
+      <td>
+        Anything that adds behaviour: <code>!bang</code> commands, panels above
+        or beside your results, extra result tabs, query rewriting, whole HTTP
+        routes, pokemon results, random numbers, weather, calculators, whatever you can dream up.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Theme</strong></td>
+      <td>
+        Restyles the entire UI. One built-in theme ships with the app, more are available in the Store.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Shortcut</strong></td>
+      <td>
+        A keyboard binding. Focusing the search box is built in, the rest are
+        installable and fully rebindable. You can even bind a shortcut to a plugin!
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="what-is-built-in">What is built in?</h2>
+<p>Not much, frankly, and that is the point. Out of the box you get:</p>
+<ul>
+  <li>
+    Four <a href="bangs-and-commands.html">bang commands</a>:
+    <code>!help</code>, <code>!ip</code>, <code>!speedtest</code>, and
+    <code>!uuid</code>.
+  </li>
+  <li>
+    Two result panels: <strong>At a glance</strong> (a preview of the top
+    result) and <strong>Wikipedia</strong> (a knowledge card in the sidebar).
+  </li>
+  <li>
+    Four <a href="engines-providers.html#transports">transports</a>: Fetch,
+    Curl, Curl Fallback, and Curl Impersonate.
+  </li>
+  <li>
+    One theme, one keyboard shortcut (<kbd>/</kbd> to focus the search box), and
+    the optional <a href="indexer.html">Degoog Indexer</a> engine.
+  </li>
+</ul>
+
+<h2 id="where-to-start">Where to go from here?</h2>
+<ul>
+  <li>
+    <a href="getting-started.html">Getting started</a> if you have not run it
+    yet, or you just installed it and the results page is empty.
+  </li>
+  <li>
+    <a href="using-search.html">Using search</a> for tabs, filters, result
+    actions, and keyboard shortcuts.
+  </li>
+  <li>
+    <a href="tips-and-tricks.html">Tips and tricks</a> when an engine keeps
+    failing and you want to know why. Google in particular has opinions about
+    being scraped.
+  </li>
+  <li>
+    <a href="settings.html">Settings</a> for how the settings page is laid out
+    and what belongs to you versus the instance.
+  </li>
+  <li>
+    <a href="server-settings.html">Server settings</a> if you run the instance
+    for other people.
+  </li>
+</ul>
+
+<h2 id="running-degoog">Running Degoog</h2>
+<p>The short version, with Docker:</p>
+<pre><code>mkdir -p ./data
+sudo chown -R 1000:1000 ./data
+
+docker run -d --name degoog \
+  -p 4444:4444 \
+  -v ./data:/app/data \
+  -e DEGOOG_SETTINGS_PASSWORDS=change-me \
+  --restart unless-stopped \
+  ghcr.io/degoog-org/degoog:latest</code></pre>
+<p>
+  Then open <code>http://localhost:4444</code>. Ready-made compose files for
+  Valkey, Postgres, and the MCP sidecar live in
+  <a href="https://github.com/degoog-org/degoog/tree/main/docker-compose-examples" class="external" target="_blank"
+    rel="noopener">docker-compose-examples</a>
+  in the repository. The longer version, including running without Docker, is in
+  <a href="getting-started.html">Getting started</a>.
+</p>
+
+<div class="block-note">
+  <p>
+    Degoog is in stable beta. It is genuinely usable day to day and people run
+    public instances on it, but expect the occasional rough edge. If something
+    looks wrong, <a href="troubleshooting.html">Troubleshooting</a> is the first
+    stop.
+  </p>
+</div>
+
+<h2 id="developer-docs">Building your own extensions</h2>
+<p>
+  Every extension type has a documented contract and a CLI scaffold. Flip the
+  sidebar switch to <a href="developer.html">Developer docs</a> when you want to
+  write an engine, a theme, a transport, or a plugin of your own.
+</p>

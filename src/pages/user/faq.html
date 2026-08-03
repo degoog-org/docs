@@ -1,0 +1,164 @@
+<div class="doc-page-header">
+  <h1><a href="index.html">Degoog</a> FAQ</h1>
+  <p class="doc-page-desc">
+    Short answers to the questions people actually ask.
+  </p>
+</div>
+
+<h2 id="what-is-it">Is Degoog a search engine?</h2>
+<p>
+  No. It is an aggregator. It has no index of the web of its own and does not
+  crawl anything. It asks the engines you install and merges their answers. The
+  optional <a href="indexer.html">indexer</a> is the one exception, and it only
+  ever remembers results you were already shown.
+</p>
+
+<h2 id="empty">I installed it and searching returns nothing. Is it broken?</h2>
+<p>
+  No, it is empty. Degoog ships with zero search engines and zero autocomplete
+  providers, deliberately. Add a store repository, install engines, enable them.
+  The <a href="getting-started.html#wizard">setup wizard</a> walks you through
+  it.
+</p>
+
+<h2 id="vs-searxng">How is this different from SearXNG?</h2>
+<p>
+  Same general idea, different shape. SearXNG is a large project with a great
+  many engines bundled in. Degoog keeps the core small and pushes almost
+  everything into installable extensions, so you assemble the instance you want
+  rather than switching off the parts you do not. Perfect for Lego nerds. Degoog
+  can also run SearXNG's own engine files through a
+  <a href="engines-providers.html#searx">compatibility layer</a> if there is one
+  you miss.
+</p>
+<p>
+  SearXNG came first and is way more mature, that said alternatives are a very
+  good thing that we should all embrace. Both are worth trying and while you are
+  at it give <a href="https://git.lolcat.ca/lolcat/4get">4get</a> a try too!
+</p>
+
+<h2 id="different-results">
+  Why do my results differ from someone else's on the same instance?
+</h2>
+<p>
+  Because engine selection, theme, and search options are stored in your
+  browser, not on the server. Two people on the same instance can be running
+  completely different sets of engines. Whoever administers it can publish a
+  default set for new visitors, but your own choices will always win.
+</p>
+
+<h2 id="result-ranking">How does Degoog decide result order?</h2>
+<p>
+  Results near the top of an engine get more points. If the same URL appears in
+  more than one engine, those points are added together and Degoog gives it a
+  small bonus. The full math is in
+  <a href="engines-providers.html#aggregation">How aggregation works</a>.
+</p>
+<p>
+  Domain scores are added at the end. So if a result has <code>29</code> points,
+  <code>example.com|20</code> makes it <code>49</code>, and
+  <code>spam.example|-15</code> makes it <code>14</code>. They are just plus or
+  minus points, not percentages.
+</p>
+
+<h2 id="internet">Can I put my instance on the internet?</h2>
+<p>Yes, some crazy people already do. Before you do:</p>
+<ul>
+  <li>
+    Set <code>DEGOOG_SETTINGS_PASSWORDS</code>. Without it, anyone who can reach
+    your instance can install extensions, and extensions run code on your
+    server.
+  </li>
+  <li>
+    Consider <code>DEGOOG_PUBLIC_INSTANCE=true</code>, which puts visitors on a
+    read-only settings page and moves admin behind a separate path.
+  </li>
+  <li>Use HTTPS and a reverse proxy you control.</li>
+  <li>
+    Apply the <strong>Public Web Instance</strong> or
+    <strong>Hardened Public Instance</strong> preset in
+    <a href="server-settings.html#presets">Server settings</a>.
+  </li>
+</ul>
+
+<h2 id="bangs">I come from the Duck, do you do bangs?</h2>
+<p>
+  It has its own <a href="bangs-and-commands.html">bang system</a>, and engines
+  can claim their own shortcut (<code>!g</code> for Google, for instance). If
+  you specifically want DuckDuckGo's enormous bang list, there is a store plugin
+  that forwards <code>!!</code> commands to DuckDuckGo, and a Custom Bangs
+  plugin for defining your own redirects.
+</p>
+
+<h2 id="google">Why does Google need so much setup?</h2>
+<p>
+  Because the big G does not want a server scraping it and does its best to
+  check for a genuine browser session. Degoog's answer is transports: the engine
+  tells you which one each results format expects, and the Store has a bunch of
+  them but you can make your own. It is documented step by step in
+  <a href="tips-and-tricks.html#google">Tips and tricks</a>.
+</p>
+
+<h2 id="private">Is it private?</h2>
+<p>
+  Your queries go from your browser to your own server, and from there to
+  whichever engines you enabled. No account, no profile, no cross-site tracking.
+  What upstream engines see is a request from your server's IP, which is why the
+  proxy support exists.
+</p>
+<p>
+  Two things to be aware of: the <a href="indexer.html">indexer</a>, if enabled,
+  records what you searched for and saw. And some extensions cause your own
+  browser to contact external services directly, which the extension card tells
+  you about explicitly.
+</p>
+
+<h2 id="mobile">Can I use it on my phone?</h2>
+<p>
+  Yes. The UI is responsive, and Degoog ships a web app manifest and service
+  worker so you can install it to your home screen. That needs HTTPS. There is a
+  button in <em>Settings, General, Install app</em> if your browser did not
+  offer it.
+</p>
+
+<h2 id="llm">Can I point an LLM at it?</h2>
+<p>
+  Two ways. Enabling <strong>Serve the SearXNG API shape</strong> in Server
+  settings makes <code>/api/search</code> answer
+  <code>format=json</code> requests the way SearXNG clients such as Open WebUI
+  expect, so those tools work with no custom glue. Separately,
+  <code>degoog-mcp</code> is a small sidecar that exposes Degoog over the Model
+  Context Protocol with <code>search</code> and <code>scrape</code> tools. See
+  the <a href="api.html">API reference</a>.
+</p>
+
+<h2 id="production">Is it production ready? I heard you are in beta.</h2>
+<p>
+  It is in stable beta. Usable day to day, and public instances run on it, but I
+  am very upfront that there can be some inconsistent behaviour. Expect the
+  occasional rough edge and keep an eye on releases.
+</p>
+
+<h2 id="extensions">Can I write my own extension?</h2>
+<p>
+  Yes, and it is one of the better parts of the project. Engines, themes,
+  transports, autocomplete providers, plugins, and shortcuts all have documented
+  contracts and a CLI scaffold. Flip the sidebar to
+  <a href="developer.html">Developer docs</a>.
+</p>
+
+<h2 id="extensions">Does degoog ship with any easter eggs?</h2>
+<p>
+  Many, have fun finding them all &lt;3
+</p>
+
+<h2 id="contribute">Where do I ask for help or report a bug?</h2>
+<p>
+  The
+  <a href="https://discord.gg/invite/mMuk2WzVZu" class="external" target="_blank" rel="noopener">Discord community</a>
+  for questions, and
+  <a href="https://github.com/degoog-org/degoog/issues" class="external" target="_blank" rel="noopener">GitHub
+    issues</a>
+  for bugs. <a href="troubleshooting.html">Troubleshooting</a> is worth a look
+  first.
+</p>

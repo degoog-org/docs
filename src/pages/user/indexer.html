@@ -1,0 +1,202 @@
+<div class="doc-page-header">
+  <h1><a href="index.html">Degoog</a> The Indexer</h1>
+  <p class="doc-page-desc">
+    Quietly remember the results you actually saw, and let them come back when
+    they are useful.
+  </p>
+</div>
+
+<h2 id="what-it-is">What it is</h2>
+<p>
+  The indexer records the results your searches return, stores them locally, and
+  then makes them available as a search engine of their own called
+  <strong>Degoog</strong>. Search for something similar later and pages you have
+  already seen can resurface, even if the upstream engine that originally found
+  them is slow, blocked, or gone.
+</p>
+<p>
+  It is not a crawler. It never goes off and fetches the web on its own. It only
+  ever remembers what a real search already put in front of you, which means
+  your index reflects your actual interests rather than someone else's idea of
+  the web.
+</p>
+<p>
+  Results that came from your index are labelled
+  <strong>From your index</strong> on the results page, and the sidebar tells
+  you how many of the results came from there.
+</p>
+
+<h2 id="turning-on">Turning it on</h2>
+<p>
+  The indexer is off by default. Enable it in
+  <em>Settings, Server, Degoog Indexer</em>, and a dedicated
+  <strong>Indexer</strong> tab appears in the settings navigation. Everything
+  below lives in that tab.
+</p>
+
+<figure class="doc-screenshot-image-wrapper">
+  <img class="doc-screenshot-image" src="images/screenshots/indexer-tab.png"
+    data-screenshot-target="images/screenshots/indexer-tab.png"
+    alt="The Indexer tab, with filters, limits, and index stats." />
+  <figcaption>The Indexer tab.</figcaption>
+</figure>
+
+<h2 id="filters">Deciding what gets remembered</h2>
+<p>
+  Three lists control what is eligible for indexing, and they are worth setting
+  up before you accumulate anything:
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>List</th>
+      <th>Behaviour</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Domain allowlist</strong></td>
+      <td>
+        One domain per line. When it is not empty, <em>only</em> those domains
+        are indexed. Leave it blank to allow everything.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Domain blocklist</strong></td>
+      <td>One domain per line. These are never indexed.</td>
+    </tr>
+    <tr>
+      <td><strong>Word blocklist</strong></td>
+      <td>
+        One word per line. If it appears in a result's title, snippet, or URL,
+        that result is never indexed.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  The word blocklist is the one people underuse. It is a straightforward way to
+  keep whole categories of results out of your index without maintaining an
+  endless domain list.
+</p>
+
+<h2 id="limits">Storage and limits</h2>
+<p>Every limit here treats <code>0</code> as "no limit".</p>
+<table>
+  <thead>
+    <tr>
+      <th>Setting</th>
+      <th>What it controls</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Results saved per search</strong></td>
+      <td>Only the top results from each search are saved.</td>
+    </tr>
+    <tr>
+      <td><strong>Max unique pages</strong></td>
+      <td>Ceiling on distinct pages kept.</td>
+    </tr>
+    <tr>
+      <td><strong>Max saved results</strong></td>
+      <td>Ceiling on saved result rows.</td>
+    </tr>
+    <tr>
+      <td><strong>Max result age (days)</strong></td>
+      <td>
+        Drops entries not seen in this many days. <code>0</code> keeps
+        everything forever.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Prune when over limits</strong></td>
+      <td>
+        Deletes the oldest entries when a cap is exceeded. Only does anything if
+        a cap is actually set.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="recall">How results come back</h2>
+<ul>
+  <li>
+    <strong>Fuzzy recall</strong> lets close variations of past searches
+    resurface pages you have already seen, rather than requiring the exact query
+    again.
+  </li>
+  <li>
+    <strong>Results shown per search from your index</strong> caps how many
+    results your index can contribute to one search, so it never floods out live
+    engines.
+  </li>
+  <li>
+    <strong>Ranking memory</strong> is how many recent sightings count towards a
+    result's rank. Lower values adapt faster to fresh results; higher values
+    stay steadier.
+  </li>
+</ul>
+<p>
+  The Degoog engine also has a bang shortcut, <code>!degoog</code>, if you want
+  to search only your own index.
+</p>
+
+<h2 id="managing">Looking at what you have</h2>
+<p>
+  <strong>Index stats</strong> shows saved results, unique pages, searches
+  remembered, database size, and a breakdown by engine type.
+</p>
+<p>
+  <strong>Manage index</strong> opens a searchable, paginated table of
+  everything stored: the query it came from, its type, the result, and its
+  score. You can select rows and delete them, individually or in bulk. Useful
+  for pruning something you would rather not have remembered.
+</p>
+<p>
+  <strong>Clear index</strong> permanently deletes every row. It makes you type
+  <code>CLEAR</code> to confirm, which should tell you how reversible it is.
+</p>
+
+<h2 id="portability">Export and import</h2>
+<p>The index is yours and it travels.</p>
+<ul>
+  <li>
+    <strong>Download index (.db)</strong> exports one engine type at a time as a
+    SQLite file.
+  </li>
+  <li>
+    <strong>Import index file</strong> accepts a <code>.db</code> (SQLite) or a
+    <code>.sql</code> dump, into whichever engine type you choose. Large files
+    take a while, and the dialog reports progress and then how many URLs and
+    links were imported.
+  </li>
+</ul>
+<p>
+  This is what makes moving instances painless, and it means an index built up
+  over months is not hostage to one machine.
+</p>
+
+<h2 id="storage-backend">Where it is stored</h2>
+<p>
+  By default the index is SQLite under <code>data/indexer/</code>, with one
+  database per engine type. The directory, the database path, and the config
+  file can all be moved with <code>DEGOOG_INDEXER_DIR</code>,
+  <code>DEGOOG_INDEXER_DB</code>, and <code>DEGOOG_INDEXER_CONFIG_FILE</code>.
+</p>
+<p>
+  For a busy instance with a large index, set <code>DEGOOG_POSTGRES</code> to a
+  Postgres connection URL and Degoog uses that instead. Postgres handles
+  concurrent writes and full-text search better than SQLite once the index gets
+  big. The <code>postgres.yml</code> and <code>full.yml</code> compose examples
+  are set up for exactly this.
+</p>
+
+<div class="block-note">
+  <p>
+    Everything the indexer stores is a record of what you searched for and what
+    you were shown. On a shared or public instance, think about that before
+    enabling it, and use the domain and word blocklists rather than assuming you
+    will tidy up later.
+  </p>
+</div>

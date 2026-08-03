@@ -1,0 +1,260 @@
+<div class="doc-page-header">
+  <h1><a href="index.html">Degoog</a> Settings</h1>
+  <p class="doc-page-desc">
+    How the settings page is laid out, what belongs to your browser, and what
+    belongs to the instance.
+  </p>
+</div>
+
+<h2 id="getting-in">Getting in</h2>
+<p>
+  The settings icon is in the top right of the home page and the results page.
+  Where it takes you depends on how the instance is configured:
+</p>
+<ul>
+  <li><strong>Normal instance:</strong> <code>/settings</code>.</li>
+  <li>
+    <strong>Public instance</strong> (<code>DEGOOG_PUBLIC_INSTANCE=true</code>):
+    visitors get a cut-down page with just appearance, search options, and
+    engine toggles. The full admin page moves to <code>/admin</code> and is only
+    reachable if a password is also configured.
+  </li>
+  <li>
+    <strong>Custom path:</strong> <code>DEGOOG_SETTINGS_PATH</code> moves the
+    admin page to any string you like, which is a reasonable way to make it
+    undiscoverable.
+  </li>
+</ul>
+<p>
+  If a password gate appears, that is
+  <code>DEGOOG_SETTINGS_PASSWORDS</code> doing its job. If you never set one,
+  Degoog generated a temporary password and printed it in the server logs at
+  startup. See <a href="getting-started.html#password">Getting started</a>.
+</p>
+<p>
+  Signing in stores a session token in an <code>HttpOnly</code>,
+  <code>SameSite=Strict</code> cookie. It also unlocks the domain action menus
+  on result rows, which is why those disappear when you are signed out.
+</p>
+
+<figure class="doc-screenshot-image-wrapper">
+  <img class="doc-screenshot-image" src="images/screenshots/settings-page.png"
+    data-screenshot-target="images/screenshots/settings-page.png" alt="The settings page with its tab navigation." />
+  <figcaption>The settings page with its tab navigation.</figcaption>
+</figure>
+
+<h2 id="tabs">The tabs</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Tab</th>
+      <th>What lives there</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>General</strong></td>
+      <td>
+        Theme, search options, instance defaults, the setup tour, app install,
+        and the version check. Covered below.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Server</strong></td>
+      <td>
+        Everything instance-wide: presets, rate limits, bot control, proxies,
+        domain rules, cache, API key, streaming. See
+        <a href="server-settings.html">Server settings</a>.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Indexer</strong></td>
+      <td>
+        Only appears once the indexer is switched on in Server settings. See
+        <a href="indexer.html">Indexer</a>.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Engines</strong></td>
+      <td>
+        Enable, disable, configure, group, and reorder your search engines. See
+        <a href="engines-providers.html">Engines and providers</a>.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Plugins</strong></td>
+      <td>
+        Every installed plugin plus the built-in commands and panels, each with
+        its own settings.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Transports</strong></td>
+      <td>
+        Outgoing HTTP clients, built-in and installed. See
+        <a href="engines-providers.html#transports">Transports</a>.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Autocomplete</strong></td>
+      <td>Suggestion providers, one toggle each.</td>
+    </tr>
+    <tr>
+      <td><strong>Shortcuts</strong></td>
+      <td>
+        Rebind keyboard shortcuts. Hidden unless shortcuts are enabled in Server
+        settings.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Themes</strong></td>
+      <td>Switch the active theme.</td>
+    </tr>
+    <tr>
+      <td><strong>Store</strong></td>
+      <td>
+        Add repositories, browse the catalogue, install and update. See
+        <a href="plugins-themes-store.html">Store and extensions</a>.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  There is a search box above the tabs that filters the settings on the current
+  page. Handy once you have a few dozen extensions.
+</p>
+
+<h2 id="general">The General tab</h2>
+
+<h3>Appearance</h3>
+<p>System default, light, or dark. Stored in your browser.</p>
+
+<h3>Search Options</h3>
+<p>
+  Eight toggles that change how results behave. They are documented in full in
+  <a href="using-search.html#search-options">Using search</a>.
+</p>
+
+<h3>Instance defaults</h3>
+<p>
+  This is the part that surprises people, so it is worth being precise about.
+</p>
+<p>
+  Your theme, your eight search options, and your enabled engines all live in
+  <strong>your browser</strong>, not on the server. Two people using the same
+  instance can have completely different setups, which is the intended
+  behaviour.
+</p>
+<p>
+  <strong>Save current settings as defaults</strong> takes your current browser
+  settings and publishes them as the starting point for anyone who visits
+  without settings of their own. It does not overwrite anyone. Each visitor's
+  own choices always win over the instance defaults.
+</p>
+<p>
+  <strong>Reset to instance defaults</strong> goes the other way: it throws away
+  your local choices and adopts the instance defaults. There is a confirmation,
+  because it does replace your saved settings on that browser.
+</p>
+<p>
+  The Engines tab has its own pair of these buttons for engine selection
+  specifically.
+</p>
+
+<h3>Setup tour</h3>
+<p>
+  Restarts the first-run wizard from the home page. Useful when you have
+  forgotten where something lives.
+</p>
+
+<h3>Install app</h3>
+<p>
+  Asks your browser to show the install prompt again. Requires HTTPS and a
+  browser that supports progressive web apps; over plain HTTP nothing will
+  happen.
+</p>
+
+<h3>Version</h3>
+<p>
+  Shows your installed version alongside the newest release on GitHub, with the
+  date of the last check. It checks at most once a day on its own, and there is
+  a <strong>Check Now</strong> button plus a link to the release notes.
+</p>
+
+<h3>Restart required</h3>
+<p>
+  A banner appears at the top of General when an installed extension needs a
+  server restart to work properly. It names the reason and gives you a button
+  that restarts Degoog for you. Searches in flight may be interrupted briefly.
+</p>
+
+<h2 id="where-settings-live">Where settings are actually stored</h2>
+<table>
+  <thead>
+    <tr>
+      <th>What</th>
+      <th>Stored where</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Theme, search options, enabled engines, tab order</td>
+      <td>Your browser (IndexedDB), unless published as instance defaults</td>
+    </tr>
+    <tr>
+      <td>
+        Extension settings (per plugin, engine, theme, transport, provider)
+      </td>
+      <td><code>data/plugin-settings.json</code> on the server</td>
+    </tr>
+    <tr>
+      <td>
+        Server settings (rate limits, honeypot, streaming, API key, indexer
+        flag)
+      </td>
+      <td><code>data/server-settings.json</code></td>
+    </tr>
+    <tr>
+      <td>Instance default engines</td>
+      <td><code>data/default-engines.json</code></td>
+    </tr>
+    <tr>
+      <td>Domain block, replace, and score lists</td>
+      <td><code>data/search/search-lists.json</code></td>
+    </tr>
+    <tr>
+      <td>Bang aliases</td>
+      <td><code>data/aliases.json</code></td>
+    </tr>
+    <tr>
+      <td>Banned IPs</td>
+      <td><code>data/blocklist.json</code></td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  All of those paths can be moved with
+  <a href="environment-variables.html">environment variables</a>. Server-side
+  settings are written atomically, so a crash mid-save will not leave you with a
+  truncated JSON file.
+</p>
+
+<h2 id="not-saving">When a setting will not stick</h2>
+<ul>
+  <li>
+    Check whether it is a browser setting. Clearing site data resets theme,
+    search options, and engine selection.
+  </li>
+  <li>
+    On a public instance most server settings are read-only for visitors, and
+    the mutation endpoints return Unauthorized by design.
+  </li>
+  <li>
+    If a list is very large, Degoog stops rendering it in the UI and tells you
+    to edit the file directly. That is deliberate, not a failure.
+  </li>
+  <li>
+    If nothing at all saves, check the server logs. See
+    <a href="environment-variables.html#viewing-server-logs">Viewing server logs</a>.
+  </li>
+</ul>

@@ -1,0 +1,255 @@
+<div class="doc-page-header">
+  <h1><a href="index.html">Degoog</a> Troubleshooting</h1>
+  <p class="doc-page-desc">
+    The things that actually go wrong, and what to do about each one.
+  </p>
+</div>
+
+<h2 id="no-results-at-all">Every search returns nothing</h2>
+<p>
+  Almost certainly no engines are installed. Degoog ships with none, on purpose.
+</p>
+<p>
+  Go to <em>Settings, Store</em>, install an engine or two, then enable them in <em>Settings, Engines</em>.
+  The results page will tell you this directly with a link to the Store if you have zero
+  engines.
+</p>
+<p>
+  If that doesn't work, and there's no info in the logs, the next likely culprit is DNS, you can use this handy site to
+  check if that's the case: <a href="https://isitdns.com" class="external" target="_blank"
+    rel="noopener">https://isitdns.com</a>
+</p>
+
+<h2 id="one-engine-fails">One engine keeps failing</h2>
+<p>
+  Look at the sidebar. Degoog names the engine and the reason, and gives you a
+  <strong>retry</strong> link to re-run just that engine.
+</p>
+<ul>
+  <li>
+    <strong>Blocked by the engine</strong> or
+    <strong>Blocked by an interstitial page</strong>: it needs a different
+    transport. This is the common case with Google. See
+    <a href="tips-and-tricks.html">Tips and tricks</a>.
+  </li>
+  <li>
+    <strong>CAPTCHA challenge</strong>: usually Cloudflare. FlareSolverr or a
+    stealth browser transport.
+  </li>
+  <li>
+    <strong>Rate limited</strong>: you are querying too fast from one IP. Enable
+    a proxy, search less aggressively, or leave the cache to do its job.
+  </li>
+  <li>
+    <strong>Timed out</strong>: raise that engine's timeout in
+    <em>Configure, Advanced</em>, or disable it.
+  </li>
+  <li>
+    <strong>Could not read the response</strong>: the site changed its markup
+    and the engine extension needs updating. Check <em>Settings, Store</em> for
+    an update.
+  </li>
+</ul>
+
+<h2 id="no-autocomplete">No suggestions under the search box</h2>
+<p>
+  No autocomplete provider is installed. They are separate from engines and,
+  like engines, none ship by default. Install one from
+  <em>Settings, Store</em> and enable it in <em>Settings, Autocomplete</em>.
+</p>
+<p>
+  If a provider is installed and enabled but nothing appears, check that the
+  provider itself is reachable from your server and that autocomplete rate
+  limiting has not kicked in.
+</p>
+
+<h2 id="cannot-get-into-settings">You cannot get into Settings</h2>
+<ul>
+  <li>
+    <strong>A password prompt you did not expect.</strong> If you never set
+    <code>DEGOOG_SETTINGS_PASSWORDS</code>, Degoog generated a one-off password
+    and printed it in the server logs at startup, under a "Temporary settings
+    password" banner. It changes on every restart, so set the environment
+    variable if you want a stable one.
+  </li>
+  <li>
+    <strong>Settings returns 404.</strong> The path may have been moved with
+    <code>DEGOOG_SETTINGS_PATH</code>. On a public instance the admin page lives
+    at <code>/admin</code>, and it only responds at all if a password is
+    configured. Without one it returns 404 with no hint that it exists, which is
+    intentional.
+  </li>
+  <li>
+    <strong>You get a cut-down settings page.</strong> That is
+    <code>DEGOOG_PUBLIC_INSTANCE=true</code>. Visitors see appearance, search
+    options, and engine toggles only. Admin lives at the separate path.
+  </li>
+  <li>
+    <strong>"Settings authentication is misconfigured."</strong> The gate is set
+    to a middleware plugin that is not loaded, for example after uninstalling an
+    SSO plugin. Fix the gate setting or set
+    <code>DEGOOG_SETTINGS_PASSWORDS</code>.
+  </li>
+</ul>
+
+<h2 id="banned">You banned yourself</h2>
+<p>
+  If you are seeing a 403 page instead of Degoog, or ASCII art of Gandalf on the
+  homepage, the bot trap caught you. That can happen with unusual clients,
+  aggressive prefetching, or a reverse proxy that hides real client IPs from
+  Degoog. See
+  <a href="tips-and-tricks.html#gandalf">What to do when you see Gandalf</a> for
+  the full walkthrough.
+</p>
+<p>
+  From an unaffected device or network, open
+  <em>Settings, Server, Bot Control</em> and unban your IP from the
+  <strong>Blocked IPs</strong> list. If it keeps happening, turn off browser
+  verification (CSS HMAC) or the honeypot entirely while you investigate.
+</p>
+
+<h2 id="rate-limited-yourself">Everyone is getting rate limited</h2>
+<p>
+  Rate limiting is per client IP. Behind a reverse proxy, Degoog defaults to
+  <em>distrusting</em> forwarded headers, which means every request can look
+  like it comes from the proxy, so a single limit is shared by everyone.
+</p>
+<p>
+  Set <code>DEGOOG_DISTRUST_PROXY=0</code> <strong>only</strong> when Degoog
+  sits behind a proxy you control and that strips or rewrites
+  <code>X-Forwarded-For</code> on incoming requests. If Degoog is exposed
+  directly to the internet, leave it alone: trusting those headers would let any
+  client claim any IP.
+</p>
+
+<h2 id="extension-does-nothing">An extension installed but nothing happened</h2>
+<p>Work down this list:</p>
+<ol>
+  <li>
+    Is it enabled? Engines, autocomplete providers, and themes need switching on
+    or selecting after install.
+  </li>
+  <li>
+    Does the card show <strong>Needs configuration</strong>? Some engines want
+    an API key or a service URL first.
+  </li>
+  <li>
+    Does it show <strong>Server restart required</strong>? The banner at the top
+    of <em>Settings, General</em> has a button.
+  </li>
+  <li>
+    Does it show <strong>Requires a newer version of Degoog</strong>? Update
+    Degoog itself.
+  </li>
+</ol>
+
+<h2 id="images-broken">Thumbnails are missing</h2>
+<p>
+  Result images are fetched by your server through an image proxy, which blocks
+  private and local addresses by default. If your engine points at something on
+  your own network, such as a Jellyfin or Meilisearch instance, its thumbnails
+  will not load until you turn on <strong>Allow local network images</strong> in
+  <em>Settings, Server</em> and add a regex pattern for that host.
+</p>
+
+<h2 id="theme-broken">The UI looks broken</h2>
+<ul>
+  <li>
+    Switch back to the built-in theme in <em>Settings, Themes</em>. It is always
+    available.
+  </li>
+  <li>
+    Clear or fix <em>Settings, Server, Custom CSS</em>. It loads last, so it
+    overrides everything.
+  </li>
+  <li>
+    Disable recently installed plugins, particularly slot plugins that inject
+    their own markup.
+  </li>
+  <li>
+    Hard-refresh. Degoog registers a service worker, so a stale cached asset can
+    survive a normal reload.
+  </li>
+</ul>
+
+<h2 id="settings-not-saving">A setting will not stick</h2>
+<ul>
+  <li>
+    Theme, search options, and engine selection are stored in
+    <strong>your browser</strong>. Clearing site data resets them, and they do
+    not follow you to another device unless someone published them as instance
+    defaults.
+  </li>
+  <li>
+    On a public instance, server-side mutations return Unauthorized by design.
+  </li>
+  <li>
+    If a list is too large to render, Degoog says so and asks you to edit the
+    file directly. That is expected behaviour, not a save failure.
+  </li>
+</ul>
+
+<h2 id="streaming-off">Streaming is on but results still arrive all at once</h2>
+<p>
+  Check whether you have
+  <strong>Use POST method for search requests</strong> enabled in your search
+  options. The two are incompatible, and POST wins. The setting even carries a
+  tooltip saying so.
+</p>
+<p>
+  Some buffering reverse proxies also swallow server-sent events. If streaming
+  works locally but not through your proxy, that is where to look, and the
+  <strong>Compatibility / Low Resource Mode</strong> preset exists precisely for
+  this.
+</p>
+
+<h2 id="install-problems">Startup and install problems</h2>
+<ul>
+  <li>
+    <strong>Permission errors on <code>data/</code>.</strong> The container runs
+    as <code>1000:1000</code> by default. Run
+    <code>sudo chown -R 1000:1000 ./data</code>, or set <code>PUID</code> and
+    <code>PGID</code> to match your host user.
+  </li>
+  <li>
+    <strong>Certificate errors on a native install.</strong> Install your
+    distribution's <code>ca-certificates</code> package.
+  </li>
+  <li>
+    <strong>The Store cannot clone repositories.</strong> A native install needs
+    <code>git</code> on the host. Several transports also need
+    <code>curl</code>.
+  </li>
+  <li>
+    <strong>Nothing resolves under a sub-path.</strong> Set
+    <code>DEGOOG_BASE_URL</code> to the path you serve from, for example
+    <code>/degoog</code>.
+  </li>
+</ul>
+
+<h2 id="logs">Reading the logs</h2>
+<p>
+  When the answer is not in the UI, it is in the logs. Set
+  <code>LOG_LEVEL=debug</code> for the full picture, including per-plugin
+  execution times. Where to read the output for each deployment style is covered
+  in
+  <a href="environment-variables.html#viewing-server-logs">Viewing server logs</a>.
+</p>
+
+<h2 id="docs-search">These docs do not search across pages</h2>
+<p>
+  Cross-page search fetches the other pages over HTTP, which browsers block from
+  <code>file://</code> URLs. Serve the docs properly (<code>npm run serve</code>
+  in the docs project) and it works.
+</p>
+
+<h2 id="still-stuck">Still stuck</h2>
+<p>
+  The
+  <a href="https://discord.gg/invite/mMuk2WzVZu" class="external" target="_blank" rel="noopener">Discord community</a>
+  is active and friendly, and
+  <a href="https://github.com/degoog-org/degoog/issues" class="external" target="_blank" rel="noopener">GitHub
+    issues</a>
+  is the right place for genuine bugs. Please have a look through these docs
+  first; a fair number of issues turn out to be "no engines installed".
+</p>

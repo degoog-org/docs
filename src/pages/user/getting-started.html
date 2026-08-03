@@ -1,0 +1,292 @@
+<div class="doc-page-header">
+  <h1><a href="index.html">Degoog</a> Getting started</h1>
+  <p class="doc-page-desc">
+    Get it running, get through the wizard (the tutorial one, nobody gets through the actual wizard... You'll learn),
+    and get a search box that actually returns things.
+  </p>
+</div>
+
+<p>
+  If you are new to self hosting,
+  <a href="#beginner-guide">click here to jump straight to our beginner guide</a>
+  at the bottom of the page where we walk you through setting up Docker from
+  scratch.
+</p>
+
+<h2 id="run-it">1. Run the thing</h2>
+<p>
+  Degoog listens on port <code>4444</code> by default and keeps everything it
+  owns in one <code>data</code> directory. Create that directory first and give
+  it to the user the container runs as (<code>1000:1000</code> unless you change
+  <code>PUID</code> and <code>PGID</code>):
+</p>
+<pre><code>mkdir -p ./data
+sudo chown -R 1000:1000 ./data</code></pre>
+
+<h3>Docker Compose</h3>
+<p>
+  Four ready-made compose files live in
+  <a href="https://github.com/degoog-org/degoog/tree/main/docker-compose-examples" class="external" target="_blank"
+    rel="noopener">docker-compose-examples</a>. Pick the one that matches how hard you plan to lean on it:
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>File</th>
+      <th>What it runs</th>
+      <th>Good for</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>simple.yml</code></td>
+      <td>Degoog on its own</td>
+      <td>Personal use, low traffic. Lowest resource usage. Not as snappy.</td>
+    </tr>
+    <tr>
+      <td><code>valkey.yml</code></td>
+      <td>Degoog + Valkey</td>
+      <td>
+        My personal favourite. Valkey is a key-value store that can be used to store settings, search results, and other
+        data. This makes degoog feels SO fast.
+      </td>
+    </tr>
+    <tr>
+      <td><code>postgres.yml</code></td>
+      <td>Degoog + Postgres</td>
+      <td>
+        A busy instance with a large <a href="indexer.html">indexer</a>. Handles
+        concurrent writes better than SQLite.
+      </td>
+    </tr>
+    <tr>
+      <td><code>full.yml</code></td>
+      <td>Degoog + Valkey + Postgres</td>
+      <td>High traffic public instance that wants both.</td>
+    </tr>
+    <tr>
+      <td><code>mcp.yml</code></td>
+      <td>Degoog + degoog-mcp</td>
+      <td>Exposing Degoog to LLM clients over the official Model Context Protocol.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Plain Docker or Podman</h3>
+<pre><code>docker run -d --name degoog \
+  -p 4444:4444 \
+  -v ./data:/app/data \
+  -e DEGOOG_SETTINGS_PASSWORDS=change-me \
+  --restart unless-stopped \
+  ghcr.io/degoog-org/degoog:latest</code></pre>
+<p>
+  Podman is the same command with <code>podman</code> and a <code>:Z</code> on
+  the volume. A Quadlet unit file is in the
+  <a href="https://github.com/degoog-org/degoog#run" class="external" target="_blank" rel="noopener">project README</a>.
+</p>
+
+<h3>Without a container</h3>
+<p>
+  You need
+  <a href="https://bun.sh" class="external" target="_blank" rel="noopener">bun</a>,
+  <a href="https://git-scm.com" class="external" target="_blank" rel="noopener">git</a>
+  (the Store clones repositories with it), and
+  <a href="https://curl.se" class="external" target="_blank" rel="noopener">curl</a>
+  (several transports shell out to it).
+  And you will likely need to install <a href="https://github.com/lwthiker/curl-impersonate" class="external"
+    target="_blank" rel="noopener">curl-impersonate</a> for some transports to work and some python libraries for
+  the searx
+  compatibility layer.
+</p>
+<pre><code>git clone https://github.com/degoog-org/degoog.git
+cd degoog
+bun install
+bun run build
+bun run start</code></pre>
+<p>
+  Always start Degoog from the project root. Paths like
+  <code>data/plugins</code> are resolved relative to the working directory. If
+  HTTPS requests fail with certificate errors, install your distribution's
+  <code>ca-certificates</code> package.
+</p>
+
+<h2 id="password">2. Set a password (or find the generated one)</h2>
+<p>
+  The settings area can install extensions, and extensions run code on your
+  server. Degoog takes that seriously, so it refuses to be quietly open:
+</p>
+<ul>
+  <li>
+    If you set <code>DEGOOG_SETTINGS_PASSWORDS</code>, that is your password. It
+    accepts a comma separated list if you want more than one.
+  </li>
+  <li>
+    If you do not, Degoog
+    <strong>generates a one-off password for that run and prints it in the server
+      logs</strong>. Look for the yellow "Temporary settings password" banner at startup. It
+    changes every restart.
+  </li>
+  <li>
+    If you genuinely want no gate at all on a trusted local network, set
+    <code>DEGOOG_DANGEROUSLY_NO_PASSWORD=true</code>. The name is the warning.
+  </li>
+</ul>
+<p>
+  See <a href="environment-variables.html">Environment variables</a> for the
+  full picture, including <code>DEGOOG_PUBLIC_INSTANCE</code> and moving the
+  settings page to a secret URL.
+</p>
+
+<h2 id="wizard">3. The setup wizard (this is the friendly one)</h2>
+<p>
+  Open <code>http://localhost:4444</code> and a guided tour starts on its own
+  the first time. It is worth following, because it walks you through the one
+  thing a new install genuinely needs: engines.
+</p>
+<p>The tour covers, in order:</p>
+<ol>
+  <li><strong>The search bar</strong>, and where settings live.</li>
+  <li>
+    <strong>Add a repository.</strong> A repository is a git URL that exposes
+    installable extensions. The official one is
+    <code>https://github.com/degoog-org/official-extensions</code>. There is
+    also a
+    <a href="https://degoog-org.github.io/community-extensions/" class="external" target="_blank"
+      rel="noopener">community extensions list</a>.
+  </li>
+  <li>
+    <strong>Install your first engines.</strong> The catalog gets filtered to
+    engines. You need at least one to continue, and this is the step that makes
+    search work at all.
+  </li>
+  <li>
+    <strong>Install an autocomplete provider</strong> if you want live
+    suggestions. Also none by default.
+  </li>
+  <li>
+    <strong>Themes, plugins, transports</strong> are all optional and can wait.
+  </li>
+  <li>
+    <strong>Enable and configure engines</strong>, then
+    <strong>pick your autocomplete provider</strong>.
+  </li>
+  <li>
+    <strong>Server settings</strong>, then a closing reminder about locking the
+    instance down if it faces the internet.
+  </li>
+</ol>
+<p>
+  You can skip the tour at any point, and restart it later from
+  <strong>Settings, General, Setup tour</strong>. To stop it appearing at all
+  (useful when provisioning instances automatically), set
+  <code>DEGOOG_WIZARD=false</code>.
+</p>
+
+<figure class="doc-screenshot-image-wrapper">
+  <img class="doc-screenshot-image" src="images/screenshots/getting-started-wizard.png"
+    data-screenshot-target="images/screenshots/getting-started-wizard.png"
+    alt="The first-run setup wizard highlighting the search bar." />
+  <figcaption>The first-run setup wizard.</figcaption>
+</figure>
+
+<h2 id="first-search">4. Your first search</h2>
+<p>Type something and press Enter. What you should see:</p>
+<ul>
+  <li>
+    A row of tabs across the top, one per engine type you installed. Install
+    only a web engine and you get one tab. Add an image engine and an Images tab
+    appears.
+  </li>
+  <li>
+    Merged results, deduplicated. A result found by three engines shows all
+    three as its sources.
+  </li>
+  <li>
+    A sidebar with engine timings, so you can see which engine is slow and which
+    one failed.
+  </li>
+</ul>
+<p>
+  If it comes back empty, that is almost always "no engines installed" or "the
+  engine got blocked". <a href="troubleshooting.html">Troubleshooting</a> and
+  <a href="tips-and-tricks.html">Tips and tricks</a> cover both.
+</p>
+
+<figure class="doc-screenshot-image-wrapper">
+  <img class="doc-screenshot-image" src="images/screenshots/getting-started-first-search.png"
+    data-screenshot-target="images/screenshots/getting-started-first-search.png"
+    alt="A first search query with results, tabs, and the engine performance sidebar." />
+  <figcaption>
+    A first search, with result tabs and the engine performance sidebar.
+  </figcaption>
+</figure>
+
+<h2 id="browser-search">5. Make it your browser's search engine</h2>
+<p>
+  Degoog publishes an OpenSearch descriptor at <code>/opensearch.xml</code>.
+  Most browsers pick this up automatically once you have visited the site.
+</p>
+<ul>
+  <li>
+    <strong>Firefox:</strong> visit your instance, then open the address bar
+    dropdown or <em>Settings, Search</em>. Degoog appears in the list of
+    available search engines and can be made the default.
+  </li>
+  <li>
+    <strong>Chrome, Edge, Brave:</strong> visit your instance, then
+    <em>Settings, Search engine, Manage search engines</em>. Degoog is usually
+    already listed under the inactive shortcuts. If it is not, add it manually
+    with the URL <code>http://your-degoog/search?q=%s</code>.
+  </li>
+</ul>
+<p>
+  Autocomplete in the browser's own address bar comes from
+  <code>/api/suggest/opensearch</code>, which is part of the same descriptor, so
+  suggestions follow whichever provider you enabled.
+</p>
+
+<h2 id="install-app">6. Optional: install it as an app</h2>
+<p>
+  Degoog ships a web app manifest and a service worker, so it can be installed
+  to your home screen or dock. Your browser will usually offer this by itself.
+  If it does not, <strong>Settings, General, Install app</strong> has a button
+  that asks again.
+</p>
+<div class="block-note">
+  <p>
+    Installing requires HTTPS and a browser that supports progressive web apps.
+    Over plain <code>http://</code> on a LAN address, the prompt will not appear
+    no matter how many times you press the button.
+  </p>
+</div>
+
+<h2 id="beginner-guide">Beginner guide to Docker</h2>
+<p>
+  Welcome! If you are reading this, you might be new to running your own
+  software. Let us break it down simply. Think of Docker as a shipping
+  container. Instead of installing all the messy requirements for an app
+  directly onto your computer, Docker grabs a neat pre packaged box that has
+  everything the app needs to run perfectly. All you do is tell Docker to start
+  the box.
+</p>
+<p>
+  To get started, you will need to install
+  <a href="https://www.docker.com/products/docker-desktop/" class="external" target="_blank" rel="noopener">Docker
+    Desktop</a>
+  if you are on Windows or Mac, or
+  <a href="https://docs.docker.com/engine/install/" class="external" target="_blank" rel="noopener">Docker Engine</a>
+  if you are using Linux. Once installed, the easiest way to launch Degoog is
+  using something called
+  <a href="https://docs.docker.com/compose/" class="external" target="_blank" rel="noopener">Docker Compose</a>. It uses
+  a simple text file to tell Docker exactly how to run the container.
+  Just copy one of the compose files from the
+  <a href="#run-it">Run it</a> section above (start with
+  <code>simple.yml</code>), save it in a folder as
+  <code>docker-compose.yml</code>, open your terminal or command prompt in that
+  folder, and type <code>docker compose up -d</code>.
+</p>
+<p>
+  That command pulls the Degoog box from the internet and starts it up quietly
+  in the background. Once it finishes, you can just open your web browser and go
+  to <code>http://localhost:4444</code> to see your brand new search engine.
+</p>
