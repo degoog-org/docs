@@ -168,8 +168,13 @@
       <td>Built in, needs the binary</td>
       <td>
         Uses
-        <a href="https://github.com/lexiforest/curl-impersonate" class="external" target="_blank"
-          rel="noopener">curl-impersonate</a>
+        <a
+          href="https://github.com/lexiforest/curl-impersonate"
+          class="external"
+          target="_blank"
+          rel="noopener"
+          >curl-impersonate</a
+        >
         to mimic Firefox's TLS fingerprint. For sites that block on the TLS
         handshake rather than on headers. Only appears as an option when the
         binary is on <code>PATH</code>.
@@ -239,71 +244,125 @@ chmod +x /usr/local/bin/curl_firefox133</code></pre>
       - "4444:4444"
     restart: unless-stopped</code></pre>
 
-<h2 id="4play">The 4play transport</h2>
+<h2 id="4play">4play</h2>
 <p>
-  Borrows a real browser session using a browser extension to grab page
-  information and data straight from browser tabs.
+  4play lets Degoog use a real Firefox session for stubborn engines that protect
+  hard against server-side requests. Degoog spawn a websocket server in parallel
+  and talks to the official 4play Firefox extension itself, so you do
+  <strong>not</strong> need the lolcat's provided sample Node server for Degoog.
 </p>
 <p>
-  All credit for the original idea and browser extension goes to
-  <a href="https://git.lolcat.ca/lolcat/4play" class="external" target="_blank" rel="noopener">lolcat</a>, author of
-  4get and 4play.
+  Credit for 4play goes to
+  <a
+    href="https://git.lolcat.ca/lolcat/4play"
+    class="external"
+    target="_blank"
+    rel="noopener"
+    >lolcat</a
+  >. Read the upstream
+  <a
+    href="https://git.lolcat.ca/lolcat/4get/src/branch/master/docs/configure.md#4play-setup"
+    class="external"
+    target="_blank"
+    rel="noopener"
+    >4play setup notes</a
+  >
+  too, especially the real desktop and display requirements.
 </p>
 
-<h3>4play (lolcat)</h3>
-<p>
-  Uses the official 4play protocol to connect the
-  <a href="https://addons.mozilla.org/en-US/firefox/addon/4play/">official 4play Firefox extension</a>
-  to Degoog. Degoog runs the WebSocket server itself on its own main port, so
-  there is no second service and no extra port to expose.
-</p>
+<h3 id="4play-setup">Setup</h3>
+<ol>
+  <li>Install <strong>4play (lolcat)</strong> from the Degoog Store.</li>
+  <li>
+    Run Firefox ESR or current Firefox on a real desktop session. Use a laptop
+    screen, powered monitor, or EDID adapter. Avoid headless/software-rendered
+    Firefox if you want this to help.
+  </li>
+  <li>
+    Install the
+    <a
+      href="https://addons.mozilla.org/en-US/firefox/addon/4play/"
+      class="external"
+      target="_blank"
+      rel="noopener"
+      >official 4play extension</a
+    >
+    in a clean Firefox profile. Allow private windows and automatic updates.
+  </li>
+  <li>
+    In Degoog, open
+    <em>Settings, Transports, 4play (lolcat), Configure</em>. Set a strong
+    password and copy the WebSocket path shown there. The official Store path is
+    normally
+    <code>/ws/degoog-org-official-extensions-lolcat-4play-transport</code>, but
+    copy your own setting instead of guessing.
+  </li>
+  <li>
+    Put your Degoog WebSocket URL and password into the Firefox extension. Set
+    the timeout to <code>30000</code>. The extension dot should turn green.
+  </li>
+  <li>
+    Pick <strong>4play (lolcat)</strong> as the
+    <em>Outgoing HTTP client</em> for the engines that need it.
+  </li>
+</ol>
+
+<h3 id="4play-settings">Settings worth knowing</h3>
 <ul>
   <li>
-    <strong>Use a clean Firefox profile.</strong> The extension manages tabs and
-    containers globally, so pointing it at your daily driver profile is a bad
-    time.
+    <strong>Container isolation:</strong> keep browser state split per origin.
+    Leave it on unless you know you want shared cookies.
   </li>
   <li>
-    Container isolation is on by default, and is forced on when you configure a
-    proxy. You can tune the container pool size and TTL.
+    <strong>Max containers:</strong> how many origins can stay ready at once.
   </li>
   <li>
-    Background warmup can re-warm known origins on a schedule (for example every
-    72 hours) so sessions are ready before you search. Set it at or below the
-    warmup TTL or you leave a cold gap.
+    <strong>Origin warmup query:</strong> the harmless search used before Degoog
+    replays your real query.
   </li>
   <li>
-    With <code>DEGOOG_VALKEY_URL</code> set, warmed sessions survive a Degoog
-    restart. Without Valkey the cache is in memory and resets.
+    <strong>Background warmup:</strong> re-warms origins that already used
+    4play. It does not blindly warm every engine.
   </li>
   <li>
-    The WebSocket URL to paste into the extension is shown at the top of
-    <em>Settings, Transports, 4play (lolcat), Configure</em>. If you set a
-    password there, append it as a path segment. The extension badge turns green
-    when connected.
+    <strong>Valkey:</strong> with <code>DEGOOG_VALKEY_URL</code>, primed
+    sessions can survive Degoog restarts.
   </li>
 </ul>
 
+<h3 id="4play-status">Status plugin</h3>
+<p>
+  Install <strong>4play status</strong> and run <code>!4play</code>. It shows
+  the Firefox connection, primed sessions, alive containers, CAPTCHA tabs, and
+  background warmup state. It can also test the transport or clear sessions. The
+  status card is admin-only by default.
+</p>
+
 <div class="block-note">
   <p>
-    <strong>The 4play transport mean your browser talks to external sites during
-      warmup, and your Degoog server receives those cookies.</strong>
-    That is the deliberate trade: real browser sessions in exchange for a more
-    privileged server. The WebSocket is plain <code>ws://</code> and
-    unencrypted, so if you bind it to anything other than localhost, set the
-    transport password and treat that port accordingly. Please make sure to run
-    everything behind proxies or having this setup will totally defy the purpose
-    of having a private meta search aggregator.
+    <strong
+      >4play is VERY powerful, but configuring it properly is crucial to stay
+      private.</strong
+    >
+    Firefox talks to engines during warmup, and Degoog gets the cookies and
+    headers it needs to reuse that browser session. That is the trade: better
+    scraping, more trust placed in your own setup. Keep the WebSocket private,
+    set a password, and proxy it properly if Firefox is not on the same box. If
+    privacy is the goal, put both Firefox and Degoog's outgoing requests behind
+    proxies or a VPN you trust. Otherwise you are mostly making scraping work
+    better, not making it more private.
   </p>
 </div>
 
 <h2 id="gandalf">What to do when you see Gandalf</h2>
 <figure class="doc-screenshot-image-wrapper">
-  <img class="doc-screenshot-image" src="images/screenshots/gandalf.png"
-    data-screenshot-target="images/screenshots/gandalf.png" alt="Gandalf the Grey blocking your access." />
-  <figcaption>
-    Gandalf the Grey says you shall not pass.
-  </figcaption>
+  <img
+    class="doc-screenshot-image"
+    src="images/screenshots/gandalf.png"
+    data-screenshot-target="images/screenshots/gandalf.png"
+    alt="Gandalf the Grey blocking your access."
+  />
+  <figcaption>Gandalf the Grey says you shall not pass.</figcaption>
 </figure>
 <p>
   If the homepage shows ASCII art of Gandalf instead of the search box, you have
@@ -325,7 +384,9 @@ chmod +x /usr/local/bin/curl_firefox133</code></pre>
   shared address gets banned, and suddenly you see Gandalf even though you never
   touched those paths yourself. The same misconfiguration also makes rate limits
   apply to everyone at once; see
-  <a href="troubleshooting.html#rate-limited-yourself">Everyone is getting rate limited</a>.
+  <a href="troubleshooting.html#rate-limited-yourself"
+    >Everyone is getting rate limited</a
+  >.
 </p>
 <p>To get back in:</p>
 <ol>
@@ -374,7 +435,9 @@ chmod +x /usr/local/bin/curl_firefox133</code></pre>
     <a href="engines-providers.html#aggregation">How aggregation works</a>.
   </li>
   <li>
-    <strong>Per-engine timeouts stop one slow engine ruining everything.</strong>
+    <strong
+      >Per-engine timeouts stop one slow engine ruining everything.</strong
+    >
     Same panel.
   </li>
   <li>
