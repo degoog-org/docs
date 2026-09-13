@@ -191,6 +191,19 @@
   big. The <code>postgres.yml</code> and <code>full.yml</code> compose examples
   are set up for exactly this.
 </p>
+<p>
+  If your setup only hands you separate credentials, such as a Kubernetes
+  operator-managed secret (CNPG, bjw-s app-template), set
+  <code>DEGOOG_POSTGRES_HOST</code> instead, along with
+  <code>DEGOOG_POSTGRES_USER</code>, <code>DEGOOG_POSTGRES_PASSWORD</code>,
+  <code>DEGOOG_POSTGRES_DATABASE</code>, and <code>DEGOOG_POSTGRES_PORT</code>
+  as needed. <code>DEGOOG_POSTGRES</code> still wins if both are set. Pointing
+  <code>DEGOOG_POSTGRES_HOST</code> at a directory such as
+  <code>/var/run/postgresql</code> connects over a unix socket with peer auth
+  instead of TCP. See the
+  <a href="environment-variables.html#indexer">environment variables</a> page
+  for the full list.
+</p>
 
 <div class="block-note">
   <p>

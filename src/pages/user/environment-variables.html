@@ -120,10 +120,11 @@ Restart=on-failure</code></pre>
     <tr>
       <td><code>DEGOOG_BASE_URL</code></td>
       <td>
-        Base path when serving behind a reverse proxy at a sub-path, for example
-        <code>/degoog</code>. A full URL is accepted and only its path is used,
-        so a bare domain with no sub-path has no effect. The OpenSearch
-        descriptor always uses just the path portion so its URLs stay valid.
+        Where Degoog is reachable from outside. Give it a path to serve under
+        a sub-path, for example <code>/degoog</code>, or a full URL such as
+        <code>https://search.example.com/degoog</code> to also pin the scheme
+        and hostname. See
+        <a href="#public-url">How Degoog works out its own URL</a> below.
       </td>
       <td></td>
     </tr>
@@ -149,8 +150,55 @@ Restart=on-failure</code></pre>
       </td>
       <td></td>
     </tr>
+    <tr>
+      <td><code>DEGOOG_PROXY_ENV_ALLOWLIST</code></td>
+      <td>
+        Comma-separated list of environment variable names that proxy settings
+        may reference with <code>${NAME}</code>. Prefixes ending in
+        <code>*</code> are accepted, for example <code>REPLIT_*</code>. Unset
+        means proxy settings do not expand environment placeholders.
+      </td>
+      <td></td>
+    </tr>
   </tbody>
 </table>
+
+<h3 id="public-url">How Degoog works out its own URL</h3>
+<p>
+  A few things have to name Degoog in full rather than by a relative path: the
+  <code>opensearch.xml</code> descriptor your browser reads to offer Degoog as a
+  search engine, and the honeypot sitemap. Degoog has no way to know its own
+  public address, so it works it out per request, in this order.
+</p>
+<ol>
+  <li>
+    The scheme and host of <code>DEGOOG_BASE_URL</code>, if you set it to a full
+    URL. This wins over everything below, so use it when the steps below cannot
+    work.
+  </li>
+  <li>
+    The <code>X-Forwarded-Proto</code> and <code>X-Forwarded-Host</code> headers
+    from your reverse proxy. Most proxies send these, which is why Degoog needs
+    no configuration on a normal setup. If the header holds a comma-separated
+    list, Degoog takes the first entry.
+  </li>
+  <li>
+    The <code>Host</code> header, then the address the request actually arrived
+    on.
+  </li>
+</ol>
+<p>
+  The default order is deliberate. It lets one image serve several hostnames,
+  which a hardcoded URL cannot do. If your descriptor shows
+  <code>http://localhost:4444</code>, your proxy reached step 3, so either
+  forward the two <code>X-Forwarded-*</code> headers, preserve the original
+  <code>Host</code>, or set <code>DEGOOG_BASE_URL</code> to the full public URL.
+</p>
+<p>
+  Redirects do not use any of this. Degoog sends them as paths, so the browser
+  resolves them against whatever address it already used, and a proxy that
+  rewrites nothing still lands the user in the right place.
+</p>
 
 <h2 id="access">Access and settings gate</h2>
 <table>
@@ -480,7 +528,52 @@ Restart=on-failure</code></pre>
         Postgres connection URL. When set, the
         <a href="indexer.html">indexer</a> uses Postgres instead of SQLite,
         which scales concurrent writes and full-text search far better on a busy
-        instance.
+        instance. Takes precedence over the discrete
+        <code>DEGOOG_POSTGRES_*</code> vars below.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_POSTGRES_HOST</code></td>
+      <td>
+        Postgres host, used only when <code>DEGOOG_POSTGRES</code> is unset.
+        Lets Kubernetes setups (CNPG, bjw-s app-template) inject credentials as
+        separate secret keys instead of assembling a connection string. A
+        value starting with <code>/</code> is treated as a unix socket
+        directory (for example <code>/var/run/postgresql</code>) and connects
+        with peer auth, no password required.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_POSTGRES_PORT</code></td>
+      <td>Postgres port, used with <code>DEGOOG_POSTGRES_HOST</code>.</td>
+      <td><code>5432</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_POSTGRES_USER</code></td>
+      <td>Postgres user, used with <code>DEGOOG_POSTGRES_HOST</code>.</td>
+      <td><code>degoog</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_POSTGRES_PASSWORD</code></td>
+      <td>
+        Postgres password, used with <code>DEGOOG_POSTGRES_HOST</code>.
+        Required for a TCP host, optional for a unix socket host.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_POSTGRES_DATABASE</code></td>
+      <td>Postgres database name, used with <code>DEGOOG_POSTGRES_HOST</code>.</td>
+      <td><code>degoog</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_POSTGRES_SSLMODE</code></td>
+      <td>
+        Optional TLS mode for the discrete-var connection:
+        <code>true</code>, <code>false</code>, <code>require</code>,
+        <code>allow</code>, <code>prefer</code>, or <code>verify-full</code>.
       </td>
       <td></td>
     </tr>
@@ -504,6 +597,64 @@ Restart=on-failure</code></pre>
     </tr>
   </tbody>
 </table>
+
+<h3 id="postgres-connection">Connecting to Postgres</h3>
+<p>
+  The indexer uses SQLite and needs no configuration. To point it at Postgres
+  instead, there are three ways to give it a connection. Pick one. If
+  <code>DEGOOG_POSTGRES</code> is set, Degoog uses it and ignores the rest.
+</p>
+
+<p>
+  <strong>A connection URL.</strong> The original form. Nothing about it has
+  changed, so an existing instance keeps working untouched.
+</p>
+<pre><code>DEGOOG_POSTGRES=postgresql://degoog:changeme@degoog-postgres:5432/degoog</code></pre>
+
+<p>
+  <strong>Separate values.</strong> Use these when your deployment hands you
+  credentials as individual keys and you cannot build the URL yourself, as
+  with a Kubernetes secret from the CNPG operator or the bjw-s app-template
+  chart. Leave <code>DEGOOG_POSTGRES</code> unset and set
+  <code>DEGOOG_POSTGRES_HOST</code>. Only the host and password have no
+  default.
+</p>
+<pre><code>DEGOOG_POSTGRES_HOST=cnpg-postgres-rw
+DEGOOG_POSTGRES_PORT=5432
+DEGOOG_POSTGRES_USER=degoog
+DEGOOG_POSTGRES_PASSWORD=changeme
+DEGOOG_POSTGRES_DATABASE=degoog</code></pre>
+<p>
+  A password containing <code>@</code>, <code>:</code>, <code>/</code> or
+  <code>#</code> works here. Degoog passes each value straight to the driver,
+  so there is no connection string for them to break.
+</p>
+
+<p>
+  <strong>A unix socket.</strong> Give <code>DEGOOG_POSTGRES_HOST</code> a
+  path starting with <code>/</code> and Degoog connects over that socket using
+  peer authentication, with no password. This is the route for a Postgres
+  running on the same host, and the one the Nix module needs.
+</p>
+<pre><code>DEGOOG_POSTGRES_HOST=/var/run/postgresql
+DEGOOG_POSTGRES_USER=degoog
+DEGOOG_POSTGRES_DATABASE=degoog</code></pre>
+
+<div class="block-note">
+  <p>
+    A socket path cannot go in a connection URL, so
+    <code>DEGOOG_POSTGRES</code> is TCP only. The separate values above are
+    the only way to reach a unix socket.
+  </p>
+</div>
+
+<p>
+  If <code>DEGOOG_POSTGRES_HOST</code> is set but a TCP host has no password,
+  or the port is not a number, Degoog logs the problem and falls back to
+  SQLite instead of refusing to start. So if the
+  <a href="indexer.html">indexer</a> page reports SQLite on an instance you
+  expected to be on Postgres, grep your logs for <code>[indexer]</code>.
+</p>
 
 <h2 id="searx">SearX compatibility layer</h2>
 <table>

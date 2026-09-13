@@ -205,7 +205,8 @@
   <code>required</code>, <code>placeholder</code>, <code>description</code>, or
   <code>secret</code>. Secret fields are never sent back to the browser. If you
   use the <code>select</code> type, you will need to add an
-  <code>options</code> array containing your string choices.
+  <code>options</code> array containing your string choices, or an
+  <code>optionsFrom</code> block if your extension fetches the choices itself.
 </p>
 <p>
   The <code>hex</code> type shows a colour picker paired with a text input and
@@ -251,6 +252,56 @@
     ]
   }
 ]</code></pre>
+<h3>Fields that fetch their own options</h3>
+<p>
+  A <code>select</code> or text-style field can ask your extension for its
+  choices at configure time instead of hardcoding them. Add an
+  <code>optionsFrom</code> block to the field and export a
+  <code>getFieldOptions(key, values)</code> function alongside
+  <code>configure(settings)</code>. Degoog renders a button next to the field;
+  clicking it calls your function with the values currently typed into the
+  dialog, so you can hit an API using a base URL the user has not saved yet.
+</p>
+<p>
+  Inside <code>optionsFrom</code>, <code>dependsOn</code> lists the field keys
+  your lookup needs, <code>refreshLabel</code> renames the button,
+  <code>emptyHint</code> is shown before the first fetch, and
+  <code>auto: true</code> runs the lookup automatically when the dialog opens
+  and every dependency already has a value. On a <code>select</code> the
+  fetched values replace the dropdown; on a text field they become suggestions
+  in a datalist, so the user can still type a value that is not on the list.
+</p>
+<p>
+  Return <code>{ options, notice }</code>. Each option is a plain string or
+  <code>{ value, label }</code>, and <code>notice</code> is a short line of
+  feedback rendered under the field, which is a good place to report what your
+  lookup detected. Secret fields are handled for you: values reach your function
+  with the stored secret filled in even though the browser never sent it back.
+  Lookups are capped at 500 options and 15 seconds.
+</p>
+<pre><code>settingsSchema: [
+  { key: "baseUrl", label: "API Base URL", type: "url" },
+  {
+    key: "model",
+    label: "Model",
+    type: "text",
+    optionsFrom: {
+      dependsOn: ["baseUrl", "apiKey"],
+      refreshLabel: "Fetch models",
+      emptyHint: "Set the base URL, then fetch the model list."
+    }
+  }
+],
+
+async getFieldOptions(key, values) {
+  if (key !== "model") return { options: [] };
+  const res = await fetch(`${values.baseUrl}/api/tags`);
+  const data = await res.json();
+  return {
+    options: data.models.map((m) => m.name),
+    notice: `Found ${data.models.length} models`
+  };
+}</code></pre>
 <h3>How settings work</h3>
 <ol>
   <li>

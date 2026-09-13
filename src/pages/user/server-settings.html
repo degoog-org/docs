@@ -224,6 +224,29 @@
 </p>
 <pre><code>reddit.com -> old.reddit.com
 twitter.com -> nitter.net</code></pre>
+<p>
+  A target can also be a full URL, which is useful when the replacement lives
+  behind a fixed path or hash on a self-hosted viewer. That URL is used exactly
+  as written, so the original path is not appended:
+</p>
+<pre><code>wikipedia.org -> https://wiki.example.com/viewer#wikipedia_en_all</code></pre>
+<p>
+  To carry parts of the original result across, use placeholders. They are
+  replaced before the URL is parsed:
+</p>
+<ul>
+  <li><code>{{url}}</code> - the full original result URL</li>
+  <li><code>{{hostname}}</code> - the original hostname</li>
+  <li><code>{{path}}</code> - the original path</li>
+  <li><code>{{query}}</code> - the original query string, including the leading <code>?</code></li>
+  <li><code>{{hash}}</code> - the original hash, including the leading <code>#</code></li>
+</ul>
+<pre><code>wikipedia.org -> https://wiki.example.com/viewer#wikipedia_en_all{{path}}</code></pre>
+<p>
+  With that rule <code>https://en.wikipedia.org/wiki/Test</code> becomes
+  <code>https://wiki.example.com/viewer#wikipedia_en_all/wiki/Test</code>. Drop
+  the scheme and the original one is reused.
+</p>
 
 <h3>Scoring</h3>
 <p>
