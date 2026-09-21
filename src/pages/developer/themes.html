@@ -252,6 +252,15 @@
   last template with a specific ID wins, meaning your overrides will always take
   priority over the defaults.
 </p>
+<p>
+  The script-free <code>/nojs</code> page reuses these same templates and the
+  page shells, filled in on the server rather than in the browser, so restyling
+  one page restyles both. Where a section cannot survive without scripts you can
+  override it with a <code>nojs/&lt;name&gt;.html</code> file inside your theme
+  folder, with no <code>theme.json</code> entry at all. The names and the
+  four-tier resolution order are in
+  <a href="developer-nojs.html#themes">No-JS support</a>.
+</p>
 
 <h3>Search page templates</h3>
 <table>

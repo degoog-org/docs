@@ -1,0 +1,284 @@
+<div class="doc-page-header">
+  <h1><a href="index.html">Degoog</a> The no-JS page</h1>
+  <p class="doc-page-desc">
+    A second search page at <code>/nojs</code>, built out of server-rendered
+    HTML and CSS. No script tags, anywhere.
+  </p>
+</div>
+
+<h2 id="what-it-is">What it is</h2>
+<p>
+  The normal Degoog UI needs JavaScript. It streams page one over SSE, renders
+  results in the browser, keeps your preferences in IndexedDB and fetches more
+  results as you scroll. That is a lot of machinery, and some people cannot or
+  will not run it: text-mode browsers such as lynx and w3m, older phones,
+  locked-down work machines, screen reader setups people already trust, and
+  anyone browsing with scripts off on purpose.
+</p>
+<p>
+  <code>/nojs</code> is for them. The server renders the whole page, sends it,
+  and the browser's only job is to draw it. Every filter, tab and page link is
+  an ordinary <code>&lt;a&gt;</code> or a form submit. There is no script tag in
+  the markup and none injected later.
+</p>
+<p>
+  It is a second front door to the same instance, not a separate instance. Same
+  engines, same cache, same rate limits, same extensions where those extensions
+  said they can cope.
+</p>
+
+<h2 id="turning-on">Turning it on</h2>
+<p>
+  It is off by default. <em>Settings, Server, No-JS page</em> has the switch,
+  and it takes effect on the next request. No restart.
+</p>
+<p>
+  While the switch is off, <code>/nojs</code> answers the same 404 as
+  <code>/purple-elephant</code>: same status, same headers, same bytes. There is
+  nothing there to fingerprint and nothing to probe. Turning it back off closes
+  the door again just as quickly, so a public instance that is getting hammered
+  does not have to wait for a restart window.
+</p>
+
+<h2 id="what-you-give-up">What you give up</h2>
+<p>
+  Everything below is a consequence of having no JavaScript, not a feature
+  waiting to be written.
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>On the normal page</th>
+      <th>On <code>/nojs</code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Autocomplete as you type</td>
+      <td>Nothing. Type the whole query and submit.</td>
+    </tr>
+    <tr>
+      <td>Infinite scroll</td>
+      <td>Numbered pagination. Each page is a fresh request.</td>
+    </tr>
+    <tr>
+      <td>Tabs and filters update in place</td>
+      <td>
+        Every tab, time filter, language and date range reloads the page. The
+        filter panel is a <code>&lt;details&gt;</code> element that stays open
+        when a filter is active.
+      </td>
+    </tr>
+    <tr>
+      <td>Your own engine toggles and preferences</td>
+      <td>
+        None. Those live in IndexedDB, which needs scripts. Searches use the
+        instance's default engine set for everyone.
+      </td>
+    </tr>
+    <tr>
+      <td>Theme follows your saved preference</td>
+      <td>
+        Your operating system decides. The page reads
+        <code>prefers-color-scheme</code>, so it is dark if your desktop is
+        dark. An admin who set an instance default theme overrides that for
+        everyone. There is no switcher, because remembering a choice per visitor
+        means a cookie, and a cookie is worse than asking your OS.
+      </td>
+    </tr>
+    <tr>
+      <td>Image lightbox, media preview, result actions</td>
+      <td>
+        Gone. The result cards themselves are the same ones the normal page
+        draws, favicon, engine tags, date, insecure badge and video thumbnail
+        included. Only the three-dot domain menu is absent, because blocking and
+        scoring a domain needs scripts.
+      </td>
+    </tr>
+    <tr>
+      <td>Infinite scroll through image results</td>
+      <td>
+        Image searches still get the image grid rather than a list of web
+        cards, laid out with CSS columns instead of the measured masonry the
+        normal page builds. Clicking a tile opens the source page, since the
+        lightbox needs scripts.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  The footer is the same one the home page has always had, a version link, the
+  repo, the docs, plus one extra link back to the full app so anyone who landed
+  here by accident can leave.
+</p>
+<p>
+  What you do not give up is the look of the thing. The page is built from the
+  same theme shells and partials the normal page uses, filled in on the server
+  instead of in your browser, so a theme that restyles one restyles both.
+</p>
+
+<h2 id="engine-breakdown">The engine breakdown and retry</h2>
+<p>
+  The sidebar on the right lists every engine the search touched, how many
+  results it returned and how long it took. An engine that failed is marked, and
+  hovering its result count tells you what went wrong, blocked, rate limited,
+  captcha, timeout.
+</p>
+<p>
+  Each engine also gets a retry link. On the normal page that is a fetch in the
+  background. Here it is an ordinary link back to
+  <code>/nojs/search</code> with a <code>retry=</code> parameter, carrying your
+  query, tab, page and filters with it. The server re-runs that one engine
+  without its cache, merges the fresh results with what the others already
+  returned and sends the page back. Worth knowing: after a retry the page links
+  disappear, because a single-engine retry does not tell the server how many
+  pages the whole search has. Run the search again to page further.
+</p>
+<p>
+  The breakdown is absent on plugin tabs, and so are the retry links. Those
+  searches go through a different handler that has no retry path.
+</p>
+
+<h2 id="bangs-and-slots">Bangs, commands and panels</h2>
+<p>
+  Bang commands work, including engine shortcuts. Result panels from plugins
+  work. Both are opt-in per extension, and the default is no.
+</p>
+<p>
+  A panel that has not opted in is simply absent. You never asked for it, so
+  nothing announces its absence. A command that has not opted in shows a short
+  notice instead of its output, because you did type <code>!something</code> and
+  deserve an answer rather than an empty page. The notice points you at the
+  extension's developer, which is the only person who can change it.
+</p>
+<p>
+  The reason for the default is that panel and command HTML comes from
+  third-party code, and it is free to contain a <code>&lt;script&gt;</code> tag
+  or an inline <code>onclick</code>. This page promises it contains neither, and
+  the only honest way to keep that promise is to render nothing the author has
+  not explicitly cleared. Developers can read the whole contract in
+  <a href="developer-nojs.html">No-JS extension support</a>.
+</p>
+
+<h2 id="css-check">The CSS bot check</h2>
+<p>
+  Bot control's browser verification works by putting a signed token in a
+  stylesheet link. Real browsers fetch stylesheets. Scrapers that read only the
+  HTML do not, and they collect strikes until they are banned. See
+  <a href="server-settings.html#bot-control">Bot control</a>.
+</p>
+<p>
+  <strong>Apply the CSS bot check to no-JS searches</strong> extends that to
+  <code>/nojs</code>. It is off by default, and you should think hard before
+  turning it on, because lynx and w3m do not fetch stylesheets either. Turn it
+  on and you will ban exactly the visitors the page exists for.
+</p>
+<p>
+  It is there for the case where <code>/nojs</code> becomes the soft underbelly
+  of a public instance: cheap to scrape, no scripts to execute, one HTTP GET per
+  page of results. If you are watching that happen in your logs, the tradeoff
+  may be worth it. If you are not, leave it alone.
+</p>
+<p>
+  Rate limiting needs no such decision. <code>/nojs</code> shares the normal
+  search limiter, so a no-JS search counts against the same per-IP budget as any
+  other search. See
+  <a href="server-settings.html#rate-limit">Rate limiting</a>.
+</p>
+
+<h2 id="reverse-proxy">Serving it on its own hostname</h2>
+<p>
+  A common wish is <code>nojs.example.org</code> rather than
+  <code>example.org/nojs</code>. That works, with one rule.
+</p>
+<p>
+  Every link the page emits is derived from the path of the request that
+  produced it. Ask for <code>/nojs/search</code> and the tab, filter and
+  pagination links all come back starting with <code>/nojs</code>. So your proxy
+  must <strong>preserve the <code>/nojs</code> prefix upstream</strong>. Send
+  the same paths through that the browser asked for, and everything holds
+  together.
+</p>
+<p>
+  The second rule is that the page is not self-contained. It pulls its
+  stylesheets from <code>/public</code> and <code>/theme</code>, theme assets
+  from <code>/themes</code>, and thumbnails from <code>/api/proxy</code>. Proxy
+  only <code>/nojs</code> and you get an unstyled page with broken images. The
+  simplest fix is to forward the whole hostname to the same origin and redirect
+  its root.
+</p>
+<pre><code>server {
+    listen 443 ssl;
+    server_name nojs.example.org;
+
+    # so visitors can type the bare hostname
+    location = / {
+        return 302 /nojs;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}</code></pre>
+<p>
+  That hostname now serves the whole instance, which is fine if
+  <code>example.org</code> is public anyway. To keep it to the no-JS page and
+  its assets, replace the catch-all with one location per prefix:
+  <code>/nojs</code>, <code>/public</code>, <code>/theme</code>,
+  <code>/themes</code>, <code>/api/proxy</code>, and
+  <code>/style</code> if you turned the CSS check on. Anything else can return
+  404.
+</p>
+<p>
+  Degoog ignores <code>X-Forwarded-For</code> unless you set
+  <code>DEGOOG_DISTRUST_PROXY=0</code>. Without it every no-JS visitor shares
+  the proxy's address, so they share one rate limit budget and one ban. Only set
+  it when you control the proxy and it strips incoming forwarded headers.
+</p>
+
+<h3 id="stripped-prefix">The setup that does not work</h3>
+<p>Do not strip the prefix:</p>
+<pre><code># broken
+location / {
+    proxy_pass http://127.0.0.1:3000/nojs/;
+}</code></pre>
+<p>
+  The first request looks right. Then the page comes back with links pointing at
+  <code>/nojs/search</code>, the browser asks for
+  <code>nojs.example.org/nojs/search</code>, nginx rewrites that to
+  <code>/nojs/nojs/search</code> upstream, and you get a 404 on the first click.
+  Serving <code>/nojs</code> at the root of a hostname is not supported yet.
+</p>
+<p>
+  What you see instead, if the upstream path never carried the prefix, is worse
+  than a 404. Degoog cannot tell where <code>/nojs</code> lives, so it falls
+  back to the instance root and every link on the page points into the full
+  JavaScript app. To a visitor it looks like the no-JS page is throwing them
+  back onto the normal site at random. The server logs one warning the first
+  time this happens, naming the path it was handed and the proxy setting that
+  usually causes it. If somebody reports being bounced off
+  <code>/nojs</code>, grep your logs for it before you go looking anywhere else.
+</p>
+<div class="block-note">
+  <p>
+    If your instance runs under a sub-path via <code>DEGOOG_BASE_URL</code>, the
+    no-JS links already carry that base path. You do not need to add it in the
+    proxy.
+  </p>
+</div>
+<div class="block-note">
+  <p>
+    <strong>POST search is honoured, but it cannot hide everything.</strong>
+    With the instance-wide POST search setting on, the no-JS search forms POST
+    and <code>/nojs/search</code> accepts them, so your query stays out of the
+    URL on submit. Pagination and the result tabs are plain links, though, and
+    links can only carry a query string. The moment someone opens page two or
+    switches tab, the query is back in the address bar and in browser history.
+    Restoring that would need JavaScript, which is the one thing this page does
+    not have.
+  </p>
+</div>

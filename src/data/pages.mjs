@@ -72,6 +72,14 @@ export const userPages = [
     description: "Presets, rate limits, bot control, proxies, domain rules, cache, and the API key."
   },
   {
+    file: "nojs.html",
+    title: "The No-JS Page - Degoog Docs",
+    navTitle: "No-JS page",
+    icon: "fa-file-code",
+    source: "src/pages/user/nojs.html",
+    description: "A script-free search page at /nojs, what it costs, and how to put it behind a proxy."
+  },
+  {
     file: "indexer.html",
     title: "The Indexer - Degoog Docs",
     navTitle: "Indexer",
@@ -121,6 +129,14 @@ export const developerPages = [
     icon: "fa-puzzle-piece",
     source: "src/pages/developer/extension-development.html",
     description: "Build plugins, bang commands, slots, routes, middleware, and search bar actions."
+  },
+  {
+    file: "developer-nojs.html",
+    title: "No-JS Support - Degoog Docs",
+    navTitle: "No-JS support",
+    icon: "fa-plug-circle-check",
+    source: "src/pages/developer/nojs.html",
+    description: "Opt slots, commands and theme templates into the script-free /nojs page."
   },
   {
     file: "developer-engines.html",

@@ -172,6 +172,21 @@
   rather than a bare error.
 </p>
 
+<h2 id="nojs">No-JS page</h2>
+<p>
+  Enables a second, script-free search page at <code>/nojs</code>. It is off by
+  default and the switch takes effect on the next request, no restart needed.
+  While it is off, <code>/nojs</code> answers 404 exactly like any path that
+  does not exist.
+</p>
+<p>
+  The nested <strong>Apply the CSS bot check to no-JS searches</strong> toggle
+  is off by default for a good reason. Text-mode browsers such as lynx and w3m
+  do not fetch stylesheets, so the check bans precisely the people the page was
+  built for. Only turn it on if that page is being scraped.
+</p>
+<p>Both switches, and the proxy setup, are covered in <a href="nojs.html">The no-JS page</a>.</p>
+
 <h2 id="proxy">Proxy</h2>
 <p>
   Routes server-side search requests through proxies. One URL per line, requests

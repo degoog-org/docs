@@ -182,7 +182,11 @@
   which might contain your <code>clientIp</code>, <code>page</code>, and
   <code>signProxyUrl(url)</code>. Call <code>context.signProxyUrl</code> to get
   a signed <code>/api/proxy/image</code> URL for any external image you want to
-  serve through the built-in image proxy.
+  serve through the built-in image proxy. On an instance that serves the
+  script-free <code>/nojs</code> page, <code>context.nojs</code> is
+  <code>true</code> and your command only runs at all if you set
+  <code>supportsNojs: true</code>. See
+  <a href="developer-nojs.html">No-JS support</a>.
 </p>
 <p>
   You can also include optional properties like
@@ -405,6 +409,12 @@
   can also include <code>settingsSchema</code>,
   <code>configure(settings)</code>, and <code>init(ctx)</code>. If multiple
   slots match the exact same query, they will all display together.
+</p>
+<p>
+  Panels are left out of the script-free <code>/nojs</code> page unless you set
+  <code>supportsNojs: true</code>, and your <code>execute</code> receives
+  <code>context.nojs</code> when it renders there. The rules and the reasoning
+  are in <a href="developer-nojs.html">No-JS support</a>.
 </p>
 <p>
   Another optional flag is <strong>waitForResults</strong>. Set this to true if
