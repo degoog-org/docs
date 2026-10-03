@@ -190,8 +190,8 @@
   <code>context.proxyUrl</code> is populated and
   <code>context.fetch</code>
   routes through it automatically. Your transport should always use
-  <code>context.fetch</code> for any outbound HTTP calls so proxy routing just
-  works effortlessly:
+  <code>context.fetch</code> for any outbound HTTP calls so they go through
+  the configured proxy:
 </p>
 <pre><code>async fetch(url, options, context) {
   const doFetch = context.fetch;
@@ -248,6 +248,13 @@
   Server tab until the instance owner restarts.
 </p>
 <pre><code>export const needsAppRestart = true;</code></pre>
+<p>
+  Set <code>handlesChallenges = true</code> if your transport drives a real
+  browser that gets through proof-of-work pages such as Anubis by itself.
+  Degoog then hands those pages to the engine untouched instead of solving them,
+  even for engines that set <code>challenges</code>.
+</p>
+<pre><code>handlesChallenges = true;</code></pre>
 
 <h2>Setup</h2>
 <p>

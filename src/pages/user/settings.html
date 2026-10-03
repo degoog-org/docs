@@ -31,15 +31,29 @@
   Degoog generated a temporary password and printed it in the server logs at
   startup. See <a href="getting-started.html#password">Getting started</a>.
 </p>
+
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/settings-locked-light.webp"
+    alt="The settings page with a lock icon, the text 'Settings are locked. Enter the password.', a password box and an Unlock button."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/settings-locked-dark.webp"
+    alt="The settings page with a lock icon, the text 'Settings are locked. Enter the password.', a password box and an Unlock button."
+    loading="lazy" />
+  <figcaption>The password gate. Type the password and hit Unlock.</figcaption>
+</figure>
 <p>
   Signing in stores a session token in an <code>HttpOnly</code>,
   <code>SameSite=Strict</code> cookie. It also unlocks the domain action menus
   on result rows, which is why those disappear when you are signed out.
 </p>
 
-<figure class="doc-screenshot-image-wrapper">
-  <img class="doc-screenshot-image" src="images/screenshots/settings-page.png"
-    data-screenshot-target="images/screenshots/settings-page.png" alt="The settings page with its tab navigation." />
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/general-tab-light.webp"
+    alt="The General tab of settings. The left menu lists General, Server, Indexer, Engines, Plugins, Transports, Autocomplete, Favicons, Shortcuts, Themes and Store. On the right are the Appearance theme picker and the Search options checkboxes."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/general-tab-dark.webp"
+    alt="The General tab of settings. The left menu lists General, Server, Indexer, Engines, Plugins, Transports, Autocomplete, Favicons, Shortcuts, Themes and Store. On the right are the Appearance theme picker and the Search options checkboxes."
+    loading="lazy" />
   <figcaption>The settings page with its tab navigation.</figcaption>
 </figure>
 
@@ -100,10 +114,18 @@
       <td>Suggestion providers, one toggle each.</td>
     </tr>
     <tr>
+      <td><strong>Favicons</strong></td>
+      <td>
+        Favicon shape and favicon providers. Toggle providers and drag them
+        into the order Degoog asks them in. See <a href="#favicons">below</a>.
+      </td>
+    </tr>
+    <tr>
       <td><strong>Shortcuts</strong></td>
       <td>
-        Rebind keyboard shortcuts. Hidden unless shortcuts are enabled in Server
-        settings.
+        Rebind keyboard shortcuts. <strong>Add shortcut</strong> lets you write
+        your own, see <a href="developer-shortcuts.html">Shortcuts</a> in the
+        developer docs.
       </td>
     </tr>
     <tr>
@@ -131,7 +153,8 @@
 
 <h3>Search Options</h3>
 <p>
-  Eight toggles that change how results behave. They are documented in full in
+  Nine toggles that change how results behave, plus a picker for the engine
+  badges in the results sidebar. They are documented in full in
   <a href="using-search.html#search-options">Using search</a>.
 </p>
 
@@ -140,7 +163,7 @@
   This is the part that surprises people, so it is worth being precise about.
 </p>
 <p>
-  Your theme, your eight search options, and your enabled engines all live in
+  Your theme, your nine search options, and your enabled engines all live in
   <strong>your browser</strong>, not on the server. Two people using the same
   instance can have completely different setups, which is the intended
   behaviour.
@@ -160,6 +183,16 @@
   The Engines tab has its own pair of these buttons for engine selection
   specifically.
 </p>
+
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/instance-defaults-light.webp"
+    alt="The Instance defaults card with the text 'Push this browser's settings as the starting point for new visitors. Whatever they change locally still wins.' and two buttons, Save current settings as defaults and Reset to instance defaults."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/instance-defaults-dark.webp"
+    alt="The Instance defaults card with the text 'Push this browser's settings as the starting point for new visitors. Whatever they change locally still wins.' and two buttons, Save current settings as defaults and Reset to instance defaults."
+    loading="lazy" />
+  <figcaption>The two instance default buttons on the General tab.</figcaption>
+</figure>
 
 <h3>Setup tour</h3>
 <p>
@@ -183,9 +216,65 @@
 
 <h3>Restart required</h3>
 <p>
-  A banner appears at the top of General when an installed extension needs a
-  server restart to work properly. It names the reason and gives you a button
-  that restarts Degoog for you. Searches in flight may be interrupted briefly.
+  A pop-up appears when an installed extension needs a server restart to work
+  properly. It names the extensions and gives you a button that restarts
+  Degoog for you, or <strong>Not now</strong> if you'd rather do it later from
+  <strong>Settings, Server, Restart server</strong>. Searches in flight may be
+  interrupted briefly.
+</p>
+
+<h2 id="favicons">The Favicons tab</h2>
+<p>
+  The icon next to each result comes from a favicon provider. Install
+  providers from <em>Settings, Store</em> with the Favicon filter and they
+  show up here. The official store has Google, DuckDuckGo, Kagi, Yandex, Site
+  favicon and Identicon.
+</p>
+<p>
+  <strong>Favicon shape</strong> sits at the top of the tab. Pick circle
+  (the default), rounded square, square, squircle, hexagon, star or flower.
+  It saves on click and applies to everyone on the instance. Every icon
+  shows at the same size. The shapes other than circle cut each icon to that
+  shape, and on the normal page, icons 32px or larger are zoomed in a little
+  to fill it. Custom themes may ignore this setting.
+</p>
+<p>
+  When the <a href="indexer.html">indexer</a> is on, a <strong>Degoog</strong>
+  card sits above the providers. It is the
+  <a href="indexer.html#favicon-store">favicon store</a>, icons your instance
+  already saved. Degoog always checks it before any provider, so you can't
+  drag it. It is on by default. Turn it off and every icon comes from the
+  providers and the cache. With every provider switched off it still serves
+  the icons it has saved, and sites it has no icon for get a letter.
+</p>
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/favicons-tab-light.webp"
+    alt="The Favicons tab. A row of seven favicon shapes with the note 'Custom themes may ignore this.' Below it a Degoog card that is switched on, then Google Favicons and DuckDuckGo Favicons, each with a Configure button, a switch and a drag handle."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/favicons-tab-dark.webp"
+    alt="The Favicons tab. A row of seven favicon shapes with the note 'Custom themes may ignore this.' Below it a Degoog card that is switched on, then Google Favicons and DuckDuckGo Favicons, each with a Configure button, a switch and a drag handle."
+    loading="lazy" />
+  <figcaption>The Favicons tab with the indexer on, so the Degoog card shows above the providers.</figcaption>
+</figure>
+<ul>
+  <li>Degoog never asks a disabled provider.</li>
+  <li>
+    Drag the provider cards to set the order. Degoog asks the top one first
+    and moves down when a provider has no icon for that domain, or returns
+    one that doesn't load. A provider you just installed goes to the bottom
+    until you move it.
+  </li>
+  <li>
+    A provider with options gets a <strong>Configure</strong> button. Every
+    provider has an <strong>Outgoing HTTP client</strong> under
+    <strong>Advanced</strong>, as engines do.
+  </li>
+</ul>
+<p>
+  With every provider off and the store off too, results show a dashed
+  placeholder with a "No favicon extension installed" tooltip.
+  <a href="engines-providers.html#favicons">Engines and providers</a> has
+  more.
 </p>
 
 <h2 id="where-settings-live">Where settings are actually stored</h2>
@@ -198,8 +287,12 @@
   </thead>
   <tbody>
     <tr>
-      <td>Theme, search options, enabled engines, tab order</td>
+      <td>Theme, search options, enabled engines</td>
       <td>Your browser (IndexedDB), unless published as instance defaults</td>
+    </tr>
+    <tr>
+      <td>Result tab order</td>
+      <td><code>data/server-settings.json</code>, the same for everyone</td>
     </tr>
     <tr>
       <td>

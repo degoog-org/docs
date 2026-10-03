@@ -53,7 +53,7 @@ export const userPages = [
     navTitle: "Engines & providers",
     icon: "fa-bolt",
     source: "src/pages/user/engines-providers.html",
-    description: "Search engines, autocomplete providers, transports, and the SearX layer."
+    description: "Search engines, autocomplete providers, favicon providers, transports, and the SearX layer."
   },
   {
     file: "plugins-themes-store.html",
@@ -70,6 +70,14 @@ export const userPages = [
     icon: "fa-server",
     source: "src/pages/user/server-settings.html",
     description: "Presets, rate limits, bot control, proxies, domain rules, cache, and the API key."
+  },
+  {
+    file: "nojs.html",
+    title: "The No-JS Page - Degoog Docs",
+    navTitle: "No-JS page",
+    icon: "fa-file-code",
+    source: "src/pages/user/nojs.html",
+    description: "A script-free search page at /nojs, what it costs, and how to put it behind a proxy."
   },
   {
     file: "indexer.html",
@@ -123,6 +131,14 @@ export const developerPages = [
     description: "Build plugins, bang commands, slots, routes, middleware, and search bar actions."
   },
   {
+    file: "developer-nojs.html",
+    title: "No-JS Support - Degoog Docs",
+    navTitle: "No-JS support",
+    icon: "fa-plug-circle-check",
+    source: "src/pages/developer/nojs.html",
+    description: "Opt slots, commands and theme templates into the script-free /nojs page."
+  },
+  {
     file: "developer-engines.html",
     title: "Engines - Degoog Docs",
     navTitle: "Engines",
@@ -152,7 +168,7 @@ export const developerPages = [
     navTitle: "Store",
     icon: "fa-store",
     source: "src/pages/developer/plugins-themes-store.html",
-    description: "Publish plugins, themes, engines, transports, autocomplete providers, and shortcuts."
+    description: "Publish plugins, themes, engines, transports, autocomplete providers, favicon providers, and shortcuts."
   },
   {
     file: "developer-autocomplete.html",
@@ -161,6 +177,14 @@ export const developerPages = [
     icon: "fa-keyboard",
     source: "src/pages/developer/autocomplete.html",
     description: "Build autocomplete providers and rich suggestions."
+  },
+  {
+    file: "developer-favicon.html",
+    title: "Favicon Providers - Degoog Docs",
+    navTitle: "Favicons",
+    icon: "fa-icons",
+    source: "src/pages/developer/favicon.html",
+    description: "Build favicon providers that return an icon URL or icon bytes."
   },
   {
     file: "developer-aliases.html",

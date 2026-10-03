@@ -25,6 +25,20 @@
   Look at the sidebar. Degoog names the engine and the reason, and gives you a
   <strong>retry</strong> link to re-run just that engine.
 </p>
+<p>
+  The reason is a tooltip, so hover the dotted <strong>0 results</strong> under
+  the engine's name to see it.
+</p>
+
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/engine-failure-reason-light.webp"
+    alt="The engine list in the results sidebar. Degoog shows 57 from your index. Under it, a tooltip reading Rate limited (429) covers the next engine's name, whose line says 0 results with a dotted underline and has a retry link."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/engine-failure-reason-dark.webp"
+    alt="The engine list in the results sidebar. Degoog shows 57 from your index. Under it, a tooltip reading Rate limited (429) covers the next engine's name, whose line says 0 results with a dotted underline and has a retry link."
+    loading="lazy" />
+  <figcaption>Hover the dotted 0 results to see why an engine failed.</figcaption>
+</figure>
 <ul>
   <li>
     <strong>Blocked by the engine</strong> or
@@ -49,7 +63,27 @@
     and the engine extension needs updating. Check <em>Settings, Store</em> for
     an update.
   </li>
+  <li>
+    <strong>Network error</strong>: the request never got out. If you just
+    switched that engine to Curl Impersonate, the binary probably isn't
+    installed. The list offers it either way, and the server logs will say "No
+    curl-impersonate binary found".
+  </li>
 </ul>
+<p>
+  The transport is in the engine's <strong>Configure</strong> window, behind
+  the <strong>Advanced</strong> switch.
+</p>
+
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/engine-configure-advanced-light.webp"
+    alt="The Configure Brave Search window with Advanced switched on. It shows Score set to 1, Outgoing HTTP client set to Curl Fallback, Timeout set to 10000 and an empty Custom user agents box, with a Save button at the bottom."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/engine-configure-advanced-dark.webp"
+    alt="The Configure Brave Search window with Advanced switched on. It shows Score set to 1, Outgoing HTTP client set to Curl Fallback, Timeout set to 10000 and an empty Custom user agents box, with a Save button at the bottom."
+    loading="lazy" />
+  <figcaption>Outgoing HTTP client is where you change an engine's transport.</figcaption>
+</figure>
 
 <h2 id="no-autocomplete">No suggestions under the search box</h2>
 <p>
@@ -63,6 +97,41 @@
   limiting has not kicked in.
 </p>
 
+<h2 id="favicons-missing">The favicons disappeared</h2>
+<p>
+  A dashed circle with a "No favicon extension installed" tooltip on every
+  result means no favicon provider is enabled and the favicon store is off.
+  Install one from the official
+  store, which has Google, DuckDuckGo, Kagi, Yandex, Site favicon and
+  Identicon, and switch it on in <em>Settings, Favicons</em>. The engine
+  icons in the sidebar come back too.
+</p>
+<p>
+  Degoog installs Google and DuckDuckGo for you once. If you removed them
+  since, it leaves them removed, so install them again yourself.
+</p>
+<p>
+  First letters in place of icons mean providers are enabled but none had an
+  icon for those sites. Add another provider or move a different one to the
+  top. For a single site, sign in and pick <strong>Refresh favicon</strong>
+  from the result's menu.
+</p>
+<p>
+  If icons look cropped or sit on a tile you didn't expect, check
+  <strong>Favicon shape</strong> in <em>Settings, Favicons</em>. Circle is the
+  classic look.
+</p>
+
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/favicons-tab-light.webp"
+    alt="The Favicons tab. A row of seven favicon shapes at the top, then a Degoog card that is switched on, described as Icons this instance has already saved. Checked before any provider. Below it, Google Favicons and DuckDuckGo Favicons are both switched on, each with a drag handle."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/favicons-tab-dark.webp"
+    alt="The Favicons tab. A row of seven favicon shapes at the top, then a Degoog card that is switched on, described as Icons this instance has already saved. Checked before any provider. Below it, Google Favicons and DuckDuckGo Favicons are both switched on, each with a drag handle."
+    loading="lazy" />
+  <figcaption>Favicon shape, the saved icon store and the providers, top to bottom.</figcaption>
+</figure>
+
 <h2 id="cannot-get-into-settings">You cannot get into Settings</h2>
 <ul>
   <li>
@@ -73,8 +142,9 @@
     variable if you want a stable one.
   </li>
   <li>
-    <strong>Settings returns 404.</strong> The path may have been moved with
-    <code>DEGOOG_SETTINGS_PATH</code>. On a public instance the admin page lives
+    <strong>Settings returns 404, or only a cut-down page.</strong> The path may have been moved with
+    <code>DEGOOG_SETTINGS_PATH</code>, in which case <code>/settings</code>
+    only shows the visitor page and the full one lives at your custom path. On a public instance the admin page lives
     at <code>/admin</code>, and it only responds at all if a password is
     configured. Without one it returns 404 with no hint that it exists, which is
     intentional.
@@ -91,6 +161,16 @@
     <code>DEGOOG_SETTINGS_PASSWORDS</code>.
   </li>
 </ul>
+
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/settings-locked-light.webp"
+    alt="The settings page with a lock icon, the text Settings are locked. Enter the password., a password box and an Unlock button."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/settings-locked-dark.webp"
+    alt="The settings page with a lock icon, the text Settings are locked. Enter the password., a password box and an Unlock button."
+    loading="lazy" />
+  <figcaption>The password gate. The password is DEGOOG_SETTINGS_PASSWORDS, or the temporary one in the logs.</figcaption>
+</figure>
 
 <h2 id="banned">You banned yourself</h2>
 <p>
@@ -130,12 +210,12 @@
     or selecting after install.
   </li>
   <li>
-    Does the card show <strong>Needs configuration</strong>? Some engines want
+    Does the dot next to <strong>Configure</strong> say <strong>Needs configuration</strong> when you hover it? Some engines want
     an API key or a service URL first.
   </li>
   <li>
-    Does it show <strong>Server restart required</strong>? The banner at the top
-    of <em>Settings, General</em> has a button.
+    Does it show a restart warning? The <strong>Restart required</strong> window
+    has a button, and so does <strong>Settings &gt; Server &gt; Restart server</strong>.
   </li>
   <li>
     Does it show <strong>Requires a newer version of Degoog</strong>? Update
@@ -187,19 +267,54 @@
     If a list is too large to render, Degoog says so and asks you to edit the
     file directly. That is expected behaviour, not a save failure.
   </li>
+  <li>
+    On the Server tab only switches and drop-downs save on their own. Text
+    boxes, lists and number fields grow a <strong>Save</strong> button the
+    moment you type in them, and nothing sticks until you press it.
+  </li>
 </ul>
+
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/domain-list-save-light.webp"
+    alt="The Blocked domains box with pinterest.com typed in it and a wide Save button right under it."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/domain-list-save-dark.webp"
+    alt="The Blocked domains box with pinterest.com typed in it and a wide Save button right under it."
+    loading="lazy" />
+  <figcaption>Typing in a Server tab box brings up its own Save button.</figcaption>
+</figure>
+
+<h2 id="domain-menu-missing">Block, replace and score are missing from the result menu</h2>
+<p>
+  Each of those needs two switches in <strong>Settings &gt; Server &gt; Domain
+  management</strong>. <strong>Enable domain blocking</strong> turns the rules
+  on, and <strong>Allow blocking from search results</strong> is what puts the
+  option in the three dots menu on each result. Same deal for replacing and
+  scoring. Until then the menu only has <strong>Refresh favicon</strong>, and
+  you need to be signed in to see it at all.
+</p>
+
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/domain-blocking-toggles-light.webp"
+    alt="The Domain management section with Enable domain blocking switched on, above the Blocked domains box and its regex help text."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/domain-blocking-toggles-dark.webp"
+    alt="The Domain management section with Enable domain blocking switched on, above the Blocked domains box and its regex help text."
+    loading="lazy" />
+  <figcaption>The first of the two switches. The Allow switch sits under the box.</figcaption>
+</figure>
 
 <h2 id="streaming-off">Streaming is on but results still arrive all at once</h2>
 <p>
   Check whether you have
-  <strong>Use POST method for search requests</strong> enabled in your search
-  options. The two are incompatible, and POST wins. The setting even carries a
-  tooltip saying so.
+  <strong>Use POST for searches. Breaks streaming.</strong> enabled in your search
+  options. The two are incompatible, and POST wins. The setting even says so in
+  its name.
 </p>
 <p>
   Some buffering reverse proxies also swallow server-sent events. If streaming
   works locally but not through your proxy, that is where to look, and the
-  <strong>Compatibility / Low Resource Mode</strong> preset exists precisely for
+  <strong>Compatibility / low resource</strong> preset exists precisely for
   this.
 </p>
 

@@ -656,3 +656,131 @@ html[data-theme="light"] mark {
     padding: 1.25rem 1rem 5rem;
   }
 }
+
+.degoog-docs-main .doc-shot {
+  margin: 1.25rem 0 1.75rem;
+  max-width: 56rem;
+}
+
+.degoog-docs-main .doc-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: var(--degoog-docs-border-w) solid var(--degoog-docs-border);
+  background: var(--degoog-docs-surface);
+}
+
+.degoog-docs-main .doc-shot.doc-shot-small {
+  max-width: 34rem;
+}
+
+.degoog-docs-main .doc-shot figcaption {
+  margin-top: var(--degoog-docs-space-8);
+  color: var(--degoog-docs-text-muted);
+  font-size: 0.875rem;
+}
+
+html[data-theme="dark"] .degoog-docs-main .doc-shot-light,
+html:not([data-theme="dark"]) .degoog-docs-main .doc-shot-dark {
+  display: none !important;
+}
+
+.degoog-docs-main ol.doc-steps {
+  list-style: none;
+  counter-reset: doc-step;
+  padding-left: 0;
+}
+
+.degoog-docs-main ol.doc-steps > li {
+  counter-increment: doc-step;
+  position: relative;
+  padding-left: 2.25rem;
+  margin: 0 0 1rem;
+  max-width: none;
+}
+
+.degoog-docs-main ol.doc-steps > li > :not(figure) {
+  max-width: 70ch;
+}
+
+.degoog-docs-main ol.doc-steps > li::before {
+  content: counter(doc-step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--degoog-docs-text);
+  font-weight: 700;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.degoog-docs-main .block-note.block-important {
+  border-left: 6px solid var(--degoog-docs-text);
+}
+
+.degoog-docs-main .block-note .block-label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.degoog-docs-main details.doc-more {
+  margin: 1rem 0 1.5rem;
+  border: var(--degoog-docs-border-w) solid var(--degoog-docs-border);
+  background: var(--degoog-docs-surface);
+  max-width: 56rem;
+}
+
+.degoog-docs-main details.doc-more > summary {
+  cursor: pointer;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+}
+
+.degoog-docs-main details.doc-more > summary:focus-visible {
+  outline: 2px solid var(--degoog-docs-text);
+  outline-offset: 2px;
+}
+
+.degoog-docs-main details.doc-more[open] > summary {
+  border-bottom: var(--degoog-docs-border-w) solid var(--degoog-docs-border);
+}
+
+.degoog-docs-main details.doc-more > :not(summary) {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.degoog-docs-main details.doc-more > :last-child {
+  margin-bottom: 1rem;
+}
+
+.degoog-docs-main details.doc-more > :nth-child(2) {
+  margin-top: 1rem;
+}
+
+.degoog-docs-main ul.doc-checklist {
+  list-style: none;
+  padding-left: 0;
+}
+
+.degoog-docs-main ul.doc-checklist > li {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.degoog-docs-main ul.doc-checklist > li::before {
+  content: "\f00c";
+  font-family: "Font Awesome 7 Free";
+  font-weight: 900;
+  position: absolute;
+  left: 0.25rem;
+  top: 0.15em;
+  font-size: 0.85em;
+  color: var(--degoog-docs-text-muted);
+}

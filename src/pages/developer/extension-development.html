@@ -27,7 +27,7 @@
 <h2>What plugins are</h2>
 <p>
   Your plugins belong in the <code>data/plugins/</code> directory, or whatever
-  you set <code>DEGOOG_PLUGINS_DIR</code> to. A plugin is simply a
+  you set <code>DEGOOG_PLUGINS_DIR</code> to. A plugin is a
   <strong>folder</strong> containing an entry file. You can use a single plugin
   to handle multiple tasks like a bang command, a slot, search bar actions, HTTP
   routes, or request middleware.
@@ -87,6 +87,7 @@
   // ctx.routeUrl("path") builds /api/plugin/&lt;ctx.pluginId&gt;/path
   // ctx.readFile is an async function to read any file from your plugin folder
   // ctx.signProxyUrl(url) returns a signed /api/proxy/image URL for any external image
+  // ctx.signFaviconUrl(url) returns a signed /api/proxy/favicon URL for the url's host, or "" when no favicon provider is enabled and the favicon store is off
   // ctx.fetch(url, init?) is a proxy-aware fetch, respects your outgoing proxy settings
   // ctx.useCache(namespace, defaultTtlMs) returns an async TTL cache { get, set, delete, clear }
 }</code></pre>
@@ -182,7 +183,11 @@
   which might contain your <code>clientIp</code>, <code>page</code>, and
   <code>signProxyUrl(url)</code>. Call <code>context.signProxyUrl</code> to get
   a signed <code>/api/proxy/image</code> URL for any external image you want to
-  serve through the built-in image proxy.
+  serve through the built-in image proxy. On an instance that serves the
+  script-free <code>/nojs</code> page, <code>context.nojs</code> is
+  <code>true</code> and your command only runs at all if you set
+  <code>supportsNojs: true</code>. See
+  <a href="developer-nojs.html">No-JS support</a>.
 </p>
 <p>
   You can also include optional properties like
@@ -444,9 +449,12 @@ async getFieldOptions(key, values) {
     <code>context</code> includes <code>clientIp</code>;
     <code>results</code> (only when <code>waitForResults: true</code>);
     proxy-aware <code>fetch(url, init?)</code>;
-    <code>signProxyUrl(url)</code> for external images; and
+    <code>signProxyUrl(url)</code> for external images;
+    <code>signFaviconUrl(url)</code> for a result's favicon, which returns an
+    empty string when no favicon provider is enabled and the favicon store
+    is off; and
     <code>useCache(namespace, defaultTtlMs)</code> for the same async TTL cache
-    factory as in <code>init(ctx)</code>. Note that the results array is only
+    factory as in <code>init(ctx)</code>. The results array is only
     populated if you set <code>waitForResults: true</code> on your plugin.
   </li>
 </ul>
@@ -456,6 +464,12 @@ async getFieldOptions(key, values) {
   can also include <code>settingsSchema</code>,
   <code>configure(settings)</code>, and <code>init(ctx)</code>. If multiple
   slots match the exact same query, they will all display together.
+</p>
+<p>
+  Panels are left out of the script-free <code>/nojs</code> page unless you set
+  <code>supportsNojs: true</code>, and your <code>execute</code> receives
+  <code>context.nojs</code> when it renders there. The rules and the reasoning
+  are in <a href="developer-nojs.html">No-JS support</a>.
 </p>
 <p>
   Another optional flag is <strong>waitForResults</strong>. Set this to true if
@@ -472,7 +486,7 @@ async getFieldOptions(key, values) {
   <code>["knowledge-panel", "above-sidebar", "below-sidebar"]</code>. If you
   include this, the application adds a Position dropdown in your plugin settings
   so you can choose exactly where the slot appears. If you leave it empty or
-  omit it, the slot simply uses your fixed <code>position</code> value.
+  omit it, the slot uses your fixed <code>position</code> value.
 </p>
 <h3 id="full-width-above-results-slot">Full width above results slot</h3>
 <p>
@@ -566,16 +580,16 @@ async getFieldOptions(key, values) {
   <strong>Slot API:</strong> Calling <code>POST /api/slots</code> with the query
   and results returns the panels for the main positions. Calling
   <code>POST /api/slots/glance</code>
-  returns only the glance panels. Slots also work perfectly for custom tabs. The
-  client simply fetches the panels after a tab search and renders them in the
-  exact same positions.
+  returns only the glance panels. Slots also work on custom tabs. The
+  client fetches the panels after a tab search and renders them in the
+  same positions.
 </p>
 
 <h2 id="search-result-tabs">Search result tabs</h2>
 <p>
   Search result tabs let you add new entries to the main tab bar, just like the
-  Web or Images tabs. Simply export <code>tab</code> or
-  <code>searchResultTab</code> from your plugin folder. You use the exact same
+  Web or Images tabs. Export <code>tab</code> or
+  <code>searchResultTab</code> from your plugin folder. You use the same
   folder structure as any other plugin.
 </p>
 <p>
@@ -785,7 +799,7 @@ export const interceptor = {
   <strong>name</strong>, and a <strong>handle(req, context)</strong> function.
   The context might include specific route information like
   <code>settings-auth</code>. Your function should return a Response, a redirect
-  URL object, or simply null to let the request continue normally. The
+  URL object, or null to let the request continue normally. The
   application uses this middleware for the <strong>settings gate</strong>. To
   choose a plugin for the gate, just click Use as settings gate in that plugin
   configuration menu under Settings. This updates your
@@ -909,15 +923,26 @@ export default {
 </table>
 <p>
   Use <code>context.signProxyUrl(url)</code> to route external images through
-  the server proxy. Doing so means you can declare
+  the server proxy, and <code>context.signFaviconUrl(url)</code> for a
+  site's favicon. Doing so means you can declare
   <code>isClientExposed: false</code>.
+</p>
+<p>
+  Don't build <code>/api/proxy/favicon</code> URLs by hand. The proxy answers
+  <code>403</code> without a valid <code>sig</code>. Don't reuse the
+  <code>favicon</code> field on <code>context.results</code> either. The
+  browser sends it back and the result seal doesn't cover it. Call
+  <code>signFaviconUrl</code> with the result's <code>url</code> instead.
 </p>
 <pre><code>export const slot = {
   name: "My Slot",
   isClientExposed: false, // all images are proxied via signProxyUrl
   async execute(query, context) {
     const imgUrl = context.signProxyUrl("https://example.com/cover.jpg");
-    return { html: `&lt;img src="${imgUrl}"&gt;` };
+    const favicon = context.signFaviconUrl("https://example.com/page");
+    return {
+      html: `&lt;img src="${imgUrl}"&gt;` + (favicon ? `&lt;img src="${favicon}"&gt;` : ""),
+    };
   },
 };</code></pre>
 <pre><code>export const slot = {

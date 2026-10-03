@@ -45,7 +45,7 @@
   nothing would be protecting the key itself.
 </p>
 <pre><code>curl -H "Authorization: Bearer YOUR_API_KEY" \
-  "http://localhost:4444/api/search?q=hello"</code></pre>
+  "http://localhost:4444/api/search?q=adam+sandler"</code></pre>
 <p>
   The web UI does not use that header. It receives a short-lived signed nonce
   with the page and sends it as <code>x-search-nonce</code> and
@@ -124,7 +124,7 @@
     </tr>
   </tbody>
 </table>
-<pre><code>curl "http://localhost:4444/api/search?q=rust+lifetimes"</code></pre>
+<pre><code>curl "http://localhost:4444/api/search?q=adam+sandler"</code></pre>
 <p>Response:</p>
 <pre><code>{
   "results": [
@@ -135,7 +135,8 @@
       "content": "...",
       "source": "Brave",
       "score": 92,
-      "sources": ["Brave", "DuckDuckGo"]
+      "sources": ["Brave", "DuckDuckGo"],
+      "favicon": "/api/proxy/favicon?domain=example.com&amp;sig=...&amp;s=64"
     }
   ],
   "query": "rust lifetimes",
@@ -147,6 +148,11 @@
 <p>
   <code>content</code> mirrors <code>snippet</code>. It exists so that Open
   WebUI, which expects that field name, works without a custom tool.
+</p>
+<p>
+  <code>favicon</code> is a signed URL on your instance, or an empty string
+  when no favicon provider is enabled and the favicon store is off. See
+  <a href="#favicons">Favicons</a>.
 </p>
 
 <h3 id="searx-shape">SearXNG-shaped responses</h3>
@@ -198,14 +204,14 @@
     <code>engine</code>, that engine's <code>timing</code>, the running merged
     <code>results</code> list, and retry metadata. Because
     <code>results</code> is the full merged list each time, a lazy consumer can
-    simply keep the last one.
+    keep the last one.
   </li>
   <li>
     <code>done</code> is the final event, with <code>totalTime</code>,
     <code>engineTimings</code>, and <code>relatedSearches</code>.
   </li>
 </ul>
-<pre><code>curl -N "http://localhost:4444/api/search/stream?q=hello"</code></pre>
+<pre><code>curl -N "http://localhost:4444/api/search/stream?q=adam+sandler"</code></pre>
 
 <h2 id="retry">GET and POST /api/search/retry</h2>
 <p>
@@ -253,13 +259,15 @@
 <p>
   Lists what is installed, grouped into <code>engines</code>,
   <code>plugins</code>, <code>themes</code>, <code>transports</code>,
-  <code>autocomplete</code>, and <code>shortcuts</code>. Each entry includes the
-  <code>id</code> you would use to restrict a search.
+  <code>autocomplete</code>, <code>favicon</code> and <code>shortcuts</code>. Each entry includes the
+  <code>id</code>. Engine IDs are the ones you pass to restrict a search.
+  Favicon providers can't be picked per search. Their order comes from
+  <a href="settings.html#favicons">Settings, Favicons</a>.
 </p>
 <p>
   Add <code>?type=</code> to fetch one group: <code>engine</code>,
   <code>plugin</code>, <code>theme</code>, <code>transport</code>,
-  <code>autocomplete</code>, or <code>shortcut</code>. An unknown type returns
+  <code>autocomplete</code>, <code>favicon</code> or <code>shortcut</code>. An unknown type returns
   <code>400</code>.
 </p>
 <pre><code>curl "http://localhost:4444/api/extensions?type=engine"</code></pre>
@@ -267,6 +275,69 @@
   Extension settings are redacted from the response unless the caller is
   authenticated to the settings area, so you will see the extensions but not
   their configured API keys.
+</p>
+
+<h2 id="favicons">Favicons</h2>
+<h3 id="favicon-proxy">GET /api/proxy/favicon</h3>
+<p>
+  Returns the icon for <code>domain</code> from the
+  <a href="engines-providers.html#favicons">favicon providers</a>.
+  Parameters are <code>domain</code>, <code>sig</code>, <code>s</code> and an
+  optional <code>v</code> cache buster. The server ignores <code>s</code>,
+  currently <code>64</code>. It only changes the URL so browsers drop icons
+  cached at the old size.
+</p>
+<p>
+  <code>sig</code> is required, and the URLs in search results already carry
+  it. A request without a valid <code>sig</code> gets <code>403</code>.
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Status</th>
+      <th>Meaning</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>200</code></td>
+      <td>
+        The icon as PNG, ICO, GIF, JPEG or WebP. Browsers cache it for a
+        day.
+      </td>
+    </tr>
+    <tr>
+      <td><code>400</code></td>
+      <td><code>domain</code> is not a valid hostname.</td>
+    </tr>
+    <tr>
+      <td><code>403</code></td>
+      <td><code>sig</code> is missing or does not match the domain.</td>
+    </tr>
+    <tr>
+      <td><code>404</code></td>
+      <td>No provider found an icon, or no provider is installed.</td>
+    </tr>
+    <tr>
+      <td><code>503</code></td>
+      <td>
+        Too many favicon requests at once. Honour the
+        <code>Retry-After</code> header.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="favicon-refresh">POST /api/favicon/refresh</h3>
+<p>
+  Drops the cached and stored icon for one domain and asks the providers
+  again. The <strong>Refresh favicon</strong> result action calls it. It
+  needs a settings session and is rate limited.
+</p>
+<pre><code>{ "domain": "example.com" }</code></pre>
+<p>
+  The response is <code>{ "url": "..." }</code> with a fresh signed URL, or
+  <code>{ "url": null }</code> when no provider had an icon.
 </p>
 
 <h2 id="discovery">Other useful endpoints</h2>
@@ -345,9 +416,10 @@
 
 <h2 id="mcp">Model Context Protocol</h2>
 <p>
-  <code>degoog-mcp</code> is a small Go sidecar that exposes Degoog to
+  <code>degoog-mcp</code> is a small TypeScript sidecar that exposes Degoog to
   MCP-capable clients over Streamable HTTP at <code>/mcp</code>, listening on
-  port <code>4443</code> by default. It offers two tools:
+  port <code>4443</code> by default. It offers eight tools, and these two do
+  most of the work:
 </p>
 <ul>
   <li>
@@ -362,11 +434,18 @@
   </li>
 </ul>
 <p>
-  It is configured entirely through <code>DEGOOG_MCP_*</code> environment
+  The rest are <code>bundle_search</code> (search and read the sources in one
+  go, the one to point small models at), <code>deep_search</code>,
+  <code>discover</code>, <code>retry_engine</code>, <code>command</code> and
+  <code>health</code>.
+</p>
+<p>
+  It is configured through the <code>mcp.yml</code> it writes to
+  <code>/data</code> on first run and <code>DEGOOG_MCP_*</code> environment
   variables, including an optional inbound bearer token, per-call result caps,
   and an engine allowlist. The <code>mcp.yml</code> compose example runs it
   alongside Degoog. Full details are in the
-  <a href="https://github.com/degoog-org/degoog/tree/main/mcp" class="external" target="_blank"
+  <a href="https://github.com/degoog-org/mcp" class="external" target="_blank"
     rel="noopener">degoog-mcp README</a>.
 </p>
 <div class="block-note">

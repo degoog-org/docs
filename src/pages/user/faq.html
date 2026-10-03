@@ -15,8 +15,9 @@
 
 <h2 id="empty">I installed it and searching returns nothing. Is it broken?</h2>
 <p>
-  No, it is empty. Degoog ships with zero search engines and zero autocomplete
-  providers, deliberately. Add a store repository, install engines, enable them.
+  No, it is empty. Degoog ships with zero search engines and zero
+  autocomplete providers, on purpose. It installs the Google and DuckDuckGo
+  favicon providers on first boot. The official store repository is already added, so install engines and enable them.
   The <a href="getting-started.html#wizard">setup wizard</a> walks you through
   it.
 </p>
@@ -128,7 +129,7 @@
   <code>format=json</code> requests the way SearXNG clients such as Open WebUI
   expect, so those tools work with no custom glue. Separately,
   <code>degoog-mcp</code> is a small sidecar that exposes Degoog over the Model
-  Context Protocol with <code>search</code> and <code>scrape</code> tools. See
+  Context Protocol with <code>search</code>, <code>scrape</code> and a handful of other tools. See
   the <a href="api.html">API reference</a>.
 </p>
 
@@ -142,14 +143,32 @@
 <h2 id="extensions">Can I write my own extension?</h2>
 <p>
   Yes, and it is one of the better parts of the project. Engines, themes,
-  transports, autocomplete providers, plugins, and shortcuts all have documented
+  transports, autocomplete providers, favicon providers, plugins and
+  shortcuts all have documented
   contracts and a CLI scaffold. Flip the sidebar to
   <a href="developer.html">Developer docs</a>.
 </p>
 
-<h2 id="extensions">Does degoog ship with any easter eggs?</h2>
+<h2 id="easter-eggs">Does degoog ship with any easter eggs?</h2>
 <p>
   Many, have fun finding them all &lt;3
+</p>
+
+<h2 id="favicons-gone">My favicons disappeared. What did I break?</h2>
+<p>
+  Probably nothing. Favicons come from extensions, and a dashed circle next
+  to every result means none is enabled and the favicon store is off. The
+  official store has Google, DuckDuckGo, Kagi, Yandex, Site favicon and
+  Identicon. Install one or two,
+  then set the order in <a href="settings.html#favicons">Settings,
+  Favicons</a>.
+  <a href="troubleshooting.html#favicons-missing">Troubleshooting</a> has
+  more.
+</p>
+<p>
+  Degoog installs Google and DuckDuckGo once. If the official store is
+  unreachable at boot, it tries again on the next boot. If you remove them
+  later, they stay removed.
 </p>
 
 <h2 id="contribute">Where do I ask for help or report a bug?</h2>

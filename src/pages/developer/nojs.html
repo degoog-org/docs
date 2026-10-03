@@ -1,0 +1,424 @@
+<div class="doc-page-header">
+  <h1><a href="developer.html">Degoog</a> No-JS support</h1>
+  <p class="doc-page-desc">
+    Opting a slot, a command or a theme into the script-free page at
+    <code>/nojs</code>.
+  </p>
+</div>
+
+<p>
+  <code>/nojs</code> is a second, server-rendered search page that ships no
+  JavaScript. What it is and how an admin turns it on is covered in
+  <a href="nojs.html">The no-JS page</a>. This page is the contract your
+  extension codes against.
+</p>
+
+<h2 id="default-deny">Default deny, and why</h2>
+<p>
+  The page makes one promise to its visitors: the HTML it sends contains no
+  <code>&lt;script&gt;</code> tag and no inline <code>on*=</code> handler. Slot
+  panels and command output are third-party HTML that Degoog concatenates into
+  that page. If the promise is to mean anything, Degoog cannot take your word
+  for it by default.
+</p>
+<p>
+  So the default is deny. A slot or a command appears on <code>/nojs</code> only
+  when it sets <code>supportsNojs: true</code>, and the check is a strict
+  <code>=== true</code>. A truthy string will not do it.
+</p>
+<pre><code>if (nojs &amp;&amp; plugin.supportsNojs !== true) continue;</code></pre>
+<p>
+  Theme templates are sanitised on the way in, because Degoog knows what they
+  are. Slot and command HTML is not: it arrives already assembled, and stripping
+  tags out of it would change what your extension said rather than tell you it
+  was wrong. The flag is you telling Degoog that every branch of your
+  <code>execute</code> returns markup free of both, which is a claim only you
+  can check.
+</p>
+
+<h2 id="slots">Slots</h2>
+<p>
+  Two fields. <code>SlotPlugin.supportsNojs</code> opts the panel in, and
+  <code>SlotPluginContext.nojs</code> tells your <code>execute</code> which page
+  it is rendering for. The context field is only present on the no-JS page, so
+  test it as <code>context?.nojs</code> and treat undefined as the normal page.
+</p>
+<pre><code>const slot: SlotPlugin = {
+  id: "my-panel",
+  name: "My panel",
+  description: "…",
+  position: SlotPanelPosition.KnowledgePanel,
+  supportsNojs: true,
+  trigger: (query) =&gt; query.length &gt; 2,
+  async execute(query, context) {
+    if (context?.nojs) return { title: "My panel", html: staticMarkup(query) };
+    return { title: "My panel", html: interactiveMarkup(query) };
+  },
+};</code></pre>
+<p>
+  Everything else behaves as it does on the normal page. Your
+  <code>trigger</code> still runs, <code>waitForResults</code> still decides
+  whether you get <code>context.results</code>, the disabled check and the
+  search type filter still apply, and the position you chose is respected.
+</p>
+<p>
+  Respected means the same container the normal page uses.
+  <code>FullWidthAboveResults</code>, <code>AboveResults</code>,
+  <code>BelowResults</code>, <code>AboveSidebar</code> and
+  <code>BelowSidebar</code> are rendered into
+  <code>#slot-full-width-above-results</code>, <code>#slot-above-results</code>,
+  <code>#slot-below-results</code>, <code>#slot-above-sidebar</code> and
+  <code>#slot-below-sidebar</code>, wrapped in the same
+  <code>.results-slot-panel</code> block with the same
+  <code>data-slot</code> and <code>data-grid</code> attributes.
+  <code>AtAGlance</code> goes into <code>#at-a-glance</code> as raw HTML with no
+  wrapper, because the background request that normally fetches it needs a
+  browser to make it. <code>KnowledgePanel</code> panels are prepended into
+  <code>#results-sidebar</code> above the engine breakdown, each in a sidebar
+  accordion, which is where the Wikipedia panel lands.
+</p>
+<p>
+  The one structural difference is the accordion itself. The normal page builds
+  it from a <code>&lt;button&gt;</code> and a listener, so the no-JS page uses
+  <code>&lt;details&gt;</code> and <code>&lt;summary&gt;</code> carrying the
+  same classes, open by default.
+</p>
+<p>
+  Panels keep their <code>data-slot</code> attribute, so the CSS you already
+  wrote against <code>[data-slot="my-panel"]</code> applies here too. Your
+  <code>style.css</code> is loaded on the no-JS page like any other page.
+</p>
+<p>
+  A slot that has not opted in is skipped in silence. Nobody asked for the
+  panel, so nobody is owed an explanation for its absence.
+</p>
+
+<h2 id="commands">Bang commands</h2>
+<p>
+  Same two fields: <code>BangCommand.supportsNojs</code> and
+  <code>CommandContext.nojs</code>. The context you receive is
+  <code>clientIp</code>, <code>page</code>, <code>signProxyUrl</code> and
+  <code>nojs: true</code>.
+</p>
+<pre><code>const command: BangCommand = {
+  name: "My command",
+  description: "…",
+  trigger: "mine",
+  supportsNojs: true,
+  async execute(args, context) {
+    const copyButton = context?.nojs ? "" : `&lt;button class="copy"&gt;Copy&lt;/button&gt;`;
+    return { title: "My command", html: `&lt;pre&gt;${answer(args)}&lt;/pre&gt;${copyButton}` };
+  },
+};</code></pre>
+<p>
+  A command that has not opted in renders a notice telling the user to ask the
+  extension's developer to add support. That is deliberately louder than the
+  slot case: the user typed <code>!mine</code>, they are waiting for an answer,
+  and silence would look like the instance is broken. Disabled commands and
+  commands that throw get their own notices through the same mechanism.
+</p>
+<p>
+  <code>totalPages</code> is honoured, but there is no pagination widget around
+  command output on this page yet.
+</p>
+
+<h2 id="checklist">Before you set the flag</h2>
+<ul>
+  <li>
+    No <code>&lt;script&gt;</code> tag, inline or external, in any branch that
+    can run when <code>context.nojs</code> is true.
+  </li>
+  <li>
+    No <code>onclick</code>, <code>onload</code>, <code>onerror</code> or any
+    other inline handler, including on images.
+  </li>
+  <li>
+    Nothing that only works once client code hydrates it: tab strips, copy
+    buttons, collapsible sections driven by a listener, anything that starts
+    empty and fills in later.
+  </li>
+  <li>
+    External images still go through <code>context.signProxyUrl</code>. The
+    image proxy is the same on both pages.
+  </li>
+  <li>
+    CSS is fine. So are links, forms, <code>&lt;details&gt;</code> and
+    <code>:hover</code>. Plenty of interactivity survives without scripts.
+  </li>
+  <li>
+    If a branch genuinely cannot work without JavaScript, do not set the flag.
+    See <a href="#speedtest">the speedtest example</a>.
+  </li>
+</ul>
+
+<h2 id="examples">Five that opted in, and one that did not</h2>
+<p>
+  All six ship with Degoog, and between them they cover every shape this
+  decision takes.
+</p>
+
+<h3 id="already-static">at-a-glance and wikipedia: nothing to change</h3>
+<p>
+  Both slots already produced plain markup. The Wikipedia panel is a summary, a
+  thumbnail through the signed image proxy and a link. At a glance is an
+  extracted snippet from the top results. Neither had a script in it, so opting
+  in was one line each and no branch on <code>context.nojs</code> at all. If
+  your panel is in this shape, so is your change.
+</p>
+
+<h3 id="help">help: same data, simpler shell</h3>
+<p>
+  <code>!help</code> normally renders a search box, a row of category tabs and
+  one visible panel, with client code filtering rows and switching tabs. None of
+  that works here, so under <code>context.nojs</code> it drops the search box
+  and the tab strip and marks every category panel active. You get the whole
+  command list at once, longer to scroll and complete. The rows themselves are
+  the same markup either way.
+</p>
+
+<h3 id="ip">ip: the server already knew the answer</h3>
+<p>
+  <code>!ip</code> with no argument has to work out who is asking. On the normal
+  page it ships an inline script that calls ipify from the browser and posts the
+  result back, which is the right call there because it sees the visitor's
+  address rather than the server's. On <code>/nojs</code> that script cannot
+  run, so the command falls back to <code>context.clientIp</code>, which the
+  server has had all along. When that address is missing or local it returns the
+  same hint text the script would have shown on failure, instead of a spinner
+  that never resolves.
+</p>
+<p>
+  This is the most interesting of the five. The no-JS branch is not a degraded
+  version of the feature, it is a different route to the same answer.
+</p>
+
+<h3 id="uuid">uuid: drop what would be inert</h3>
+<p>
+  <code>!uuid</code> generates identifiers on the server and prints them, so the
+  output itself needs nothing. The only casualty is the per-row Copy button,
+  which under <code>context.nojs</code> is omitted rather than rendered dead. A
+  button that does nothing when clicked is worse than no button.
+</p>
+
+<h3 id="speedtest">speedtest: declining is a correct answer</h3>
+<p>
+  <code>!speedtest</code> does not set <code>supportsNojs</code>, and it should
+  not. Measuring throughput means downloading a payload and timing it, in the
+  browser, which is running code in the browser. There is no static markup that
+  measures anything. A server-side number would describe the server's
+  connection, not yours, and quietly answering a different question than the one
+  asked is worse than not answering.
+</p>
+<p>
+  So it opts out, and a user who types <code>!speedtest</code> on
+  <code>/nojs</code> gets the notice. That notice is the feature working. If
+  your command is in this category, leave the flag off and let the page tell the
+  truth about it.
+</p>
+
+<h2 id="themes">Theme overrides</h2>
+<p>
+  The no-JS page is built out of the same shells and partials your theme already
+  ships. It loads <code>index.html</code> and <code>search.html</code>, fills
+  the empty <code>#id</code> containers in them server side the way the client
+  fills them at runtime, and renders the partials named in your
+  <code>theme.json</code>. Restyle the normal page and the no-JS page follows.
+  You do not have to write it twice.
+</p>
+<p>
+  Where a section genuinely cannot survive without scripts, drop a
+  <code>nojs/&lt;name&gt;.html</code> file into your theme folder. There is
+  nothing to add to <code>theme.json</code>. Each name resolves down four tiers
+  and stops at the first hit.
+</p>
+<ol>
+  <li>your theme's <code>nojs/&lt;name&gt;.html</code></li>
+  <li>the default theme's <code>nojs/&lt;name&gt;.html</code></li>
+  <li>
+    your theme's own template for that name, through the <code>html</code> or
+    <code>templates</code> map in your <code>theme.json</code>
+  </li>
+  <li>the default theme's template for that name</li>
+</ol>
+<p>
+  Tier three is the one that matters. Ship a <code>result.html</code> and no
+  <code>nojs/</code> folder and <code>/nojs</code> uses <em>your</em> result
+  card, not degoog's.
+</p>
+<pre><code>my-theme/
+  theme.json
+  style.css
+  search-templates/
+    result.html       &lt;- used on both pages
+  nojs/
+    tabs.html         &lt;- only if you need a different filter form</code></pre>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Where it comes from</th>
+      <th>What it is</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>layout</code></td>
+      <td><code>html.layout</code></td>
+      <td>
+        The HTML shell. The same one the normal page uses, with its scripts
+        stripped and the no-JS stylesheets added.
+      </td>
+    </tr>
+    <tr>
+      <td><code>index</code></td>
+      <td><code>html.index</code></td>
+      <td>The home shell. Its empty containers are filled server side.</td>
+    </tr>
+    <tr>
+      <td><code>search</code></td>
+      <td><code>html.search</code></td>
+      <td>The results shell, containers and all.</td>
+    </tr>
+    <tr>
+      <td><code>home-header</code></td>
+      <td><code>templates.home-header</code></td>
+      <td>The settings gear, dropped into <code>#header</code>.</td>
+    </tr>
+    <tr>
+      <td><code>home-search</code></td>
+      <td><code>templates.home-search</code></td>
+      <td>
+        The home search form. It is already a real
+        <code>&lt;form&gt;</code>; the server only rewrites its
+        <code>action</code> and <code>method</code> and removes the
+        feeling-lucky button, which cannot work here.
+      </td>
+    </tr>
+    <tr>
+      <td><code>home-footer</code></td>
+      <td><code>templates.home-footer</code></td>
+      <td>
+        Version, repo and docs links. The server appends one more link back to
+        the full app.
+      </td>
+    </tr>
+    <tr>
+      <td><code>search-header</code></td>
+      <td><code>templates.search-header</code></td>
+      <td>
+        Small logo plus the results search bar. The bar is not a form on the
+        normal page, so the server wraps it in one, names the input
+        <code>q</code> and makes the submit button a real submit button.
+      </td>
+    </tr>
+    <tr>
+      <td><code>result</code></td>
+      <td><code>templates.result</code></td>
+      <td>
+        One web result, favicon, engine tags, insecure badge and video overlay
+        included. The actions menu collapses because the server passes
+        <code>show_actions: false</code>.
+      </td>
+    </tr>
+    <tr>
+      <td><code>image-card</code></td>
+      <td><code>templates.image-card</code></td>
+      <td>
+        One tile in the image grid, wrapped in a link since the lightbox needs
+        scripts. Video searches use <code>result</code>, exactly as the normal
+        page does.
+      </td>
+    </tr>
+    <tr>
+      <td><code>logo</code></td>
+      <td><code>nojs/logo.html</code></td>
+      <td>
+        The home logo. The default theme renders its letters in binary in a
+        monospace face here, which is a deliberate difference rather than a
+        thing to inherit.
+      </td>
+    </tr>
+    <tr>
+      <td><code>tabs</code></td>
+      <td><code>nojs/tabs.html</code></td>
+      <td>
+        The tab row and the filter form. The normal tools panel is
+        <code>&lt;button&gt;</code>s driving dropdowns, so this one is a
+        <code>&lt;details&gt;</code> whose <code>&lt;summary&gt;</code> is
+        <code>#results-tabs</code>, with a real <code>&lt;form&gt;</code> of
+        <code>&lt;select&gt;</code>s below it. Same class names as the normal
+        one, so the same CSS applies.
+      </td>
+    </tr>
+    <tr>
+      <td><code>pagination</code></td>
+      <td><code>nojs/pagination.html</code></td>
+      <td>
+        Page links. The client builds pagination in code, so there is no normal
+        template to inherit. Only rendered when there is more than one page.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  Two kinds of placeholder appear in these files.
+  <code>__UPPER_SNAKE__</code> tokens are substituted by the server:
+  <code>__PAGE_CONTENT__</code> and <code>__BODY_CLASS__</code> in the layout,
+  and <code>__THEME_CSS__</code>, <code>__CUSTOM_CSS__</code>,
+  <code>__LANG_ATTR__</code>, <code>__THEME_ATTRS__</code>,
+  <code>__RTL_SUPPORT__</code> and <code>__APP_VERSION__</code> in the head.
+  <code>__PLUGIN_ASSETS__</code> and <code>__THEME_TEMPLATES__</code> resolve to
+  nothing, because neither has anything to do on a page with no client code.
+  Alongside them, result, tab, filter and pagination templates use the same
+  small mustache-style engine as the rest of the theme system, with
+  <code>{{ value }}</code>, <code>{{#if key}}</code>,
+  <code>{{^if key}}</code> and <code>{{#each list}}</code>. Values are HTML
+  escaped for you. Translated strings use
+  <code>{{t:namespace.key}}</code>, and <code>__THEME_PATH__</code> resolves to
+  your theme's asset directory as it does everywhere else.
+</p>
+<h3 id="override-failures">When an override does not load</h3>
+<p>
+  Overrides are matched by exact filename. Name a file something degoog never
+  asks for and the page still works, quietly, using the tier below. It warns
+  twice over rather than leaving no trace.
+</p>
+<ul>
+  <li>
+    The first time a theme's <code>nojs/</code> folder is read, any
+    <code>.html</code> file in it that is not one of the names above produces a
+    warning naming the stray files and the names degoog accepts. This is the
+    typo case, and it is the one that used to cost people an afternoon.
+  </li>
+  <li>
+    A file that is there but cannot be read or parsed warns on every load and
+    falls back to the tier below. Only the file genuinely being absent stays
+    quiet, because not overriding a template is the normal case.
+  </li>
+</ul>
+
+<div class="block-note">
+  <p>
+    <strong>You do not have to strip your own scripts.</strong> Every template
+    the no-JS page renders, the layout included, is run through a sanitiser that
+    removes <code>&lt;script&gt;</code> blocks, inline <code>on*=</code>
+    handlers and module preloads before anything else touches it. That is why
+    your normal <code>layout.html</code> can be reused unchanged. It also means
+    a section that only works once a script hydrates it will render empty rather
+    than render broken, so check what your template looks like with its
+    behaviour taken away. The one thing the sanitiser cannot clean is slot and
+    command HTML, which is why those are opt-in.
+  </p>
+</div>
+<p>
+  The CSS bot check needs nothing from your layout either. When the admin turns
+  it on, the server injects the signed stylesheet link before
+  <code>&lt;/head&gt;</code> itself, along with the no-JS and icon stylesheets.
+</p>
+<p>
+  Dark mode needs nothing from you. The page ships no theme switcher and no
+  cookie, so <code>prefers-color-scheme</code> in the core stylesheet decides,
+  unless the admin set an instance default theme. If your
+  <code>style.css</code> hardcodes light colours, the no-JS page is where that
+  shows up first.
+</p>

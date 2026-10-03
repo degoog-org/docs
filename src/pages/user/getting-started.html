@@ -136,6 +136,20 @@ bun run start</code></pre>
   full picture, including <code>DEGOOG_PUBLIC_INSTANCE</code> and moving the
   settings page to a secret URL.
 </p>
+<p>
+  The gear icon in the top right of the home page takes you to settings, and
+  this is what you'll see until you type the password in and hit
+  <strong>Unlock</strong>.
+</p>
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/settings-locked-light.webp"
+    alt="The settings page with a lock icon, the text 'Settings are locked. Enter the password.', a password box and an Unlock button."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/settings-locked-dark.webp"
+    alt="The settings page with a lock icon, the text 'Settings are locked. Enter the password.', a password box and an Unlock button."
+    loading="lazy" />
+  <figcaption>The password gate in front of settings.</figcaption>
+</figure>
 
 <h2 id="wizard">3. The setup wizard (this is the friendly one)</h2>
 <p>
@@ -189,6 +203,80 @@ bun run start</code></pre>
   <figcaption>The first-run setup wizard.</figcaption>
 </figure>
 
+<h3 id="by-hand">Skipped the tour? Doing it by hand</h3>
+<p>
+  The official repository is already added for you, so you can go straight to
+  the Store.
+</p>
+<ol class="doc-steps">
+  <li>
+    <p>
+      Open <strong>Settings, Store</strong> and switch the first drop-down
+      under Catalog from <strong>Extensions</strong> to
+      <strong>Engines</strong>.
+    </p>
+    <figure class="doc-shot">
+      <img class="doc-shot-light" src="images/screenshots/guide/store-engines-filter-light.webp"
+        alt="The Store catalog filtered to Engines (31). Cards for Google, Google CSE and Google Images each have a blue Install button, with more engines below."
+        loading="lazy" />
+      <img class="doc-shot-dark" src="images/screenshots/guide/store-engines-filter-dark.webp"
+        alt="The Store catalog filtered to Engines (31). Cards for Google, Google CSE and Google Images each have a blue Install button, with more engines below."
+        loading="lazy" />
+      <figcaption>The catalog filtered down to engines.</figcaption>
+    </figure>
+  </li>
+  <li>
+    <p>
+      Hit <strong>Install</strong> on two or three. DuckDuckGo and Wikipedia
+      are a safe start, and the search box above the catalog saves you some
+      scrolling. Installed cards get a green dot and an
+      <strong>Uninstall</strong> button.
+    </p>
+    <figure class="doc-shot">
+      <img class="doc-shot-light" src="images/screenshots/guide/store-installed-card-light.webp"
+        alt="Three Store cards. DuckDuckGo and DuckDuckGo Images show a green dot and an Uninstall button. DuckDuckGo News still has a blue Install button."
+        loading="lazy" />
+      <img class="doc-shot-dark" src="images/screenshots/guide/store-installed-card-dark.webp"
+        alt="Three Store cards. DuckDuckGo and DuckDuckGo Images show a green dot and an Uninstall button. DuckDuckGo News still has a blue Install button."
+        loading="lazy" />
+      <figcaption>Two installed engines next to one that is not.</figcaption>
+    </figure>
+  </li>
+  <li>
+    <p>
+      New engines get switched on for you, but have a look in
+      <strong>Settings, Engines</strong> anyway. Engines are grouped by type,
+      and the green tag next to each name is its bang. An engine you switch
+      off still answers its bang, the card tells you so.
+    </p>
+    <figure class="doc-shot">
+      <img class="doc-shot-light" src="images/screenshots/guide/engines-tab-light.webp"
+        alt="The Engines tab. Under Web, Degoog, Brave Search, DuckDuckGo and Wikipedia each have a green bang tag, a Configure button and a switch. Brave Search is switched off and reads "Off in normal searches, still works with !brave." Bing Images is listed under Images."
+        loading="lazy" />
+      <img class="doc-shot-dark" src="images/screenshots/guide/engines-tab-dark.webp"
+        alt="The Engines tab. Under Web, Degoog, Brave Search, DuckDuckGo and Wikipedia each have a green bang tag, a Configure button and a switch. Brave Search is switched off and reads "Off in normal searches, still works with !brave." Bing Images is listed under Images."
+        loading="lazy" />
+      <figcaption>The Engines tab, with Brave switched off but still reachable through !brave.</figcaption>
+    </figure>
+  </li>
+  <li>
+    <p>
+      For suggestions, go back to the Store, pick
+      <strong>Autocomplete</strong> in the same drop-down and install one.
+      The provider's name shows next to each suggestion.
+    </p>
+    <figure class="doc-shot doc-shot-small">
+      <img class="doc-shot-light" src="images/screenshots/guide/autocomplete-light.webp"
+        alt="The home page search box with 'adam sand' typed. A list of suggestions starting with 'adam sandler' is open below it, with DuckDuckGo written on the right of each one."
+        loading="lazy" />
+      <img class="doc-shot-dark" src="images/screenshots/guide/autocomplete-dark.webp"
+        alt="The home page search box with 'adam sand' typed. A list of suggestions starting with 'adam sandler' is open below it, with DuckDuckGo written on the right of each one."
+        loading="lazy" />
+      <figcaption>Suggestions from DuckDuckGo Autocomplete.</figcaption>
+    </figure>
+  </li>
+</ol>
+
 <h2 id="first-search">4. Your first search</h2>
 <p>Type something and press Enter. What you should see:</p>
 <ul>
@@ -212,14 +300,19 @@ bun run start</code></pre>
   <a href="tips-and-tricks.html">Tips and tricks</a> cover both.
 </p>
 
-<figure class="doc-screenshot-image-wrapper">
-  <img class="doc-screenshot-image" src="images/screenshots/getting-started-first-search.png"
-    data-screenshot-target="images/screenshots/getting-started-first-search.png"
-    alt="A first search query with results, tabs, and the engine performance sidebar." />
-  <figcaption>
-    A first search, with result tabs and the engine performance sidebar.
-  </figcaption>
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/results-page-light.webp"
+    alt="Results for adam sandler. Web and Images tabs and a Filter button at the top. An At a glance box quotes IMDb, then the Adam Sandler IMDb and Wikipedia results with their engine tags. A Wikipedia card with his photo sits on the right, above the engine timings."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/results-page-dark.webp"
+    alt="Results for adam sandler. Web and Images tabs and a Filter button at the top. An At a glance box quotes IMDb, then the Adam Sandler IMDb and Wikipedia results with their engine tags. A Wikipedia card with his photo sits on the right, above the engine timings."
+    loading="lazy" />
+  <figcaption>A first search, with result tabs and the engine performance sidebar.</figcaption>
 </figure>
+<p>
+  An engine that failed shows <strong>0 results</strong> in that sidebar.
+  Hover it and it tells you why, rate limited, blocked, timed out and so on.
+</p>
 
 <h2 id="browser-search">5. Make it your browser's search engine</h2>
 <p>
@@ -249,8 +342,8 @@ bun run start</code></pre>
 <p>
   Degoog ships a web app manifest and a service worker, so it can be installed
   to your home screen or dock. Your browser will usually offer this by itself.
-  If it does not, <strong>Settings, General, Install app</strong> has a button
-  that asks again.
+  If it does not, <strong>Settings, General, Install app</strong> has a
+  <strong>Show install prompt</strong> button that asks again.
 </p>
 <div class="block-note">
   <p>

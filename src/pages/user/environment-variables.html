@@ -144,21 +144,47 @@ Restart=on-failure</code></pre>
       <td><code>DEGOOG_OUTGOING_ALLOWED_HOSTS</code></td>
       <td>
         Comma-separated allowlist of hostnames Degoog may reach for outgoing
-        requests. Wildcards such as <code>*.example.com</code> are accepted.
-        Unset means no hostname restriction. A good hardening layer on an
-        exposed instance.
+        requests made by engines, extensions, the image proxy and core
+        features. <code>*.example.com</code> matches any subdomain of
+        <code>example.com</code> but not <code>example.com</code> itself, and
+        <code>*</code> matches everything. Only the requested URL is checked,
+        not redirects a transport follows on its own. Store and compatibility
+        layer installs are not affected. Unset means no hostname restriction.
       </td>
       <td></td>
     </tr>
     <tr>
       <td><code>DEGOOG_PROXY_ENV_ALLOWLIST</code></td>
       <td>
-        Comma-separated list of environment variable names that proxy settings
-        may reference with <code>${NAME}</code>. Prefixes ending in
-        <code>*</code> are accepted, for example <code>REPLIT_*</code>. Unset
-        means proxy settings do not expand environment placeholders.
+        Comma-separated list of environment variable names that proxy URLs in
+        Server settings may pull in with <code>${NAME}</code>, so proxy
+        passwords can stay out of the settings file. <code>PREFIX_*</code>
+        allows every name starting with <code>PREFIX_</code> and <code>*</code>
+        allows any. Placeholders for names not on the list are left as typed.
       </td>
       <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_ANUBIS_MAX_DIFFICULTY</code></td>
+      <td>
+        The hardest Anubis proof-of-work challenge Degoog will solve for
+        engines that ask for it, such as Startpage. Each step costs 16 times the
+        CPU of the one before, and 6 is the highest value it accepts. A
+        challenge above the limit fails that engine's search.
+      </td>
+      <td><code>4</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_BODY_SIZE</code></td>
+      <td>
+        The largest request body, in KB, that public routes like search,
+        autocomplete and result panels will read. Anything bigger is refused
+        with a <code>413</code>. Set it to <code>0</code> to remove the limit.
+        <strong>Max request body</strong> in
+        <a href="server-settings.html#rate-limit">server settings</a> overrides
+        it when filled in.
+      </td>
+      <td><code>3072</code></td>
     </tr>
   </tbody>
 </table>
@@ -301,6 +327,31 @@ Restart=on-failure</code></pre>
       <td></td>
     </tr>
     <tr>
+      <td><code>DEGOOG_AUTOCOMPLETE_TIMEOUT_MS</code></td>
+      <td>
+        How long an autocomplete provider gets to answer before Degoog gives up
+        on it.
+      </td>
+      <td><code>8000</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_SLOT_TIMEOUT_MS</code></td>
+      <td>
+        How long a slot plugin (a panel above, below or beside the results) gets
+        to answer before Degoog drops it.
+      </td>
+      <td><code>10000</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_FAVICON_PROVIDER_TIMEOUT_MS</code></td>
+      <td>
+        How long each <a href="engines-providers.html#favicons">favicon
+        provider</a> gets to answer for one domain. A provider that runs over
+        counts as having no icon, and Degoog asks the next one.
+      </td>
+      <td><code>5000</code></td>
+    </tr>
+    <tr>
       <td><code>LOG_LEVEL</code></td>
       <td>
         Console verbosity, from most to least severe: <code>fatal</code>,
@@ -412,6 +463,16 @@ Restart=on-failure</code></pre>
       <td>Group ID the container process runs as.</td>
       <td><code>1000</code></td>
     </tr>
+    <tr>
+      <td><code>DEGOOG_DOCKER</code></td>
+      <td>
+        Set to <code>1</code> to tell Degoog it runs in a container when it
+        cannot spot <code>/.dockerenv</code> itself. Restart server then just
+        exits and leaves the restart to your restart policy, instead of
+        spawning a new process.
+      </td>
+      <td></td>
+    </tr>
   </tbody>
 </table>
 
@@ -460,15 +521,28 @@ Restart=on-failure</code></pre>
       <td><code>data/autocomplete</code></td>
     </tr>
     <tr>
+      <td><code>DEGOOG_FAVICON_DIR</code></td>
+      <td>Installed favicon providers.</td>
+      <td><code>data/favicon</code></td>
+    </tr>
+    <tr>
       <td><code>DEGOOG_SHORTCUTS_DIR</code></td>
       <td>Installed keyboard shortcuts.</td>
       <td><code>data/shortcuts</code></td>
     </tr>
     <tr>
+      <td><code>DEGOOG_ENGINE_HOSTS_FILE</code></td>
+      <td>
+        Remembers which site each engine searches, for the engine icons in the
+        results sidebar.
+      </td>
+      <td><code>data/engine-hosts.json</code></td>
+    </tr>
+    <tr>
       <td><code>DEGOOG_PLUGIN_SETTINGS_FILE</code></td>
       <td>
         Per-extension settings for plugins, themes, engines, autocomplete
-        providers, and transports.
+        providers, favicon providers, and transports.
       </td>
       <td><code>data/plugin-settings.json</code></td>
     </tr>
@@ -529,17 +603,20 @@ Restart=on-failure</code></pre>
         <a href="indexer.html">indexer</a> uses Postgres instead of SQLite,
         which scales concurrent writes and full-text search far better on a busy
         instance. Takes precedence over the discrete
-        <code>DEGOOG_POSTGRES_*</code> vars below.
+        <code>DEGOOG_POSTGRES_*</code> vars below. The
+        <a href="indexer.html#favicon-store">favicon store</a> uses the same
+        connection with its own <code>degoog_favicon</code> schema.
       </td>
       <td></td>
     </tr>
     <tr>
       <td><code>DEGOOG_POSTGRES_HOST</code></td>
       <td>
-        Postgres host, used only when <code>DEGOOG_POSTGRES</code> is unset.
-        Lets Kubernetes setups (CNPG, bjw-s app-template) inject credentials as
-        separate secret keys instead of assembling a connection string. A
-        value starting with <code>/</code> is treated as a unix socket
+        Use this in place of the URL. When <code>DEGOOG_POSTGRES</code> is
+        unset and this is set, Degoog builds the connection from the variables
+        below. Lets Kubernetes setups (CNPG, bjw-s app-template) inject
+        credentials as separate secret keys instead of assembling a connection
+        string. A value that starts with <code>/</code> is a Unix socket
         directory (for example <code>/var/run/postgresql</code>) and connects
         with peer auth, no password required.
       </td>
@@ -559,7 +636,7 @@ Restart=on-failure</code></pre>
       <td><code>DEGOOG_POSTGRES_PASSWORD</code></td>
       <td>
         Postgres password, used with <code>DEGOOG_POSTGRES_HOST</code>.
-        Required for a TCP host, optional for a unix socket host.
+        Required unless the host is a socket path.
       </td>
       <td></td>
     </tr>
@@ -571,21 +648,21 @@ Restart=on-failure</code></pre>
     <tr>
       <td><code>DEGOOG_POSTGRES_SSLMODE</code></td>
       <td>
-        Optional TLS mode for the discrete-var connection:
-        <code>true</code>, <code>false</code>, <code>require</code>,
-        <code>allow</code>, <code>prefer</code>, or <code>verify-full</code>.
+        <code>require</code>, <code>verify-full</code>, or <code>true</code>.
+        Degoog refuses <code>allow</code>, <code>prefer</code> and
+        <code>false</code> as not secure enough. With a network host and a
+        password it defaults to <code>require</code>.
       </td>
       <td></td>
     </tr>
     <tr>
       <td><code>DEGOOG_INDEXER_DIR</code></td>
-      <td>Directory holding the index databases and its config.</td>
+      <td>
+        Directory holding the index databases (one
+        <code>index-&lt;type&gt;.db</code> per search type on SQLite), its
+        config, and the favicon store's <code>favicon.db</code>.
+      </td>
       <td><code>data/indexer</code></td>
-    </tr>
-    <tr>
-      <td><code>DEGOOG_INDEXER_DB</code></td>
-      <td>Path to the main SQLite index file.</td>
-      <td><code>data/indexer/index.db</code></td>
     </tr>
     <tr>
       <td><code>DEGOOG_INDEXER_CONFIG_FILE</code></td>
@@ -688,12 +765,43 @@ DEGOOG_POSTGRES_DATABASE=degoog</code></pre>
   </tbody>
 </table>
 
+<h2 id="fourget">4get compatibility layer</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>DEGOOG_FOURGET_DIR</code></td>
+      <td>Where downloaded 4get scrapers are kept.</td>
+      <td><code>data/fourget</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_FOURGET_EXTRA_SCRAPERS</code></td>
+      <td>
+        Comma-separated 4get scraper codes to offer on top of the built-in
+        list. For trying scrapers that have not been checked yet.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_PHP_BIN</code></td>
+      <td>PHP interpreter used to run 4get scrapers. Needs PHP 8.1 or newer.</td>
+      <td><code>php</code></td>
+    </tr>
+  </tbody>
+</table>
+
 <div class="block-note">
   <p>
     The <code>degoog-mcp</code> sidecar has its own
     <code>DEGOOG_MCP_*</code> variables, documented in the
     <a
-      href="https://github.com/degoog-org/degoog/tree/main/mcp"
+      href="https://github.com/degoog-org/mcp"
       class="external"
       target="_blank"
       rel="noopener"

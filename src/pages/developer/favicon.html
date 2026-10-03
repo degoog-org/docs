@@ -1,0 +1,382 @@
+<div class="doc-page-header">
+  <h1><a href="developer.html">Degoog</a> Favicon providers</h1>
+  <p class="doc-page-desc">
+    Write a provider that tells Degoog where to find the icon for a domain.
+    Core fetches the icon, checks it and serves it.
+  </p>
+</div>
+
+<div class="doc-cli-banner">
+  <i class="fa-solid fa-terminal"></i>
+  <p>
+    <strong>degoog-cli is now available.</strong>
+    Run <code>create --type favicon</code> to scaffold a favicon provider from
+    your terminal. Install with
+    <code
+      >curl -fsSL
+      https://raw.githubusercontent.com/degoog-org/cli/main/install.sh |
+      sh</code
+    >
+    or grab it from
+    <a href="https://github.com/degoog-org/cli" target="_blank" rel="noopener"
+      >github.com/degoog-org/cli</a
+    >.
+  </p>
+</div>
+
+<h2 id="what-they-are">What favicon providers are</h2>
+<p>
+  Core has no built-in favicon source. Every icon on the results page comes
+  from a <strong>favicon</strong> extension installed from the
+  <a href="developer-plugins-themes-store.html">Store</a>.
+</p>
+<p>
+  Degoog gives your provider a hostname. You return a URL, the icon bytes, or
+  <code>null</code>. Core fetches and checks the icon, and the browser loads it
+  from a signed <code>/api/proxy/favicon</code> URL on the same instance.
+</p>
+
+<h2 id="where-they-live">Where providers live</h2>
+<p>
+  Installed providers go in <code>data/favicon/</code>, or wherever
+  <code>DEGOOG_FAVICON_DIR</code> points. Each provider is a folder with an
+  entry file named <code>index.js</code>, <code>index.ts</code>,
+  <code>index.mjs</code> or <code>index.cjs</code>. The entry exports a class
+  or an object with a <code>name</code> and a <code>getFavicon</code>
+  function.
+</p>
+<p>
+  The loader looks for the <code>default</code> export, then
+  <code>provider</code>, then <code>Provider</code>. It skips anything without
+  a string <code>name</code> and a <code>getFavicon</code> function.
+</p>
+
+<h2 id="provider-contract">Provider contract</h2>
+<p>
+  Two members are required. <code>name</code> is the label in Settings -&gt;
+  Favicons. <code>getFavicon(host, context)</code> is async and returns a
+  <code>FaviconResult</code>. <code>host</code> is a bare hostname like
+  <code>example.com</code>, with no scheme or path.
+</p>
+<p>
+  Return <code>null</code> on a miss instead of throwing. Core catches thrown
+  errors, but it logs every one.
+</p>
+<p>
+  <code>description</code>, <code>settingsSchema</code> and
+  <code>configure(settings)</code> are optional and work as they do on
+  engines. <a href="developer-engines.html">Search engines</a> has the
+  <code>SettingField</code> reference.
+</p>
+<pre><code>export type FaviconResult =
+  | { url: string }
+  | { data: Uint8Array; contentType: string }
+  | null;
+
+export interface FaviconProvider {
+  name: string;
+  description?: string;
+  settingsSchema?: SettingField[];
+  configure?(settings: Record&lt;string, unknown&gt;): void;
+  getFavicon(host: string, context: FaviconContext): Promise&lt;FaviconResult&gt;;
+}</code></pre>
+
+<h2 id="return-shapes">The three return shapes</h2>
+<table>
+  <thead>
+    <tr>
+      <th>You return</th>
+      <th>What core does with it</th>
+      <th>Use it for</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>{ url: string }</code></td>
+      <td>
+        Fetches the URL on the server and validates the bytes. If the fetch
+        or the check fails, asks the next provider.
+      </td>
+      <td>
+        Services with one icon URL per domain, like the official Google and
+        DuckDuckGo providers.
+      </td>
+    </tr>
+    <tr>
+      <td><code>{ data: Uint8Array, contentType: string }</code></td>
+      <td>Validates the bytes you passed.</td>
+      <td>
+        Icons you generate, like identicons, or icons you fetched yourself
+        with <code>context.fetch</code>, for example because the upstream
+        needs an auth header.
+      </td>
+    </tr>
+    <tr>
+      <td><code>null</code></td>
+      <td>Asks the next provider in the list.</td>
+      <td>Any host you know nothing about.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="context">The context object</h2>
+<p>
+  Every call to <code>getFavicon</code> gets a <code>context</code> argument.
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>context.fetch</code></td>
+      <td><code>typeof fetch</code></td>
+      <td>
+        Use it instead of the global <code>fetch</code>. It applies the proxy
+        settings and this provider's <strong>Outgoing HTTP client</strong>.
+      </td>
+    </tr>
+    <tr>
+      <td><code>context.userAgent</code></td>
+      <td><code>string</code></td>
+      <td>The user agent Degoog sends on outgoing requests.</td>
+    </tr>
+    <tr>
+      <td><code>context.size</code></td>
+      <td><code>number</code></td>
+      <td>
+        The icon size core asks for, in pixels. It is <code>64</code>. Pass it
+        to services that take a size. Returning a smaller icon is fine, core
+        keeps whatever size you return.
+      </td>
+    </tr>
+    <tr>
+      <td><code>context.useCache</code></td>
+      <td><code>UseCache</code></td>
+      <td>
+        <code>context.useCache&lt;T&gt;(namespace, defaultTtlMs)</code> returns
+        an async TTL cache with <code>get</code>, <code>set</code>,
+        <code>delete</code> and <code>clear</code>. It lives in Valkey when
+        that is configured, in process memory otherwise. Core already caches
+        the final icon, so use this for your own lookups, like an API token.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="validation">How core checks the bytes</h2>
+<ul>
+  <li>
+    Core accepts PNG, ICO, GIF, JPEG and WebP. It rejects SVG, because SVG
+    can carry scripts, so convert SVG icons to PNG.
+  </li>
+  <li>
+    Core reads the format from the file's first bytes and ignores the
+    <code>Content-Type</code> header, yours or the upstream's.
+  </li>
+  <li>Icons over 64KB are rejected.</li>
+  <li>
+    Core fetches a <code>{ url }</code> result with a 5 second timeout and
+    checks the resolved address on every redirect, so a URL that points at
+    <code>127.0.0.1</code> or a private network fails.
+  </li>
+</ul>
+<p>
+  A failed check counts as <code>null</code>, and core asks the next
+  provider.
+</p>
+
+<h2 id="priority">Priority and the provider chain</h2>
+<p>
+  Core asks providers one at a time and stops at the first icon that passes
+  validation. Unlike autocomplete, results are not merged.
+</p>
+<p>
+  The order comes from the reserved <code>priority</code> settings key.
+  Higher goes first, and ties fall back to folder order. Providers with no
+  priority yet, such as one just installed, go after all ranked ones.
+  Instance owners set the order by dragging cards in Settings -&gt; Favicons.
+  Core skips providers with the reserved <code>disabled</code> key. Your
+  provider doesn't need to handle either key.
+</p>
+<p>
+  When the indexer's <a href="indexer.html#favicon-store">favicon store</a>
+  is on, core checks it before any provider.
+</p>
+<p>
+  Each <code>getFavicon</code> call gets 5 seconds, set by
+  <code>DEGOOG_FAVICON_PROVIDER_TIMEOUT_MS</code>. A provider that runs over
+  counts as <code>null</code>.
+</p>
+<p>
+  If every provider returns <code>null</code>, the result shows the domain's
+  first letter. If no provider is enabled and the favicon store is off,
+  results show a "No favicon extension installed" placeholder and the
+  browser requests no icons.
+</p>
+<p>
+  Core caches the final answer, icon or miss, so your provider is asked
+  about a given host rarely, not on every search.
+</p>
+
+<h2 id="outgoing-transport">Outgoing transport</h2>
+<p>
+  Every favicon provider gets an <strong>Outgoing HTTP client</strong>
+  selector under <strong>Advanced</strong>, stored in the reserved
+  <code>outgoingTransport</code> key. Options are <code>fetch</code>,
+  <code>curl</code>, <code>curl-fallback</code>, or any installed
+  <a href="developer-transports.html">transport</a>. It applies to
+  <code>context.fetch</code> only, not to core's fetch of a
+  <code>{ url }</code> result.
+</p>
+
+<h2 id="ids">IDs, folders and the manifest</h2>
+<p>
+  The ID, which is also the settings key, is the install folder name plus
+  <code>-favicon</code>. Store installs name the folder after the repo and
+  item, giving <code>{author}-{repo}-{item}-favicon</code>. The official
+  Google provider is
+  <code>degoog-org-official-extensions-google-favicon</code>.
+</p>
+<p>
+  In a store repository, providers live under
+  <code>favicon/&lt;name&gt;/</code> and are listed under the
+  <code>"favicon"</code> key of the root <code>package.json</code>.
+</p>
+<pre><code>my-degoog-repo/
+  package.json
+  favicon/
+    my-provider/
+      index.js
+      author.json
+      README.md
+      screenshots/</code></pre>
+<pre><code>{
+  "favicon": [
+    {
+      "path": "favicon/my-provider",
+      "name": "My Favicon Provider",
+      "description": "Icons from icons.example.com."
+    }
+  ]
+}</code></pre>
+<p>
+  <code>author.json</code>, <code>README.md</code> and
+  <code>screenshots/</code> are optional. Other extensions can depend on your
+  provider with a dependency URL ending in <code>favicon/&lt;name&gt;</code>.
+  <a href="developer-plugins-themes-store.html">Store repositories</a> covers
+  the rest of the manifest.
+</p>
+
+<h2 id="url-example">Minimal example with a URL</h2>
+<pre><code>export default class MyFaviconProvider {
+  name = "My Favicon Provider";
+  description = "Icons from icons.example.com.";
+
+  async getFavicon(host, context) {
+    if (!host) return null;
+    return {
+      url: `https://icons.example.com/${encodeURIComponent(host)}?size=${context.size}`,
+    };
+  }
+}</code></pre>
+<p>
+  The provider only builds the URL. If it returns a 404 or something that
+  isn't an image, core asks the next provider.
+</p>
+
+<h2 id="generated-example">Minimal example with a generated icon</h2>
+<p>
+  This one returns a 1x1 GIF coloured from a hash of the hostname, with no
+  network calls.
+</p>
+<pre><code>const GIF_HEAD = [0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0x01, 0x00, 0x01, 0x00, 0x80, 0x00, 0x00];
+const GIF_TAIL = [
+  0x00, 0x00, 0x00,
+  0x2c, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00,
+  0x02, 0x02, 0x44, 0x01, 0x00,
+  0x3b,
+];
+
+const hashHost = (host) =&gt; {
+  let hash = 0;
+  for (const char of host) hash = (hash * 31 + char.charCodeAt(0)) &gt;&gt;&gt; 0;
+  return hash;
+};
+
+export default {
+  name: "Colour Swatch",
+  description: "A tiny colour per domain, no network needed.",
+
+  async getFavicon(host) {
+    if (!host) return null;
+    const hash = hashHost(host);
+    const rgb = [(hash &gt;&gt; 16) &amp; 0xff, (hash &gt;&gt; 8) &amp; 0xff, hash &amp; 0xff];
+    return {
+      data: new Uint8Array([...GIF_HEAD, ...rgb, ...GIF_TAIL]),
+      contentType: "image/gif",
+    };
+  },
+};</code></pre>
+<p>
+  Generated bytes go through the same validation as fetched ones.
+</p>
+
+<h2 id="settings-example">Settings example</h2>
+<pre><code>export default class MyFaviconProvider {
+  name = "My Favicon Provider";
+
+  settingsSchema = [
+    {
+      key: "apiKey",
+      label: "API Key",
+      type: "password",
+      secret: true,
+      required: true,
+      description: "Key for the icon service.",
+    },
+  ];
+
+  apiKey = "";
+
+  configure(settings) {
+    this.apiKey = typeof settings.apiKey === "string" ? settings.apiKey.trim() : "";
+  }
+
+  async getFavicon(host, context) {
+    if (!host || !this.apiKey) return null;
+    try {
+      const res = await context.fetch(
+        `https://icons.example.com/v1/${encodeURIComponent(host)}`,
+        { headers: { Authorization: `Bearer ${this.apiKey}`, "User-Agent": context.userAgent } },
+      );
+      if (!res.ok) return null;
+      const contentType = res.headers.get("content-type") ?? "";
+      return { data: new Uint8Array(await res.arrayBuffer()), contentType };
+    } catch {
+      return null;
+    }
+  }
+}</code></pre>
+<p>
+  The upstream needs an auth header, so the provider fetches the bytes with
+  <code>context.fetch</code> and returns <code>{ data }</code>. Core still
+  reads the format from the bytes, so a wrong <code>content-type</code> does
+  no harm.
+</p>
+
+<h2 id="setup">Setup</h2>
+<p>
+  Add a folder with an <code>index.js</code> to <code>data/favicon/</code> or
+  <code>DEGOOG_FAVICON_DIR</code> and restart Degoog. Then enable the
+  provider and drag it into place in Settings -&gt; Favicons.
+</p>
+<p>
+  The official store has Google, DuckDuckGo, Kagi, Yandex, Site favicon
+  (experimental) and Identicon, which generates a 64px icon offline. Google
+  and DuckDuckGo are short enough to use as references.
+</p>

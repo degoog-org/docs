@@ -12,11 +12,25 @@
   test out and fine tune your instance to your liking. Degoog is HEAVILY customisable.
 </p>
 
-<figure class="doc-screenshot-image-wrapper">
-  <img class="doc-screenshot-image" src="images/screenshots/settings-server.png"
-    data-screenshot-target="images/screenshots/settings-server.png" alt="The Server tab." />
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/server-tab-light.webp"
+    alt="The Server tab in settings. The Restart server box is at the top, then Presets and backup with a Choose a preset drop-down, Download backup, a file drop area and Restore backup, and the start of the Cache box."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/server-tab-dark.webp"
+    alt="The Server tab in settings. The Restart server box is at the top, then Presets and backup with a Choose a preset drop-down, Download backup, a file drop area and Restore backup, and the start of the Cache box."
+    loading="lazy" />
   <figcaption>The Server tab.</figcaption>
 </figure>
+
+<div class="block-note">
+  <p>
+    <strong>Text boxes need a Save.</strong> Switches and drop-downs save the
+    moment you change them, with a little "Saved" note in the corner. Lists,
+    text boxes and number boxes don't. Type in one and a
+    <strong>Save</strong> button shows up under it, and nothing is saved until
+    you press it.
+  </p>
+</div>
 
 <h2 id="presets">Server presets</h2>
 <p>
@@ -134,6 +148,12 @@
   long Degoog waits after you stop typing before asking providers for
   suggestions. Raising it cuts requests noticeably.
 </p>
+<p>
+  <strong>Max request body (KB)</strong> caps how much a single public search,
+  autocomplete or panel request can send. Left empty, it uses
+  <a href="environment-variables.html#server"><code>DEGOOG_BODY_SIZE</code></a>,
+  which defaults to 3 MB.
+</p>
 <div class="block-note">
   <p>
     Rate limiting is per client IP, so it only works if Degoog can see the real
@@ -161,7 +181,7 @@
   </li>
 </ul>
 <p>
-  <strong>Ban duration</strong> is in hours and defaults to 72. Set it to
+  <strong>Ban duration</strong> is in hours and defaults to 24. Set it to
   <code>0</code> for permanent bans (frankly that'd make you a piece of shit given IP rotate, but you do you).
   Expired bans are cleaned up automatically on the next request.
 </p>
@@ -171,6 +191,21 @@
   manually with <strong>Ban IP</strong>. Banned visitors get a themed 403 page
   rather than a bare error.
 </p>
+
+<h2 id="nojs">No-JS page</h2>
+<p>
+  Enables a second, script-free search page at <code>/nojs</code>. It is off by
+  default and the switch takes effect on the next request, no restart needed.
+  While it is off, <code>/nojs</code> answers 404 exactly like any path that
+  does not exist.
+</p>
+<p>
+  The nested <strong>Apply the CSS bot check to no-JS searches</strong> toggle
+  is off by default for a good reason. Text-mode browsers such as lynx and w3m
+  do not fetch stylesheets, so the check bans precisely the people the page was
+  built for. Only turn it on if that page is being scraped.
+</p>
+<p>Both switches, and the proxy setup, are covered in <a href="nojs.html">The no-JS page</a>.</p>
 
 <h2 id="proxy">Proxy</h2>
 <p>
@@ -216,6 +251,41 @@
   The first regex blocks <code>instagram.com</code> and every subdomain; the
   second blocks only <code>www.instagram.com</code>.
 </p>
+<ol class="doc-steps">
+  <li>
+    <p>
+      Under <strong>Domain management</strong>, turn on
+      <strong>Enable domain blocking</strong> and the list box shows up.
+    </p>
+    <figure class="doc-shot">
+      <img class="doc-shot-light" src="images/screenshots/guide/domain-blocking-toggles-light.webp"
+        alt="The Domain management section. Enable domain blocking is switched on. Below it is the Blocked domains box with grey example text quora.com, tiktok.com and a regex, and Allow blocking from search results is switched on."
+        loading="lazy" />
+      <img class="doc-shot-dark" src="images/screenshots/guide/domain-blocking-toggles-dark.webp"
+        alt="The Domain management section. Enable domain blocking is switched on. Below it is the Blocked domains box with grey example text quora.com, tiktok.com and a regex, and Allow blocking from search results is switched on."
+        loading="lazy" />
+      <figcaption>Domain blocking switched on.</figcaption>
+    </figure>
+  </li>
+  <li>
+    <p>
+      Type your domains, one per line. The grey text in an empty box is just
+      an example, it doesn't block anything.
+    </p>
+  </li>
+  <li>
+    <p>Press <strong>Save</strong> under the box.</p>
+    <figure class="doc-shot">
+      <img class="doc-shot-light" src="images/screenshots/guide/domain-list-save-light.webp"
+        alt="The Blocked domains box with pinterest.com typed in it and a wide blue Save button right under the box."
+        loading="lazy" />
+      <img class="doc-shot-dark" src="images/screenshots/guide/domain-list-save-dark.webp"
+        alt="The Blocked domains box with pinterest.com typed in it and a wide blue Save button right under the box."
+        loading="lazy" />
+      <figcaption>The Save button that shows up once you type.</figcaption>
+    </figure>
+  </li>
+</ol>
 
 <h3>Replacement</h3>
 <p>
@@ -224,6 +294,20 @@
 </p>
 <pre><code>reddit.com -> old.reddit.com
 twitter.com -> nitter.net</code></pre>
+<p>
+  Type it as <code>-&gt;</code>, the box may draw it as an arrow. Same as
+  blocking, you need <strong>Enable domain replacement</strong> on and the
+  <strong>Save</strong> button under the box when you're done.
+</p>
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/replace-domain-rules-light.webp"
+    alt="The domain replacement section. Enable domain replacement is switched on, the Replacement rules box holds the rule en.wikipedia.org to wikiless.example.org, and Allow replacing from search results is switched on."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/replace-domain-rules-dark.webp"
+    alt="The domain replacement section. Enable domain replacement is switched on, the Replacement rules box holds the rule en.wikipedia.org to wikiless.example.org, and Allow replacing from search results is switched on."
+    loading="lazy" />
+  <figcaption>A replacement rule sending en.wikipedia.org somewhere else.</figcaption>
+</figure>
 <p>
   A target can also be a full URL, which is useful when the replacement lives
   behind a fixed path or hash on a self-hosted viewer. That URL is used exactly
@@ -256,6 +340,21 @@ twitter.com -> nitter.net</code></pre>
 <pre><code>example.com|20
 spam.example|-15</code></pre>
 <p>
+  In the settings page each rule is its own row with the domain and the
+  number. <strong>+ Add domain</strong> gives you a new row, the cross removes
+  one, and like the other lists it needs the <strong>Save</strong> button
+  under the rows.
+</p>
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/score-domain-rules-light.webp"
+    alt="The domain scoring section. Enable domain scoring is switched on. Under Scoring rules there is one row with imdb.com and 20 and a cross to remove it, a + Add domain link, and Allow scoring from search results is switched on."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/score-domain-rules-dark.webp"
+    alt="The domain scoring section. Enable domain scoring is switched on. Under Scoring rules there is one row with imdb.com and 20 and a cross to remove it, a + Add domain link, and Allow scoring from search results is switched on."
+    loading="lazy" />
+  <figcaption>A scoring rule giving imdb.com 20 extra points.</figcaption>
+</figure>
+<p>
   Think of it as a final nudge after Degoog has already merged the search
   engines. If a result has <code>29</code> points and you add
   <code>example.com|20</code>, it becomes <code>49</code>. If you add
@@ -283,6 +382,20 @@ spam.example|-15</code></pre>
   replace, or score that domain on the spot. These menus are hidden entirely on
   public or unauthenticated instances regardless of the setting.
 </p>
+<p>
+  The toggle sits under its list and only does anything while that list's own
+  Enable switch is on too, so you need both. Signed-in users always get
+  <strong>Refresh favicon</strong> in that menu either way.
+</p>
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/result-domain-menu-light.webp"
+    alt="The three dots menu open on the Adam Sandler Wikipedia result, with Block this domain, Replace this domain, Score this domain and Refresh favicon."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/result-domain-menu-dark.webp"
+    alt="The three dots menu open on the Adam Sandler Wikipedia result, with Block this domain, Replace this domain, Score this domain and Refresh favicon."
+    loading="lazy" />
+  <figcaption>The result menu with all three domain actions turned on.</figcaption>
+</figure>
 <div class="block-note">
   <p>
     If a list grows past what the UI can sensibly render, Degoog stops rendering
@@ -314,7 +427,7 @@ spam.example|-15</code></pre>
 <h2 id="api-key">API key</h2>
 <p>
   Degoog generates a server key you can use to protect the public API endpoints.
-  The section is hidden until a password is configured via
+  The key and its switches stay hidden until a password is configured via
   <code>DEGOOG_SETTINGS_PASSWORDS</code>, since there would be nothing
   protecting the key itself.
 </p>
@@ -357,6 +470,15 @@ spam.example|-15</code></pre>
   <li>
     <strong>Degoog Indexer.</strong> Turns on local result recording and makes
     the Indexer tab appear. See <a href="indexer.html">Indexer</a>.
+    <figure class="doc-shot">
+      <img class="doc-shot-light" src="images/screenshots/guide/indexer-enable-light.webp"
+        alt="The Degoog Indexer box on the Server tab with the text Save the results you actually see, then serve them back later as a Degoog engine, and the Enable the indexer switch turned on."
+        loading="lazy" />
+      <img class="doc-shot-dark" src="images/screenshots/guide/indexer-enable-dark.webp"
+        alt="The Degoog Indexer box on the Server tab with the text Save the results you actually see, then serve them back later as a Degoog engine, and the Enable the indexer switch turned on."
+        loading="lazy" />
+      <figcaption>The indexer switch.</figcaption>
+    </figure>
   </li>
   <li>
     <strong>SearX compatibility layer.</strong> Adds the SearX section to the
@@ -370,8 +492,8 @@ spam.example|-15</code></pre>
     SearXNG-shaped response. Requests without that parameter are unaffected.
   </li>
   <li>
-    <strong>Keyboard shortcuts.</strong> Enables the shortcuts system for the
-    instance. When off, the Shortcuts tab is hidden and no shortcuts are active.
+    <strong>Keyboard shortcuts.</strong> There's no server switch for these
+    anymore. The Shortcuts tab is always there.
   </li>
   <li>
     <strong>Restart server.</strong> Restarts the Degoog process. Searches in
