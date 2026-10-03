@@ -100,6 +100,13 @@
       <td>Suggestion providers, one toggle each.</td>
     </tr>
     <tr>
+      <td><strong>Favicons</strong></td>
+      <td>
+        Favicon shape and favicon providers. Toggle providers and drag them
+        into the order Degoog asks them in. See <a href="#favicons">below</a>.
+      </td>
+    </tr>
+    <tr>
       <td><strong>Shortcuts</strong></td>
       <td>
         Rebind keyboard shortcuts. Hidden unless shortcuts are enabled in Server
@@ -186,6 +193,51 @@
   A banner appears at the top of General when an installed extension needs a
   server restart to work properly. It names the reason and gives you a button
   that restarts Degoog for you. Searches in flight may be interrupted briefly.
+</p>
+
+<h2 id="favicons">The Favicons tab</h2>
+<p>
+  The icon next to each result comes from a favicon provider. Install
+  providers from <em>Settings, Store</em> with the Favicon filter and they
+  show up here. The official store has Google, DuckDuckGo, Kagi, Yandex, Site
+  favicon and Identicon.
+</p>
+<p>
+  <strong>Favicon shape</strong> sits at the top of the tab. Pick circle
+  (the default), rounded square, square, squircle, hexagon, star or flower.
+  It saves on click and applies to everyone on the instance. Every icon
+  shows at the same size. The shapes other than circle cut each icon to that
+  shape, and on the normal page, icons 32px or larger are zoomed in a little
+  to fill it. Custom themes may ignore this setting.
+</p>
+<p>
+  When the <a href="indexer.html">indexer</a> is on, a <strong>Degoog</strong>
+  card sits above the providers. It is the
+  <a href="indexer.html#favicon-store">favicon store</a>, icons your instance
+  already saved. Degoog always checks it before any provider, so you can't
+  drag it. It is on by default. Turn it off and every icon comes from the
+  providers and the cache. With every provider switched off it still serves
+  the icons it has saved, and sites it has no icon for get a letter.
+</p>
+<ul>
+  <li>Degoog never asks a disabled provider.</li>
+  <li>
+    Drag the provider cards to set the order. Degoog asks the top one first
+    and moves down when a provider has no icon for that domain, or returns
+    one that doesn't load. A provider you just installed goes to the bottom
+    until you move it.
+  </li>
+  <li>
+    A provider with options gets a <strong>Configure</strong> button. Every
+    provider has an <strong>Outgoing HTTP client</strong> under
+    <strong>Advanced</strong>, as engines do.
+  </li>
+</ul>
+<p>
+  With no provider enabled, results show a dashed placeholder with a "No
+  favicon extension installed" tooltip.
+  <a href="engines-providers.html#favicons">Engines and providers</a> has
+  more.
 </p>
 
 <h2 id="where-settings-live">Where settings are actually stored</h2>

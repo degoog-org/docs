@@ -175,6 +175,40 @@
   waits after you stop typing before asking for suggestions.
 </p>
 
+<h2 id="favicons">Favicon providers</h2>
+<p>
+  A favicon provider supplies the icon next to each result. Degoog installs
+  Google and DuckDuckGo on first boot. The rest come from the Store.
+</p>
+<p>
+  The official store has six. Google, DuckDuckGo, Kagi and Yandex ask those
+  services for the icon. Site favicon, which is experimental, gets it from
+  the site itself. Identicon draws a pattern from the domain name and works
+  offline. One or two is enough. Put Identicon last so it only fills gaps.
+</p>
+<p>
+  Your server fetches the icons, and your browser loads them from your own
+  instance. The server asks providers one at a time, in the order you set in
+  <a href="settings.html#favicons">Settings, Favicons</a>, and keeps the
+  first icon that loads. With the <a href="indexer.html">indexer</a> on, it
+  checks the <a href="indexer.html#favicon-store">favicon store</a> before
+  any provider.
+</p>
+<p>
+  If no provider is enabled, every result gets a dashed circle with a "No
+  favicon extension installed" tooltip, and the sidebar hides the engine
+  icons.
+</p>
+<p>
+  If providers are enabled but none has an icon for a domain, the result
+  shows the first letter of the domain.
+</p>
+<p>
+  When a site shows an old or wrong icon, signed-in users can pick
+  <strong>Refresh favicon</strong> from that result's menu. See
+  <a href="using-search.html#results">Reading a result</a>.
+</p>
+
 <h2 id="transports">Transports</h2>
 <p>
   A transport is how your server makes an outgoing HTTP request. This matters

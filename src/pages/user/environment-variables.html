@@ -143,11 +143,24 @@ Restart=on-failure</code></pre>
       <td><code>DEGOOG_OUTGOING_ALLOWED_HOSTS</code></td>
       <td>
         Comma-separated allowlist of hostnames Degoog may reach for outgoing
-        requests. Wildcards such as <code>*.example.com</code> are accepted.
-        Unset means no hostname restriction. A good hardening layer on an
-        exposed instance.
+        requests made by engines, extensions, the image proxy and core
+        features. <code>*.example.com</code> matches any subdomain of
+        <code>example.com</code> but not <code>example.com</code> itself, and
+        <code>*</code> matches everything. Only the requested URL is checked,
+        not redirects a transport follows on its own. Store and compatibility
+        layer installs are not affected. Unset means no hostname restriction.
       </td>
       <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_ANUBIS_MAX_DIFFICULTY</code></td>
+      <td>
+        The hardest Anubis proof-of-work challenge Degoog will solve for
+        engines that ask for it, such as Startpage. Each step costs 16 times the
+        CPU of the one before, and 6 is the highest value it accepts. A
+        challenge above the limit fails that engine's search.
+      </td>
+      <td><code>4</code></td>
     </tr>
   </tbody>
 </table>
@@ -251,6 +264,15 @@ Restart=on-failure</code></pre>
         nightly testers.
       </td>
       <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_FAVICON_PROVIDER_TIMEOUT_MS</code></td>
+      <td>
+        How long each <a href="engines-providers.html#favicons">favicon
+        provider</a> gets to answer for one domain. A provider that runs over
+        counts as having no icon, and Degoog asks the next one.
+      </td>
+      <td><code>5000</code></td>
     </tr>
     <tr>
       <td><code>LOG_LEVEL</code></td>
@@ -412,6 +434,11 @@ Restart=on-failure</code></pre>
       <td><code>data/autocomplete</code></td>
     </tr>
     <tr>
+      <td><code>DEGOOG_FAVICON_DIR</code></td>
+      <td>Installed favicon providers.</td>
+      <td><code>data/favicon</code></td>
+    </tr>
+    <tr>
       <td><code>DEGOOG_SHORTCUTS_DIR</code></td>
       <td>Installed keyboard shortcuts.</td>
       <td><code>data/shortcuts</code></td>
@@ -420,7 +447,7 @@ Restart=on-failure</code></pre>
       <td><code>DEGOOG_PLUGIN_SETTINGS_FILE</code></td>
       <td>
         Per-extension settings for plugins, themes, engines, autocomplete
-        providers, and transports.
+        providers, favicon providers, and transports.
       </td>
       <td><code>data/plugin-settings.json</code></td>
     </tr>
@@ -480,13 +507,57 @@ Restart=on-failure</code></pre>
         Postgres connection URL. When set, the
         <a href="indexer.html">indexer</a> uses Postgres instead of SQLite,
         which scales concurrent writes and full-text search far better on a busy
-        instance.
+        instance. The <a href="indexer.html#favicon-store">favicon store</a>
+        uses the same connection with its own <code>degoog_favicon</code>
+        schema.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_POSTGRES_HOST</code></td>
+      <td>
+        Use this in place of the URL. When <code>DEGOOG_POSTGRES</code> is
+        unset and this is set, Degoog builds the connection from the variables
+        below. A value that starts with <code>/</code> is a Unix socket path.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_POSTGRES_PORT</code></td>
+      <td>Postgres port.</td>
+      <td><code>5432</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_POSTGRES_USER</code></td>
+      <td>Postgres user.</td>
+      <td><code>degoog</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_POSTGRES_PASSWORD</code></td>
+      <td>Postgres password. Required unless the host is a socket path.</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_POSTGRES_DATABASE</code></td>
+      <td>Postgres database name.</td>
+      <td><code>degoog</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_POSTGRES_SSLMODE</code></td>
+      <td>
+        <code>require</code>, <code>verify-full</code>, or <code>true</code>.
+        Degoog refuses <code>allow</code>, <code>prefer</code> and
+        <code>false</code> as not secure enough. With a network host and a
+        password it defaults to <code>require</code>.
       </td>
       <td></td>
     </tr>
     <tr>
       <td><code>DEGOOG_INDEXER_DIR</code></td>
-      <td>Directory holding the index databases and its config.</td>
+      <td>
+        Directory holding the index databases, its config, and the favicon
+        store's <code>favicon.db</code>.
+      </td>
       <td><code>data/indexer</code></td>
     </tr>
     <tr>

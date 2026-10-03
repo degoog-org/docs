@@ -135,7 +135,8 @@
       "content": "...",
       "source": "Brave",
       "score": 92,
-      "sources": ["Brave", "DuckDuckGo"]
+      "sources": ["Brave", "DuckDuckGo"],
+      "favicon": "/api/proxy/favicon?domain=example.com&amp;sig=...&amp;s=64"
     }
   ],
   "query": "rust lifetimes",
@@ -147,6 +148,10 @@
 <p>
   <code>content</code> mirrors <code>snippet</code>. It exists so that Open
   WebUI, which expects that field name, works without a custom tool.
+</p>
+<p>
+  <code>favicon</code> is a signed URL on your instance, or an empty string
+  when no favicon provider is enabled. See <a href="#favicons">Favicons</a>.
 </p>
 
 <h3 id="searx-shape">SearXNG-shaped responses</h3>
@@ -253,13 +258,13 @@
 <p>
   Lists what is installed, grouped into <code>engines</code>,
   <code>plugins</code>, <code>themes</code>, <code>transports</code>,
-  <code>autocomplete</code>, and <code>shortcuts</code>. Each entry includes the
+  <code>autocomplete</code>, <code>favicon</code> and <code>shortcuts</code>. Each entry includes the
   <code>id</code> you would use to restrict a search.
 </p>
 <p>
   Add <code>?type=</code> to fetch one group: <code>engine</code>,
   <code>plugin</code>, <code>theme</code>, <code>transport</code>,
-  <code>autocomplete</code>, or <code>shortcut</code>. An unknown type returns
+  <code>autocomplete</code>, <code>favicon</code> or <code>shortcut</code>. An unknown type returns
   <code>400</code>.
 </p>
 <pre><code>curl "http://localhost:4444/api/extensions?type=engine"</code></pre>
@@ -267,6 +272,69 @@
   Extension settings are redacted from the response unless the caller is
   authenticated to the settings area, so you will see the extensions but not
   their configured API keys.
+</p>
+
+<h2 id="favicons">Favicons</h2>
+<h3 id="favicon-proxy">GET /api/proxy/favicon</h3>
+<p>
+  Returns the icon for <code>domain</code> from the
+  <a href="engines-providers.html#favicons">favicon providers</a>.
+  Parameters are <code>domain</code>, <code>sig</code>, <code>s</code> and an
+  optional <code>v</code> cache buster. The server ignores <code>s</code>,
+  currently <code>64</code>. It only changes the URL so browsers drop icons
+  cached at the old size.
+</p>
+<p>
+  <code>sig</code> is required, and the URLs in search results already carry
+  it. A request without a valid <code>sig</code> gets <code>403</code>.
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Status</th>
+      <th>Meaning</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>200</code></td>
+      <td>
+        The icon as PNG, ICO, GIF, JPEG or WebP. Browsers cache it for a
+        day.
+      </td>
+    </tr>
+    <tr>
+      <td><code>400</code></td>
+      <td><code>domain</code> is not a valid hostname.</td>
+    </tr>
+    <tr>
+      <td><code>403</code></td>
+      <td><code>sig</code> is missing or does not match the domain.</td>
+    </tr>
+    <tr>
+      <td><code>404</code></td>
+      <td>No provider found an icon, or no provider is installed.</td>
+    </tr>
+    <tr>
+      <td><code>503</code></td>
+      <td>
+        Too many favicon requests at once. Honour the
+        <code>Retry-After</code> header.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="favicon-refresh">POST /api/favicon/refresh</h3>
+<p>
+  Drops the cached and stored icon for one domain and asks the providers
+  again. The <strong>Refresh favicon</strong> result action calls it. It
+  needs a settings session and is rate limited.
+</p>
+<pre><code>{ "domain": "example.com" }</code></pre>
+<p>
+  The response is <code>{ "url": "..." }</code> with a fresh signed URL, or
+  <code>{ "url": null }</code> when no provider had an icon.
 </p>
 
 <h2 id="discovery">Other useful endpoints</h2>

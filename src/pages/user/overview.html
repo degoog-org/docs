@@ -21,8 +21,8 @@
 </p>
 <p>
   The core is deliberately small. Almost everything interesting is an extension:
-  search engines, autocomplete providers, transports, themes, plugins, and
-  keyboard shortcuts all live outside the core and get installed from git
+  search engines, autocomplete providers, favicon providers, transports,
+  themes, plugins, and keyboard shortcuts all live outside the core and get installed from git
   repositories through the Store.
 </p>
 
@@ -60,6 +60,14 @@
         Supplies the live suggestions under the search box as you type. Separate
         from engines they live in their own extension type. This allows for separate rate limiting and other
         customisation.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Favicon provider</strong></td>
+      <td>
+        Supplies the icon next to each result. Your server fetches the icons,
+        and your browser loads them from your instance. With none enabled,
+        results show a placeholder.
       </td>
     </tr>
     <tr>

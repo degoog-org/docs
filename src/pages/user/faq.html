@@ -15,8 +15,9 @@
 
 <h2 id="empty">I installed it and searching returns nothing. Is it broken?</h2>
 <p>
-  No, it is empty. Degoog ships with zero search engines and zero autocomplete
-  providers, deliberately. Add a store repository, install engines, enable them.
+  No, it is empty. Degoog ships with zero search engines and zero
+  autocomplete providers, on purpose. It installs the Google and DuckDuckGo
+  favicon providers on first boot. Add a store repository, install engines, enable them.
   The <a href="getting-started.html#wizard">setup wizard</a> walks you through
   it.
 </p>
@@ -142,14 +143,31 @@
 <h2 id="extensions">Can I write my own extension?</h2>
 <p>
   Yes, and it is one of the better parts of the project. Engines, themes,
-  transports, autocomplete providers, plugins, and shortcuts all have documented
+  transports, autocomplete providers, favicon providers, plugins and
+  shortcuts all have documented
   contracts and a CLI scaffold. Flip the sidebar to
   <a href="developer.html">Developer docs</a>.
 </p>
 
-<h2 id="extensions">Does degoog ship with any easter eggs?</h2>
+<h2 id="easter-eggs">Does degoog ship with any easter eggs?</h2>
 <p>
   Many, have fun finding them all &lt;3
+</p>
+
+<h2 id="favicons-gone">My favicons disappeared. What did I break?</h2>
+<p>
+  Probably nothing. Favicons come from extensions, and a dashed circle next
+  to every result means none is enabled. The official store has Google,
+  DuckDuckGo, Kagi, Yandex, Site favicon and Identicon. Install one or two,
+  then set the order in <a href="settings.html#favicons">Settings,
+  Favicons</a>.
+  <a href="troubleshooting.html#favicons-missing">Troubleshooting</a> has
+  more.
+</p>
+<p>
+  Degoog installs Google and DuckDuckGo once. If the official store is
+  unreachable at boot, it tries again on the next boot. If you remove them
+  later, they stay removed.
 </p>
 
 <h2 id="contribute">Where do I ask for help or report a bug?</h2>

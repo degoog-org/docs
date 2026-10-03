@@ -192,6 +192,34 @@
   are set up for exactly this.
 </p>
 
+<h2 id="favicon-store">The favicon store</h2>
+<p>
+  While the indexer is on, Degoog also saves the icons your
+  <a href="engines-providers.html#favicons">favicon providers</a> return.
+  After a restart or once the cache expires, a site your instance has seen
+  before gets its icon from there, and the providers aren't asked.
+</p>
+<p>
+  The store is on by default. Switch it off with the <strong>Degoog</strong>
+  card at the top of <a href="settings.html#favicons">Settings,
+  Favicons</a>, which only shows while the indexer is on. The server setting
+  is <code>degoogFaviconStoreEnabled</code>. Turning the indexer off stops
+  the store too.
+</p>
+<p>
+  Stored icons expire after 30 days. Change that with <strong>Favicon max
+  age (days)</strong> under <strong>Favicon store</strong> in the Indexer
+  tab, or <code>degoogFaviconStoreMaxAgeDays</code>. A domain where no
+  provider found an icon gets another try after one day.
+</p>
+<p>
+  On SQLite the store is <code>favicon.db</code> in the indexer directory,
+  <code>data/indexer/</code> unless <code>DEGOOG_INDEXER_DIR</code> says
+  otherwise. On Postgres it is a <code>degoog_favicon</code> schema in the
+  same database, using the indexer's connection, so there is nothing extra to
+  set up.
+</p>
+
 <div class="block-note">
   <p>
     Everything the indexer stores is a record of what you searched for and what

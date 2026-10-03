@@ -602,11 +602,20 @@
 </p>
 <ul>
   <li>
-    <code>result-favicon-{N}</code> is the favicon image. It must also carry
-    <code>data-favicon-host="{{ favicon_host }}"</code> so JavaScript can attach
-    the fallback chain. During the final fallback phase the
-    <code>&lt;img&gt;</code> is smoothly replaced with a
-    <code>&lt;span class="result-favicon-fallback"&gt;</code> element.
+    <code>result-favicon-{N}</code> is the favicon <code>&lt;img&gt;</code>.
+    Give it the <code>degoog-result--favicon</code> class,
+    <code>loading="lazy"</code> and
+    <code>data-favicon-host="{{ favicon_host }}"</code>. When no provider has
+    an icon, JavaScript replaces it with a
+    <code>&lt;span class="result-favicon-fallback"&gt;</code> showing the
+    domain's first letter.
+  </li>
+  <li>
+    When <code>favicon_missing</code> is true, no provider is enabled. Render
+    an element with the classes
+    <code>result-favicon-missing degoog-result--favicon-missing</code> and
+    <code>data-tooltip="{{ favicon_missing_tip }}"</code> instead of the
+    <code>&lt;img&gt;</code>.
   </li>
   <li>
     <code>result-actions-{N}</code> is the wrapper for per result actions like
@@ -629,7 +638,43 @@
     <code>action_replace</code>, or <code>action_score</code> placeholder is
     active.
   </li>
+  <li>
+    <code>result-action-refresh-{N}</code> is the Refresh favicon button. Wrap
+    it in <code>{{#if action_refresh}}</code>, which is true for signed-in
+    users when at least one favicon provider is enabled.
+  </li>
 </ul>
+
+<h4 id="favicon-shape">Favicon shape</h4>
+<p>
+  The <strong>Favicon shape</strong> setting puts a
+  <code>data-favicon-shape</code> attribute on <code>&lt;html&gt;</code>, on
+  both the JS and no-JS pages. Values are <code>circle</code> (the default),
+  <code>rounded</code>, <code>square</code>, <code>squircle</code>,
+  <code>hexagon</code>, <code>star</code> and <code>flower</code>.
+</p>
+<ul>
+  <li>
+    The core styles target <code>.degoog-result--favicon</code>. Every icon
+    fills the same box. For every shape except circle, the icon is clipped to
+    that shape over a tile.
+  </li>
+  <li>
+    On the JS page, the client adds <code>favicon-hires</code> to the image
+    once it loads at 32px or larger. For every shape except circle, those
+    icons are zoomed in a little to fill the shape. The no-JS page never adds
+    the class.
+  </li>
+  <li>
+    The dashed outline on <code>.degoog-result--favicon-missing</code> follows
+    the shape too.
+  </li>
+</ul>
+<p>
+  If your theme drops these classes or restyles the favicon, the setting has
+  no effect. To support it, keep the classes or add your own rules on
+  <code>:root[data-favicon-shape="..."]</code>.
+</p>
 
 <h4><code>degoog-search-media-preview</code></h4>
 <ul>
@@ -730,14 +775,30 @@
       <td><code>favicon_url</code></td>
       <td>string</td>
       <td>
-        The proxied favicon. This is just the first candidate before the
-        fallback chain runs in JavaScript.
+        The signed <code>/api/proxy/favicon</code> URL for this host. Empty
+        when no favicon provider is enabled
       </td>
     </tr>
     <tr>
       <td><code>favicon_host</code></td>
       <td>string</td>
-      <td>The hostname used by the favicon fallback chain</td>
+      <td>The hostname used for the favicon and the letter fallback</td>
+    </tr>
+    <tr>
+      <td><code>favicon_missing</code></td>
+      <td>boolean</td>
+      <td>
+        True when no favicon provider is enabled. Render the placeholder
+        instead of the image
+      </td>
+    </tr>
+    <tr>
+      <td><code>favicon_missing_tip</code></td>
+      <td>string</td>
+      <td>
+        The translated placeholder tooltip. In English it reads "No favicon
+        extension installed"
+      </td>
     </tr>
     <tr>
       <td><code>thumbnail_url</code></td>
@@ -787,6 +848,13 @@
       <td><code>action_score</code></td>
       <td>boolean</td>
       <td>Shows the score domain menu item</td>
+    </tr>
+    <tr>
+      <td><code>action_refresh</code></td>
+      <td>boolean</td>
+      <td>
+        Shows the Refresh favicon menu item. Always false on the no-JS page.
+      </td>
     </tr>
   </tbody>
 </table>

@@ -570,6 +570,31 @@ async executeSearch(query, page = 1, timeFilter, context) {
   tab until the instance owner restarts.
 </p>
 <pre><code>export const needsAppRestart = true;</code></pre>
+<p>
+  Set <code>challenges = ["anubis"]</code> if the site puts an
+  <a
+    href="https://github.com/TecharoHQ/anubis"
+    class="external"
+    target="_blank"
+    rel="noopener"
+    >Anubis</a
+  >
+  proof-of-work page in front of its results. When <code>context.fetch</code>
+  gets an Anubis page back, Degoog solves it, sends the pass request with the
+  cookies the page set, and repeats your request with the token it gets. It
+  keeps that token per site and transport, so every engine on the same site
+  shares one solve. Your engine only ever sees the real page.
+</p>
+<p>
+  This works on transports that return response cookies or keep their own
+  cookie jar, such as <code>fetch</code> and <code>curl-impersonate</code>. The
+  plain <code>curl</code> transport drops cookies, so the search fails with an
+  <code>interstitial</code> error. Transports that set
+  <code>handlesChallenges</code>, like 4play, get the page as-is, because their
+  browser gets through it without help. Degoog also refuses challenges above
+  <code>DEGOOG_ANUBIS_MAX_DIFFICULTY</code>.
+</p>
+<pre><code>challenges = ["anubis"];</code></pre>
 
 <h2>Setup</h2>
 <p>

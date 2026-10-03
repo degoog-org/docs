@@ -248,6 +248,13 @@
   Server tab until the instance owner restarts.
 </p>
 <pre><code>export const needsAppRestart = true;</code></pre>
+<p>
+  Set <code>handlesChallenges = true</code> if your transport drives a real
+  browser that gets through proof-of-work pages such as Anubis by itself.
+  Degoog then hands those pages to the engine untouched instead of solving them,
+  even for engines that set <code>challenges</code>.
+</p>
+<pre><code>handlesChallenges = true;</code></pre>
 
 <h2>Setup</h2>
 <p>

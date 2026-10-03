@@ -2,7 +2,7 @@
   <h1><a href="developer.html">Degoog</a> Store repositories</h1>
   <p class="doc-page-desc">
     Git repositories you can add in Settings then Store to easily install
-    plugins, themes, and engines.
+    plugins, themes, engines and every other kind of extension.
   </p>
 </div>
 
@@ -10,8 +10,9 @@
 <p>
   A <strong>store repo</strong> is a Git repository you can link to Degoog by
   going to <strong>Settings</strong> then <strong>Store</strong>. Once you add
-  it, you can browse and install plugins, themes, engines, and transports
-  directly from the Store tab without having to copy files manually.
+  it, you can browse and install plugins, themes, engines, transports,
+  autocomplete providers, favicon providers and shortcuts from the Store tab
+  without having to copy files manually.
 </p>
 
 <h2>Repo structure</h2>
@@ -32,10 +33,19 @@
       index.js
   transports/
     my-transport/
+      index.js
+  autocomplete/
+    my-autocomplete/
+      index.js
+  favicon/
+    my-favicon/
+      index.js
+  shortcuts/
+    my-shortcut/
       index.js</code></pre>
 <p>
-  Your plugin, theme, engine, and transport folders use the exact same format as
-  they do when installed directly in your
+  Each extension folder uses the same format it has when installed directly
+  in your
   <code>data</code> folders. You do not need any extra packaging.
 </p>
 
@@ -68,6 +78,29 @@
   ],
   "engines": [],
   "transports": [],
+  "autocomplete": [
+    {
+      "path": "autocomplete/my-autocomplete",
+      "name": "My Autocomplete",
+      "description": "Suggestions from somewhere",
+      "version": "1.0.0"
+    }
+  ],
+  "favicon": [
+    {
+      "path": "favicon/my-favicon",
+      "name": "My Favicon Provider",
+      "description": "Icons from icons.example.com"
+    }
+  ],
+  "shortcuts": [
+    {
+      "path": "shortcuts/my-shortcut",
+      "name": "My Shortcut",
+      "description": "What the key does",
+      "version": "1.0.0"
+    }
+  ],
   "repo-image": "logo.png"
 }</code></pre>
 <ul>
@@ -97,11 +130,20 @@
   Only the items you explicitly list here will appear in the Store. Make sure
   your paths match your actual folders.
 </p>
+<p>
+  The manifest keys are <code>plugins</code>, <code>themes</code>,
+  <code>engines</code>, <code>transports</code>, <code>autocomplete</code>,
+  <code>favicon</code> and <code>shortcuts</code>. <code>autocomplete</code>
+  and <code>favicon</code> are singular and <code>shortcuts</code> is plural.
+  The Store ignores a misspelled key and everything under it. <a href="developer-autocomplete.html">Autocomplete</a>,
+  <a href="developer-favicon.html">Favicon providers</a> and
+  <a href="developer-shortcuts.html">Shortcuts</a> cover what goes in those
+  folders.
+</p>
 
 <h2>Optional author.json and screenshots</h2>
 <p>
-  Inside any plugin, theme, engine, or transport folder you can include a few
-  extra details:
+  Inside any extension folder you can include a few extra details:
 </p>
 <ul>
   <li>

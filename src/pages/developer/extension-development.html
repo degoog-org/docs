@@ -87,6 +87,7 @@
   // ctx.routeUrl("path") builds /api/plugin/&lt;ctx.pluginId&gt;/path
   // ctx.readFile is an async function to read any file from your plugin folder
   // ctx.signProxyUrl(url) returns a signed /api/proxy/image URL for any external image
+  // ctx.signFaviconUrl(url) returns a signed /api/proxy/favicon URL for the url's host, or "" when no favicon provider is enabled
   // ctx.fetch(url, init?) is a proxy-aware fetch, respects your outgoing proxy settings
   // ctx.useCache(namespace, defaultTtlMs) returns an async TTL cache { get, set, delete, clear }
 }</code></pre>
@@ -397,7 +398,9 @@
     <code>context</code> includes <code>clientIp</code>;
     <code>results</code> (only when <code>waitForResults: true</code>);
     proxy-aware <code>fetch(url, init?)</code>;
-    <code>signProxyUrl(url)</code> for external images; and
+    <code>signProxyUrl(url)</code> for external images;
+    <code>signFaviconUrl(url)</code> for a result's favicon, which returns an
+    empty string when no favicon provider is enabled; and
     <code>useCache(namespace, defaultTtlMs)</code> for the same async TTL cache
     factory as in <code>init(ctx)</code>. Note that the results array is only
     populated if you set <code>waitForResults: true</code> on your plugin.
@@ -868,15 +871,27 @@ export default {
 </table>
 <p>
   Use <code>context.signProxyUrl(url)</code> to route external images through
-  the server proxy. Doing so means you can declare
+  the server proxy, and <code>context.signFaviconUrl(url)</code> for a
+  site's favicon. Doing so means you can declare
   <code>isClientExposed: false</code>.
+</p>
+<p>
+  Never build <code>/api/proxy/favicon</code> URLs by hand. The proxy rejects
+  any request without a valid <code>sig</code>, so hand-built URLs get a
+  <code>403</code>. Don't reuse the <code>favicon</code> field on
+  <code>context.results</code> either. It comes back from the browser and
+  isn't covered by the result seal, so sign the favicon on the server from
+  the result's <code>url</code>.
 </p>
 <pre><code>export const slot = {
   name: "My Slot",
   isClientExposed: false, // all images are proxied via signProxyUrl
   async execute(query, context) {
     const imgUrl = context.signProxyUrl("https://example.com/cover.jpg");
-    return { html: `&lt;img src="${imgUrl}"&gt;` };
+    const favicon = context.signFaviconUrl("https://example.com/page");
+    return {
+      html: `&lt;img src="${imgUrl}"&gt;` + (favicon ? `&lt;img src="${favicon}"&gt;` : ""),
+    };
   },
 };</code></pre>
 <pre><code>export const slot = {

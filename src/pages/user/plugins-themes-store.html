@@ -63,7 +63,8 @@
 <h2 id="browsing">Finding things</h2>
 <p>
   The catalogue has a search box and two filters: extension type (Plugins,
-  Themes, Engines, Transports, Autocomplete) and, for plugins, a sub-type filter
+  Themes, Engines, Transports, Autocomplete, Favicons, Shortcuts) and, for
+  plugins, a sub-type filter
   (Bang, Slot, Search tab, Search bar). Extensions with screenshots get a
   gallery you can open in a lightbox.
 </p>
@@ -107,6 +108,13 @@
   autocomplete providers, and themes all need enabling or selecting; some need
   configuration before they do anything. A "Needs configuration" badge tells you
   which.
+</p>
+<p>
+  Favicon extensions supply the icon next to each result. Without one, every
+  result shows a "No favicon extension installed" placeholder. The official
+  store has Google, DuckDuckGo, Kagi, Yandex, Site favicon (experimental)
+  and Identicon, which works offline. Install one or two and set the order
+  in <a href="settings.html#favicons">Settings, Favicons</a>.
 </p>
 <p>
   Some extensions need a server restart to load properly. Degoog shows a banner
@@ -154,9 +162,9 @@
     third parties.
   </li>
   <li>
-    <code>DEGOOG_OUTGOING_ALLOWED_HOSTS</code> restricts every outgoing request
-    to a hostname allowlist, which is a solid extra layer on an exposed
-    instance.
+    <code>DEGOOG_OUTGOING_ALLOWED_HOSTS</code> restricts the requests engines
+    and extensions make to a hostname allowlist, which is a solid extra layer
+    on an exposed instance.
   </li>
 </ul>
 
