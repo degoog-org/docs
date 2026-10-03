@@ -69,6 +69,20 @@
         <em>Configure, Advanced</em>, or leave it disabled.
       </td>
     </tr>
+    <tr>
+      <td>Network error</td>
+      <td>
+        The request never made it out. A classic cause is picking Curl
+        Impersonate without the binary installed, and the server logs will say
+        "No curl-impersonate binary found".
+      </td>
+    </tr>
+    <tr>
+      <td>No usable response from this engine</td>
+      <td>
+        Something came back, but nothing in it looked like results.
+      </td>
+    </tr>
   </tbody>
 </table>
 <p>
@@ -76,6 +90,21 @@
   that engine, which is much faster than reloading the whole search while you
   experiment.
 </p>
+<p>
+  The reason doesn't sit there in plain sight though. A failed engine just says
+  <strong>0 results</strong> with a dotted underline, and you have to hover it
+  to get the tooltip.
+</p>
+
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/engine-failure-reason-light.webp"
+    alt="The engine list in the results sidebar. Degoog shows 57 from your index. Under it, a tooltip reading Rate limited (429) covers the next engine's name, whose line says 0 results with a dotted underline and has a retry link."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/engine-failure-reason-dark.webp"
+    alt="The engine list in the results sidebar. Degoog shows 57 from your index. Under it, a tooltip reading Rate limited (429) covers the next engine's name, whose line says 0 results with a dotted underline and has a retry link."
+    loading="lazy" />
+  <figcaption>Hover the dotted 0 results to see why an engine failed.</figcaption>
+</figure>
 
 <h2 id="google">Google</h2>
 <p>
@@ -94,7 +123,9 @@
     It works over any transport, including plain <code>fetch</code> or
     <code>curl</code>, and needs no extra infrastructure. Titles and snippets
     are thinner than the real thing, but it is reliable and it is the right
-    starting point.
+    starting point. Google does rate-limit that page per IP though, so busy
+    instances start getting CAPTCHAs, and 4play is still the recommended
+    transport for either mode.
   </li>
   <li>
     <strong>HTML results</strong> fetch the full desktop results page. Much
@@ -171,8 +202,9 @@
         <a href="https://github.com/lexiforest/curl-impersonate" class="external" target="_blank"
           rel="noopener">curl-impersonate</a>
         to mimic Firefox's TLS fingerprint. For sites that block on the TLS
-        handshake rather than on headers. Only appears as an option when the
-        binary is on <code>PATH</code>.
+        handshake rather than on headers. Needs the binary on <code>PATH</code>,
+        but it shows up in the list either way, so if you pick it without the
+        binary the engine just fails with "Network error".
       </td>
     </tr>
     <tr>
@@ -204,15 +236,52 @@
       <td>The same idea with stealth Firefox.</td>
     </tr>
     <tr>
-      <td><strong>4play (lolcat)</strong> and <strong>degoog-4play</strong></td>
+      <td><strong>4play (lolcat)</strong></td>
       <td>Store</td>
       <td>
         A real browser on your own machine, lending its session to the server.
-        The strongest option, and the one Google's HTML and JSON modes expect.
+        The strongest option, and the one Google's HTML mode expects. The older
+        degoog-4play transport is deprecated.
       </td>
     </tr>
   </tbody>
 </table>
+<p>To actually switch an engine over:</p>
+<ol class="doc-steps">
+  <li>
+    <p>
+      Open <strong>Settings &gt; Engines</strong> and hit
+      <strong>Configure</strong> on the engine that keeps failing.
+    </p>
+  </li>
+  <li>
+    <p>
+      Flip the <strong>Advanced</strong> switch on. The transport picker is
+      hidden until you do.
+    </p>
+    <figure class="doc-shot">
+      <img class="doc-shot-light" src="images/screenshots/guide/engine-configure-advanced-light.webp"
+        alt="The Configure Brave Search window with Advanced switched on. It shows Score set to 1, Outgoing HTTP client set to Curl Fallback, Timeout set to 10000 and an empty Custom user agents box, with a Save button at the bottom."
+        loading="lazy" />
+      <img class="doc-shot-dark" src="images/screenshots/guide/engine-configure-advanced-dark.webp"
+        alt="The Configure Brave Search window with Advanced switched on. It shows Score set to 1, Outgoing HTTP client set to Curl Fallback, Timeout set to 10000 and an empty Custom user agents box, with a Save button at the bottom."
+        loading="lazy" />
+      <figcaption>The transport lives under Advanced, in Outgoing HTTP client.</figcaption>
+    </figure>
+  </li>
+  <li>
+    <p>
+      Pick a transport in <strong>Outgoing HTTP client</strong> and press
+      <strong>Save</strong>.
+    </p>
+  </li>
+  <li>
+    <p>
+      Hit <strong>retry</strong> next to the engine in the results sidebar to
+      try it without rerunning the whole search.
+    </p>
+  </li>
+</ol>
 
 <h3 id="curl-impersonate">Installing curl-impersonate</h3>
 <p>On macOS:</p>
@@ -398,8 +467,9 @@ chmod +x /usr/local/bin/curl_firefox133</code></pre>
     them means they resurface even when an upstream engine is having a bad day.
   </li>
   <li>
-    <strong>Restart when Degoog asks.</strong> Some extensions show a "Server
-    restart required" warning. The banner in <em>Settings, General</em> has a
-    button that does it for you.
+    <strong>Restart when Degoog asks.</strong> Some extensions show a "Restart
+    required" window when they need it, with a button that does it for you.
+    <strong>Settings &gt; Server &gt; Restart server</strong> does the same if
+    you clicked "Not now".
   </li>
 </ul>

@@ -19,6 +19,11 @@ weather london !weather</code></pre>
   <code>!IP</code> and <code>!ip</code> both work.
 </p>
 <p>
+  There's also a type prefix, which isn't a bang but lives next to them. Put a
+  search type and a colon in front of your query, like
+  <code>images:adam sandler</code>, and Degoog opens that tab straight away.
+</p>
+<p>
   Not sure what you have? Type <code>!help</code>. It lists every command your
   instance can currently run, grouped into <strong>Built-in</strong>,
   <strong>Plugins</strong>, and <strong>Engine shortcuts</strong>, with a search
@@ -26,10 +31,23 @@ weather london !weather</code></pre>
   are left out, so what you see is what will actually work.
 </p>
 
-<figure class="doc-screenshot-image-wrapper">
-  <img class="doc-screenshot-image" src="images/screenshots/help-bang.png"
-    data-screenshot-target="images/screenshots/help-bang.png" alt="The !help command output" />
-  <figcaption>The <code>!help</code> command output.</figcaption>
+<figure class="doc-shot doc-shot-small">
+  <img class="doc-shot-light" src="images/screenshots/guide/help-builtin-light.webp"
+    alt="The !help output. A Search commands box, the hint Search with a type prefix: images:query, and two groups on the left, Built-in with 5 and Engine shortcuts with 5. Built-in is selected and lists !help, !ip, !nojs with its aliases !no-js and !nojavascript, and !speedtest."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/help-builtin-dark.webp"
+    alt="The !help output. A Search commands box, the hint Search with a type prefix: images:query, and two groups on the left, Built-in with 5 and Engine shortcuts with 5. Built-in is selected and lists !help, !ip, !nojs with its aliases !no-js and !nojavascript, and !speedtest."
+    loading="lazy" />
+  <figcaption>The Built-in group in !help.</figcaption>
+</figure>
+<figure class="doc-shot doc-shot-small">
+  <img class="doc-shot-light" src="images/screenshots/guide/help-engine-shortcuts-light.webp"
+    alt="The same !help output with Engine shortcuts selected, listing !degoog Degoog only, !brave Brave Search only, !ddg DuckDuckGo only, !ddgi DuckDuckGo Images only and !w Wikipedia only."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/help-engine-shortcuts-dark.webp"
+    alt="The same !help output with Engine shortcuts selected, listing !degoog Degoog only, !brave Brave Search only, !ddg DuckDuckGo only, !ddgi DuckDuckGo Images only and !w Wikipedia only."
+    loading="lazy" />
+  <figcaption>The Engine shortcuts group, one bang per installed engine that has one.</figcaption>
 </figure>
 
 <h2 id="built-in">The four built-in commands</h2>
@@ -73,6 +91,12 @@ weather london !weather</code></pre>
   </tbody>
 </table>
 <p>
+  Turn on the <a href="nojs.html">no-JS page</a> and you get a fifth one,
+  <code>!nojs</code> (also <code>!no-js</code> and <code>!nojavascript</code>).
+  On its own it opens the JavaScript-free page, and with a query it runs the
+  search there.
+</p>
+<p>
   There are also two built-in panels that are not commands and appear on their
   own: <strong>At a glance</strong> pulls a readable excerpt from the top result
   and shows it above your results, and <strong>Wikipedia</strong> puts a summary
@@ -93,6 +117,21 @@ weather london !weather</code></pre>
   shortcuts exist depends entirely on which engines you installed.
   <code>!help</code> lists them all under "Engine shortcuts".
 </p>
+<p>
+  The green tag next to an engine's name in Settings, Engines is its
+  bang. An engine you switch off still answers its bang, so you can keep a
+  slow or noisy engine out of normal searches and only call it when you want
+  it.
+</p>
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/bang-engine-shortcut-light.webp"
+    alt="Results for !w adam sandler. Only a Web tab is shown. The results are the Adam Sandler, Adam Sandler filmography and Sadie Sandler Wikipedia articles, each tagged Wikipedia only."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/bang-engine-shortcut-dark.webp"
+    alt="Results for !w adam sandler. Only a Web tab is shown. The results are the Adam Sandler, Adam Sandler filmography and Sadie Sandler Wikipedia articles, each tagged Wikipedia only."
+    loading="lazy" />
+  <figcaption>!w adam sandler, answered by Wikipedia alone.</figcaption>
+</figure>
 
 <h2 id="natural-language">Natural language mode</h2>
 <p>
@@ -169,7 +208,7 @@ weather london !weather</code></pre>
     </tr>
     <tr>
       <td><code>!qr</code></td>
-      <td>Generates a QR code for a URL.</td>
+      <td>Generates a QR code for a URL. Also <code>!qrcode</code>.</td>
     </tr>
     <tr>
       <td><code>!password</code></td>
@@ -182,6 +221,7 @@ weather london !weather</code></pre>
       <td><code>!colors</code></td>
       <td>
         Five-colour palette generator. Space shuffles, click locks a colour.
+        Also <code>!palette</code>, <code>!colours</code>.
       </td>
     </tr>
     <tr>

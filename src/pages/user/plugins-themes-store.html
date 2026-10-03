@@ -18,21 +18,31 @@
   vetting the code on your behalf.
 </p>
 
-<figure class="doc-screenshot-image-wrapper">
-  <img class="doc-screenshot-image" src="images/screenshots/store-page.png"
-    data-screenshot-target="images/screenshots/store-page.png"
-    alt="The Store tab: repositories on top, catalogue underneath." />
-  <figcaption>
-    The Store tab, with repositories on top and the catalogue underneath.
-  </figcaption>
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/store-overview-light.webp"
+    alt="The Store tab in settings. A Repositories box at the top has Refresh all and Add repository buttons and the official repository logo. Below it, the Catalog has a search box, two drop-downs and cards for 4play status, AI Summary and Weather."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/store-overview-dark.webp"
+    alt="The Store tab in settings. A Repositories box at the top has Refresh all and Add repository buttons and the official repository logo. Below it, the Catalog has a search box, two drop-downs and cards for 4play status, AI Summary and Weather."
+    loading="lazy" />
+  <figcaption>The Store tab, with repositories on top and the catalogue underneath.</figcaption>
 </figure>
 
 <h2 id="repositories">Adding a repository</h2>
 <ol>
   <li>Open <em>Settings, Store</em>.</li>
   <li>
-    Paste a git URL into <strong>Add repository</strong> and press
-    <strong>Add</strong>.
+    Press <strong>Add repository</strong>, paste a git URL into the box that
+    shows up and press <strong>+</strong>.
+    <figure class="doc-shot">
+      <img class="doc-shot-light" src="images/screenshots/guide/store-add-repository-light.webp"
+        alt="The Repositories box with a URL field under the Add repository button. The field contains https://github.com/someone/their-degoog-extensions and a blue plus button sits on its right."
+        loading="lazy" />
+      <img class="doc-shot-dark" src="images/screenshots/guide/store-add-repository-dark.webp"
+        alt="The Repositories box with a URL field under the Add repository button. The field contains https://github.com/someone/their-degoog-extensions and a blue plus button sits on its right."
+        loading="lazy" />
+      <figcaption>The URL box that Add repository opens.</figcaption>
+    </figure>
   </li>
   <li>
     The catalogue below fills in with everything that repository publishes.
@@ -54,11 +64,22 @@
   </li>
 </ul>
 <p>
-  Each repository row shows when it was last refreshed and has a
+  Repositories show up as a row of logos. Click one to open it, and it
+  shows when it was last refreshed and has a
   <strong>Refresh</strong> button; <strong>Refresh all</strong> does the lot.
   <strong>Remove</strong> deletes a repository, but only once you have
-  uninstalled everything you installed from it.
+  uninstalled everything you installed from it. The official one can't be
+  removed, so it has no Remove button.
 </p>
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/store-repository-details-light.webp"
+    alt="The Repositories box after clicking the official logo. Below the logo it shows official-extensions, the URL https://github.com/degoog-org/official-extensions.git, the text just now and a Refresh button."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/store-repository-details-dark.webp"
+    alt="The Repositories box after clicking the official logo. Below the logo it shows official-extensions, the URL https://github.com/degoog-org/official-extensions.git, the text just now and a Refresh button."
+    loading="lazy" />
+  <figcaption>The official repository, opened by clicking its logo.</figcaption>
+</figure>
 
 <h2 id="browsing">Finding things</h2>
 <p>
@@ -68,6 +89,19 @@
   (Bang, Slot, Search tab, Search bar). Extensions with screenshots get a
   gallery you can open in a lightbox.
 </p>
+<p>
+  Engines get a sub-type filter too, by search type (Web, Images, News and so
+  on), and the last drop-down filters by whether you have it installed.
+</p>
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/store-engines-filter-light.webp"
+    alt="The Store catalog with the type drop-down set to Engines. Cards for Google, Google CSE, Google Images, Google Videos, Bing and Bing Images each have an Install button."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/store-engines-filter-dark.webp"
+    alt="The Store catalog with the type drop-down set to Engines. Cards for Google, Google CSE, Google Images, Google Videos, Bing and Bing Images each have an Install button."
+    loading="lazy" />
+  <figcaption>The catalogue filtered down to engines.</figcaption>
+</figure>
 <p>The four plugin sub-types, in plain terms:</p>
 <ul>
   <li>
@@ -99,15 +133,28 @@
   confirmation first, because plugins run code on your server.
 </p>
 <p>
+  Once it's in, the card gets a green dot and an <strong>Uninstall</strong>
+  button where Install used to be.
+</p>
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/store-installed-card-light.webp"
+    alt="Three Store cards. DuckDuckGo and DuckDuckGo Images show a green dot and an Uninstall button. DuckDuckGo News still shows a blue Install button."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/store-installed-card-dark.webp"
+    alt="Three Store cards. DuckDuckGo and DuckDuckGo Images show a green dot and an Uninstall button. DuckDuckGo News still shows a blue Install button."
+    loading="lazy" />
+  <figcaption>Two installed engines next to one that is not.</figcaption>
+</figure>
+<p>
   When newer versions exist, the Store shows an update count and an
   <strong>Update all</strong> button. Individual items get their own
   <strong>Update</strong>.
 </p>
 <p>
-  After installing, go to the matching tab to switch it on. Engines,
-  autocomplete providers, and themes all need enabling or selecting; some need
-  configuration before they do anything. A "Needs configuration" badge tells you
-  which.
+  After installing, go to the matching tab to check it. Engines and
+  autocomplete providers come switched on, themes need selecting; some need
+  configuration before they do anything. Hover the dot next to Configure and
+  it tells you if one needs configuration.
 </p>
 <p>
   Favicon extensions supply the icon next to each result. Without one, and
@@ -118,8 +165,9 @@
   in <a href="settings.html#favicons">Settings, Favicons</a>.
 </p>
 <p>
-  Some extensions need a server restart to load properly. Degoog shows a banner
-  in <em>Settings, General</em> with a button that does it.
+  Some extensions need a server restart to load properly. Degoog shows a
+  "Restart required" pop-up with a button that does it, or you can hit
+  <strong>Restart server</strong> later from Settings, Server.
 </p>
 
 <h2 id="themes">Themes</h2>
@@ -161,6 +209,18 @@
     Read the exposure note on an extension card. "Browser may contact external
     services directly" means your own browser, not just the server, will talk to
     third parties.
+    It's the little icon in front of the name in the settings tabs: a green
+    tick means everything goes through your server, a yellow warning triangle
+    means it doesn't. Hover it to read the note.
+    <figure class="doc-shot">
+      <img class="doc-shot-light" src="images/screenshots/guide/exposure-icons-light.webp"
+        alt="The Plugins tab. Help and No-JS page have a green tick before their name. IP Lookup has a yellow warning triangle, and hovering it shows the tooltip Browser may contact external services directly."
+        loading="lazy" />
+      <img class="doc-shot-dark" src="images/screenshots/guide/exposure-icons-dark.webp"
+        alt="The Plugins tab. Help and No-JS page have a green tick before their name. IP Lookup has a yellow warning triangle, and hovering it shows the tooltip Browser may contact external services directly."
+        loading="lazy" />
+      <figcaption>The warning triangle on IP Lookup, with its note.</figcaption>
+    </figure>
   </li>
   <li>
     <code>DEGOOG_OUTGOING_ALLOWED_HOSTS</code> restricts the requests engines

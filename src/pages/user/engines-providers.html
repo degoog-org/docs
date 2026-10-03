@@ -18,12 +18,20 @@
   <a href="plugins-themes-store.html">Store</a> first.
 </p>
 
-<figure class="doc-screenshot-image-wrapper">
-  <img class="doc-screenshot-image" src="images/screenshots/settings-engines.png"
-    data-screenshot-target="images/screenshots/settings-engines.png"
-    alt="The Engines tab, with engines grouped by search type." />
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/engines-tab-light.webp"
+    alt="The Engines tab. A Search tabs card with Order tabs, Save as instance defaults and Reset to instance defaults buttons. Under Web: Degoog, Brave Search, DuckDuckGo and Wikipedia, each with a green bang tag such as !ddg. Brave Search is switched off and reads 'Off in normal searches, still works with !brave.' Under Images: Bing Images."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/engines-tab-dark.webp"
+    alt="The Engines tab. A Search tabs card with Order tabs, Save as instance defaults and Reset to instance defaults buttons. Under Web: Degoog, Brave Search, DuckDuckGo and Wikipedia, each with a green bang tag such as !ddg. Brave Search is switched off and reads 'Off in normal searches, still works with !brave.' Under Images: Bing Images."
+    loading="lazy" />
   <figcaption>The Engines tab, with engines grouped by search type.</figcaption>
 </figure>
+<p>
+  The green tag next to an engine's name is its bang. Switch an engine off and
+  it stops running on normal searches, but its bang still works, so
+  <code>!brave adam sandler</code> searches Brave even while it's off.
+</p>
 
 <h3 id="engine-types">Types and tabs</h3>
 <p>
@@ -40,15 +48,26 @@
 <p>
   <strong>Order tabs</strong> at the top of the Engines tab opens a
   drag-and-drop list so you can put Images before News, or whatever suits how
-  you search.
+  you search. There's no save button, the order sticks as soon as you drop a
+  tab, and it's the same for everyone on the instance.
 </p>
+<figure class="doc-shot doc-shot-small">
+  <img class="doc-shot-light" src="images/screenshots/guide/order-tabs-light.webp"
+    alt="The Order tabs window with two rows, Web and Images, each with a drag handle on the right."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/order-tabs-dark.webp"
+    alt="The Order tabs window with two rows, Web and Images, each with a drag handle on the right."
+    loading="lazy" />
+  <figcaption>Drag the handles to reorder the result tabs.</figcaption>
+</figure>
 
 <h3 id="engine-config">Configuring an engine</h3>
 <p>
   <strong>Configure</strong> on an engine card opens its settings. What is
   inside varies by engine (safe search, results format, API keys, instance
-  URLs), but three options are added by Degoog to every engine, under
-  <strong>Advanced</strong>:
+  URLs), but six options are added by Degoog to every engine, under
+  <strong>Advanced</strong>. Flip the Advanced switch in the window to see
+  them:
 </p>
 <table>
   <thead>
@@ -79,14 +98,83 @@
         default.
       </td>
     </tr>
+    <tr>
+      <td><strong>Custom user agents</strong></td>
+      <td>
+        One user agent per line. Degoog picks a random one for each request
+        this engine makes.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Override proxies</strong></td>
+      <td>
+        Gives this engine its own proxy list and ignores the global one from
+        <a href="server-settings.html#proxy">Server settings</a>. Turning it on
+        shows a <strong>Proxy override list</strong> box.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Engine type override</strong></td>
+      <td>
+        Changes which tabs this engine runs in. Use one type, like
+        <code>images</code>, or a comma separated list. Leave blank to keep the
+        engine's own types.
+      </td>
+    </tr>
   </tbody>
 </table>
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/engine-configure-advanced-light.webp"
+    alt="The Configure Brave Search window. Safe search is set to Moderate. The Advanced switch is on, showing Score set to 1, Outgoing HTTP client set to Curl Fallback, Timeout set to 10000 and an empty Custom user agents box. A Save button is at the bottom."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/engine-configure-advanced-dark.webp"
+    alt="The Configure Brave Search window. Safe search is set to Moderate. The Advanced switch is on, showing Score set to 1, Outgoing HTTP client set to Curl Fallback, Timeout set to 10000 and an empty Custom user agents box. A Save button is at the bottom."
+    loading="lazy" />
+  <figcaption>An engine's Configure window with Advanced switched on.</figcaption>
+</figure>
+
+<h4 id="fix-blocked-engine">When an engine keeps getting blocked</h4>
+<ol class="doc-steps">
+  <li>
+    <p>
+      Search for something and look at the sidebar. A failing engine shows
+      <strong>0 results</strong> with a dotted underline. Hover it and the
+      reason pops up, like "Rate limited (429)" or "Blocked by the engine".
+    </p>
+    <figure class="doc-shot doc-shot-small">
+      <img class="doc-shot-light" src="images/screenshots/guide/engine-failure-reason-light.webp"
+        alt="The engine list in the results sidebar. A dark tooltip reading 'Rate limited (429)' sits above an engine that shows '0 results' with a dotted underline. DuckDuckGo shows 10 results and Wikipedia 15 results, each with a retry link."
+        loading="lazy" />
+      <img class="doc-shot-dark" src="images/screenshots/guide/engine-failure-reason-dark.webp"
+        alt="The engine list in the results sidebar. A dark tooltip reading 'Rate limited (429)' sits above an engine that shows '0 results' with a dotted underline. DuckDuckGo shows 10 results and Wikipedia 15 results, each with a retry link."
+        loading="lazy" />
+      <figcaption>Hover "0 results" to see why an engine failed.</figcaption>
+    </figure>
+  </li>
+  <li>
+    <p>
+      Go to <strong>Settings, Engines</strong>, hit <strong>Configure</strong>
+      on that engine and flip the <strong>Advanced</strong> switch.
+    </p>
+  </li>
+  <li>
+    <p>
+      Pick a different <strong>Outgoing HTTP client</strong>, hit
+      <strong>Save</strong>, then press <strong>retry</strong> next to the
+      engine in the sidebar.
+    </p>
+  </li>
+</ol>
+<p>
+  Not sure which one to pick? <a href="tips-and-tricks.html">Tips and tricks</a>
+  has the pairings that are known to work.
+</p>
 <p>Cards also carry small status badges:</p>
 <ul>
   <li>
-    <strong>Configured</strong> or <strong>Needs configuration</strong>, so you
-    can spot the engine that is silently doing nothing because it wants an API
-    key.
+    <strong>Configured</strong> or <strong>Needs configuration</strong>, shown
+    when you hover the dot next to Configure, so you can spot the engine that
+    is silently doing nothing because it wants an API key.
   </li>
   <li>
     <strong>Requires a newer version of Degoog</strong>, when an extension
@@ -99,9 +187,20 @@
   <li>
     An exposure note: either "Browser requests go through the server" or
     "Browser may contact external services directly". Worth reading if you care
-    about what your own browser is talking to.
+    about what your own browser is talking to. It shows as a little icon in
+    front of the name, a green tick for the first and an orange warning
+    triangle for the second, and hovering it shows the text.
   </li>
 </ul>
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/exposure-icons-light.webp"
+    alt="The Plugins tab. Help has a green tick in front of its name. IP Lookup has an orange warning triangle, and a tooltip next to it reads 'Browser may contact external services directly'. No-JS page has a green tick."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/exposure-icons-dark.webp"
+    alt="The Plugins tab. Help has a green tick in front of its name. IP Lookup has an orange warning triangle, and a tooltip next to it reads 'Browser may contact external services directly'. No-JS page has a green tick."
+    loading="lazy" />
+  <figcaption>The exposure icon in front of each name. Hover it for the full note.</figcaption>
+</figure>
 
 <h3 id="engine-defaults">Your engines versus the instance's</h3>
 <p>
@@ -117,8 +216,8 @@
   Degoog can run SearXNG's own engine files directly, inside Degoog, with no
   separate SearXNG instance. Enable it in
   <em>Settings, Server, SearX compatibility layer</em> and a
-  <strong>SearX engines</strong> section appears in the Engines tab with an
-  <strong>Add from SearX</strong> button.
+  <strong>Compatibility layers</strong> box appears in the Engines tab with a
+  <strong>Browse SearX engines</strong> button.
 </p>
 <p>
   It is marked experimental for good reasons, and the UI is upfront about them:
@@ -169,6 +268,15 @@
   mostly gets you six copies of the same suggestion. One or two is usually
   plenty.
 </p>
+<figure class="doc-shot doc-shot-small">
+  <img class="doc-shot-light" src="images/screenshots/guide/autocomplete-light.webp"
+    alt="The home page search box with 'adam sand' typed. A list of suggestions below starts with 'adam sandler', and each suggestion has DuckDuckGo written on the right."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/autocomplete-dark.webp"
+    alt="The home page search box with 'adam sand' typed. A list of suggestions below starts with 'adam sandler', and each suggestion has DuckDuckGo written on the right."
+    loading="lazy" />
+  <figcaption>Suggestions from the DuckDuckGo provider, with its name on each row.</figcaption>
+</figure>
 <p>
   The <strong>Autocomplete delay</strong> in
   <a href="server-settings.html">Server settings</a> controls how long Degoog
@@ -194,6 +302,15 @@
   checks the <a href="indexer.html#favicon-store">favicon store</a> before
   any provider.
 </p>
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/favicons-tab-light.webp"
+    alt="The Favicons tab. A row of seven favicon shapes with the note 'Custom themes may ignore this.' Below it a Degoog card that is switched on, then Google Favicons and DuckDuckGo Favicons, each with a Configure button, a switch and a drag handle."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/favicons-tab-dark.webp"
+    alt="The Favicons tab. A row of seven favicon shapes with the note 'Custom themes may ignore this.' Below it a Degoog card that is switched on, then Google Favicons and DuckDuckGo Favicons, each with a Configure button, a switch and a drag handle."
+    loading="lazy" />
+  <figcaption>Drag the provider cards to change the order Degoog asks them in.</figcaption>
+</figure>
 <p>
   If no provider is enabled but the indexer and its favicon store are on,
   results still get the icons the store has saved, and a letter for every
@@ -251,16 +368,18 @@
     <tr>
       <td><strong>Curl Impersonate</strong></td>
       <td>
-        Uses curl-impersonate to mimic Firefox's TLS fingerprint. Only offered
-        when the binary is on <code>PATH</code>.
+        Uses curl-impersonate to mimic Firefox's TLS fingerprint. It's listed
+        even when the binary isn't on <code>PATH</code>, in which case the
+        engine just fails with "Network error" and the server log says
+        "No curl-impersonate binary found".
       </td>
     </tr>
   </tbody>
 </table>
 <p>
   The Store adds heavier options: FlareSolverr for Cloudflare challenges,
-  Browserless and the stealth browsers CloakBrowser and Camoufox, and the two
-  4play transports that borrow a real browser session.
+  Browserless and the stealth browsers CloakBrowser and Camoufox, and the
+  4play transport that borrows a real browser session.
 </p>
 <p>
   The Transports tab has a <strong>Test Connection</strong> button on transports

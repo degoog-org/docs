@@ -6,10 +6,14 @@
   </p>
 </div>
 
-<figure class="doc-screenshot-image-wrapper">
-  <img class="doc-screenshot-image" src="images/screenshots/autocomplete-preview.png"
-    data-screenshot-target="images/screenshots/autocomplete-preview.png" alt="Autocomplete preview" />
-  <figcaption>Autocomplete preview.</figcaption>
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/autocomplete-light.webp"
+    alt="The home page search box with adam sand typed in it. Eight suggestions starting with adam sandler are listed underneath, each with DuckDuckGo in grey on the right."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/autocomplete-dark.webp"
+    alt="The home page search box with adam sand typed in it. Eight suggestions starting with adam sandler are listed underneath, each with DuckDuckGo in grey on the right."
+    loading="lazy" />
+  <figcaption>Autocomplete, with the provider's name on the right of each suggestion.</figcaption>
 </figure>
 
 <h2 id="autocomplete">Autocomplete</h2>
@@ -49,6 +53,15 @@
   The <strong>Filter</strong> button next to the tabs opens a small panel with
   two controls:
 </p>
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/filter-time-light.webp"
+    alt="The Web and Images tabs with Filter next to them. Below are Time and Language drop-downs, and the Time list is open showing Any time, Hour, 24 hours, Week, Month, Year and Custom."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/filter-time-dark.webp"
+    alt="The Web and Images tabs with Filter next to them. Below are Time and Language drop-downs, and the Time list is open showing Any time, Hour, 24 hours, Week, Month, Year and Custom."
+    loading="lazy" />
+  <figcaption>The Time filter, open.</figcaption>
+</figure>
 <ul>
   <li>
     <strong>Time.</strong> Any time, past hour, past 24 hours, week, month,
@@ -68,11 +81,21 @@
 
 <h3 id="image-filters">Image filters</h3>
 <p>
-  On an images tab you get a second, richer filter panel: <strong>size</strong>,
+  On an images tab there's no Filter button. The filters live in the sidebar
+  instead, and you get a richer set: <strong>size</strong>,
   <strong>colour</strong>, <strong>type</strong> (photo, clipart, line art,
   animated), <strong>layout</strong> (square, wide, tall), and
   <strong>safe mode</strong> (strict, moderate, off).
 </p>
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/images-tab-light.webp"
+    alt="The Images tab for adam sandler. A grid of photos of Adam Sandler fills the left. The sidebar on the right lists Degoog with 57 from your index and Bing Images with 35 results, then Time, Language, Size, Color, Type, Layout and Safe mode drop-downs."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/images-tab-dark.webp"
+    alt="The Images tab for adam sandler. A grid of photos of Adam Sandler fills the left. The sidebar on the right lists Degoog with 57 from your index and Bing Images with 35 results, then Time, Language, Size, Color, Type, Layout and Safe mode drop-downs."
+    loading="lazy" />
+  <figcaption>Image filters in the sidebar of the Images tab.</figcaption>
+</figure>
 <div class="block-note">
   <p>
     The options you see are the union of what your enabled image engines
@@ -98,7 +121,8 @@
     could not read the response, timed out, network error, blocked by an
     interstitial page, or no usable response. There is a
     <strong>retry</strong> link next to each failure that re-runs only that
-    engine.
+    engine. The reason only shows when you hover the dotted
+    <strong>0 results</strong> under the engine's name.
   </li>
   <li>
     <strong>People also search for.</strong> Related queries, when engines
@@ -115,8 +139,26 @@
   you need a different transport, not a different engine.
   <a href="tips-and-tricks.html">Tips and tricks</a> explains which one.
 </p>
+<figure class="doc-shot doc-shot-small">
+  <img class="doc-shot-light" src="images/screenshots/guide/engine-failure-reason-light.webp"
+    alt="The engine list in the sidebar. Degoog shows 57 from your index. Under it a dark tooltip reading Rate limited (429) sits above a dotted 0 results line and a retry link."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/engine-failure-reason-dark.webp"
+    alt="The engine list in the sidebar. Degoog shows 57 from your index. Under it a dark tooltip reading Rate limited (429) sits above a dotted 0 results line and a retry link."
+    loading="lazy" />
+  <figcaption>Hovering 0 results shows why the engine failed.</figcaption>
+</figure>
 
 <h2 id="results">Reading a result</h2>
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/results-page-light.webp"
+    alt="Results for adam sandler. Web and Images tabs and Filter at the top. An At a glance box quotes IMDb. Below it the IMDb result is tagged Degoog and DuckDuckGo, and the Wikipedia result is tagged Degoog, DuckDuckGo and Wikipedia. A Wikipedia card with his photo is on the right, with the engine list under it."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/results-page-dark.webp"
+    alt="Results for adam sandler. Web and Images tabs and Filter at the top. An At a glance box quotes IMDb. Below it the IMDb result is tagged Degoog and DuckDuckGo, and the Wikipedia result is tagged Degoog, DuckDuckGo and Wikipedia. A Wikipedia card with his photo is on the right, with the engine list under it."
+    loading="lazy" />
+  <figcaption>A results page, with engine tags under each result.</figcaption>
+</figure>
 <ul>
   <li>
     <strong>Sources.</strong> When several engines return the same page, Degoog
@@ -128,7 +170,8 @@
     <code>http://</code>.
   </li>
   <li>
-    <strong>From your index.</strong> Shows when a result came from the
+    <strong>From your index.</strong> Shows as a <strong>Degoog</strong> engine
+    tag (hover it and it says "From your index") when a result came from the
     <a href="indexer.html">Degoog Indexer</a> rather than a live engine.
   </li>
   <li>
@@ -139,7 +182,10 @@
     <em>score</em> it to push that domain up or down in future rankings. These
     are instance-wide rules and are hidden entirely on public or unauthenticated
     instances. The switches live in
-    <a href="server-settings.html#domain-rules">Server settings</a>.
+    <a href="server-settings.html#domain-rules">Server settings</a>, and each
+    action needs two of them on: the <strong>Enable</strong> one and the
+    <strong>Allow ... from search results</strong> one. With only the first,
+    the rule works but the menu won't offer it.
   </li>
   <li>
     <strong>Refresh favicon.</strong> When a site shows an old or wrong icon,
@@ -157,10 +203,94 @@
   </li>
 </ul>
 
+<h3 id="domain-actions">Using the three dots menu</h3>
+<ol class="doc-steps">
+  <li>
+    <p>
+      Hover a result and click the three dots on the right of its address.
+      You get whichever of Block, Replace and Score are switched on, plus
+      Refresh favicon.
+    </p>
+    <figure class="doc-shot">
+      <img class="doc-shot-light" src="images/screenshots/guide/result-domain-menu-light.webp"
+        alt="The Adam Sandler Wikipedia result with its three dots menu open, listing Block this domain, Replace this domain, Score this domain and Refresh favicon."
+        loading="lazy" />
+      <img class="doc-shot-dark" src="images/screenshots/guide/result-domain-menu-dark.webp"
+        alt="The Adam Sandler Wikipedia result with its three dots menu open, listing Block this domain, Replace this domain, Score this domain and Refresh favicon."
+        loading="lazy" />
+      <figcaption>The menu with all three domain actions switched on.</figcaption>
+    </figure>
+  </li>
+  <li>
+    <p>
+      <strong>Block this domain</strong> asks you to confirm, then hides the
+      domain from every result for everyone on the instance.
+    </p>
+    <figure class="doc-shot doc-shot-small">
+      <img class="doc-shot-light" src="images/screenshots/guide/block-domain-dialog-light.webp"
+        alt="A dialog titled Block domain? reading en.wikipedia.org - This domain will be removed from all results, with Cancel and Confirm buttons."
+        loading="lazy" />
+      <img class="doc-shot-dark" src="images/screenshots/guide/block-domain-dialog-dark.webp"
+        alt="A dialog titled Block domain? reading en.wikipedia.org - This domain will be removed from all results, with Cancel and Confirm buttons."
+        loading="lazy" />
+      <figcaption>Blocking a domain.</figcaption>
+    </figure>
+  </li>
+  <li>
+    <p>
+      <strong>Replace this domain</strong> asks which domain to send it to.
+      Type something like <code>wikiless.example.org</code> and confirm, and
+      every link to that domain gets rewritten straight away.
+    </p>
+    <figure class="doc-shot doc-shot-small">
+      <img class="doc-shot-light" src="images/screenshots/guide/replace-domain-dialog-light.webp"
+        alt="A dialog titled Replace domain asking Replace with which domain?, with wikiless.example.org typed in the box and Cancel and Confirm buttons."
+        loading="lazy" />
+      <img class="doc-shot-dark" src="images/screenshots/guide/replace-domain-dialog-dark.webp"
+        alt="A dialog titled Replace domain asking Replace with which domain?, with wikiless.example.org typed in the box and Cancel and Confirm buttons."
+        loading="lazy" />
+      <figcaption>Replacing a domain.</figcaption>
+    </figure>
+    <figure class="doc-shot">
+      <img class="doc-shot-light" src="images/screenshots/guide/replace-domain-result-light.webp"
+        alt="The Adam Sandler Wikipedia result, now showing the address wikiless.example.org/wiki/Adam_Sandler."
+        loading="lazy" />
+      <img class="doc-shot-dark" src="images/screenshots/guide/replace-domain-result-dark.webp"
+        alt="The Adam Sandler Wikipedia result, now showing the address wikiless.example.org/wiki/Adam_Sandler."
+        loading="lazy" />
+      <figcaption>The same result after the replace rule.</figcaption>
+    </figure>
+  </li>
+  <li>
+    <p>
+      <strong>Score this domain</strong> asks for a number. Positive pushes the
+      domain up, negative pushes it down. It always starts at 10, even if the
+      domain already has a score.
+    </p>
+    <figure class="doc-shot doc-shot-small">
+      <img class="doc-shot-light" src="images/screenshots/guide/score-domain-dialog-light.webp"
+        alt="A dialog titled Score domain with the text Score for this domain (positive boosts, negative demotes) and the number 10 in the box, with Cancel and Confirm buttons."
+        loading="lazy" />
+      <img class="doc-shot-dark" src="images/screenshots/guide/score-domain-dialog-dark.webp"
+        alt="A dialog titled Score domain with the text Score for this domain (positive boosts, negative demotes) and the number 10 in the box, with Cancel and Confirm buttons."
+        loading="lazy" />
+      <figcaption>Scoring a domain.</figcaption>
+    </figure>
+  </li>
+</ol>
+<p>
+  Every rule you add from here ends up in the lists in
+  <a href="server-settings.html#domain-rules">Server settings</a>, where you
+  can edit or remove it later.
+</p>
+
 <h2 id="media">Images and videos</h2>
 <p>
-  Image results open in a lightbox you can zoom with the scroll wheel (up to
-  eight times) and drag around. Videos and other media open in a preview panel.
+  Clicking an image result opens a preview panel on the right, with
+  <strong>Visit page</strong> and <strong>Download</strong> buttons and arrows
+  for the next and previous image. Click the big image in that panel and it
+  opens in a lightbox you can zoom with the scroll wheel (up to eight times)
+  and drag around. Videos and other media open in a preview panel.
   In both, <kbd>&larr;</kbd> and <kbd>&rarr;</kbd> move between items and
   <kbd>Esc</kbd> closes.
 </p>
@@ -172,9 +302,10 @@
 
 <h2 id="pagination">Pages</h2>
 <p>
-  Results paginate up to <strong>page 10</strong>. That is a hard ceiling in the
-  server, not a UI limit, and it exists because most engines stop being useful
-  (or stop answering politely) well before then.
+  Results paginate for as long as the engines say there are more pages, but
+  most engines stop being useful (or stop answering politely) somewhere around
+  page 10. Whoever runs the instance can swap the page links for infinite
+  scroll in <a href="server-settings.html">Server settings</a>.
 </p>
 
 <h2 id="lucky">I'm Feeling Lucky</h2>
@@ -186,10 +317,19 @@
 
 <h2 id="search-options">Search options worth knowing</h2>
 <p>
-  <em>Settings, General, Search Options</em> holds eight toggles that change how
+  <em>Settings, General, Search Options</em> holds nine toggles that change how
   the results page behaves. They are stored in your browser, so they are yours
   alone:
 </p>
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/general-tab-light.webp"
+    alt="The General settings tab. Appearance is set to System default. Under Search options, Show engine performance, Show related searches, Disable GIF animation in image results and Show publication dates on results are ticked, and the other five boxes are empty."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/general-tab-dark.webp"
+    alt="The General settings tab. Appearance is set to System default. Under Search options, Show engine performance, Show related searches, Disable GIF animation in image results and Show publication dates on results are ticked, and the other five boxes are empty."
+    loading="lazy" />
+  <figcaption>Search options in Settings, General.</figcaption>
+</figure>
 <table>
   <thead>
     <tr>
@@ -216,7 +356,7 @@
     </tr>
     <tr>
       <td>Disable GIF animation in image results</td>
-      <td>Off</td>
+      <td>On</td>
       <td>Freezes animated GIFs in the image grid.</td>
     </tr>
     <tr>
@@ -242,8 +382,19 @@
       <td>Off</td>
       <td>Trims tracking junk off the displayed URL.</td>
     </tr>
+    <tr>
+      <td>Show publication dates on results</td>
+      <td>On</td>
+      <td>Shows the date an engine reports for a result, when it has one.</td>
+    </tr>
   </tbody>
 </table>
+
+<p>
+  Under the toggles, <strong>Engine badges in the results sidebar</strong>
+  picks the little icon next to each engine in the sidebar: the instance
+  default, the engine's favicon, where the engine came from, or nothing.
+</p>
 
 <h2 id="keyboard">Keyboard shortcuts</h2>
 <p>
@@ -259,15 +410,13 @@
   </li>
   <li>Go home and go to settings</li>
   <li>
-    Highlight next result, highlight previous result, and open the highlighted
-    result
+    Highlight next result and highlight previous result (the highlighted
+    result has focus, so <kbd>Enter</kbd> opens it)
   </li>
 </ul>
 <p>
   To rebind one, click it in <em>Settings, Shortcuts</em> and press the key
-  combination you want. <kbd>Esc</kbd> cancels the recording. Shortcuts are off
-  entirely unless keyboard shortcuts are enabled for the instance in
-  <a href="server-settings.html">Server settings</a>.
+  combination you want. <kbd>Esc</kbd> cancels the recording.
 </p>
 
 <h2 id="doc-search">Searching these docs</h2>

@@ -153,6 +153,17 @@ Restart=on-failure</code></pre>
       <td></td>
     </tr>
     <tr>
+      <td><code>DEGOOG_PROXY_ENV_ALLOWLIST</code></td>
+      <td>
+        Comma-separated list of environment variable names that proxy URLs in
+        Server settings may pull in with <code>${NAME}</code>, so proxy
+        passwords can stay out of the settings file. <code>PREFIX_*</code>
+        allows every name starting with <code>PREFIX_</code> and <code>*</code>
+        allows any. Placeholders for names not on the list are left as typed.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
       <td><code>DEGOOG_ANUBIS_MAX_DIFFICULTY</code></td>
       <td>
         The hardest Anubis proof-of-work challenge Degoog will solve for
@@ -161,6 +172,18 @@ Restart=on-failure</code></pre>
         challenge above the limit fails that engine's search.
       </td>
       <td><code>4</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_BODY_SIZE</code></td>
+      <td>
+        The largest request body, in KB, that public routes like search,
+        autocomplete and result panels will read. Anything bigger is refused
+        with a <code>413</code>. Set it to <code>0</code> to remove the limit.
+        <strong>Max request body</strong> in
+        <a href="server-settings.html#rate-limit">server settings</a> overrides
+        it when filled in.
+      </td>
+      <td><code>3072</code></td>
     </tr>
   </tbody>
 </table>
@@ -264,6 +287,22 @@ Restart=on-failure</code></pre>
         nightly testers.
       </td>
       <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_AUTOCOMPLETE_TIMEOUT_MS</code></td>
+      <td>
+        How long an autocomplete provider gets to answer before Degoog gives up
+        on it.
+      </td>
+      <td><code>8000</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_SLOT_TIMEOUT_MS</code></td>
+      <td>
+        How long a slot plugin (a panel above, below or beside the results) gets
+        to answer before Degoog drops it.
+      </td>
+      <td><code>10000</code></td>
     </tr>
     <tr>
       <td><code>DEGOOG_FAVICON_PROVIDER_TIMEOUT_MS</code></td>
@@ -386,6 +425,16 @@ Restart=on-failure</code></pre>
       <td>Group ID the container process runs as.</td>
       <td><code>1000</code></td>
     </tr>
+    <tr>
+      <td><code>DEGOOG_DOCKER</code></td>
+      <td>
+        Set to <code>1</code> to tell Degoog it runs in a container when it
+        cannot spot <code>/.dockerenv</code> itself. Restart server then just
+        exits and leaves the restart to your restart policy, instead of
+        spawning a new process.
+      </td>
+      <td></td>
+    </tr>
   </tbody>
 </table>
 
@@ -442,6 +491,14 @@ Restart=on-failure</code></pre>
       <td><code>DEGOOG_SHORTCUTS_DIR</code></td>
       <td>Installed keyboard shortcuts.</td>
       <td><code>data/shortcuts</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_ENGINE_HOSTS_FILE</code></td>
+      <td>
+        Remembers which site each engine searches, for the engine icons in the
+        results sidebar.
+      </td>
+      <td><code>data/engine-hosts.json</code></td>
     </tr>
     <tr>
       <td><code>DEGOOG_PLUGIN_SETTINGS_FILE</code></td>
@@ -555,15 +612,11 @@ Restart=on-failure</code></pre>
     <tr>
       <td><code>DEGOOG_INDEXER_DIR</code></td>
       <td>
-        Directory holding the index databases, its config, and the favicon
-        store's <code>favicon.db</code>.
+        Directory holding the index databases (one
+        <code>index-&lt;type&gt;.db</code> per search type on SQLite), its
+        config, and the favicon store's <code>favicon.db</code>.
       </td>
       <td><code>data/indexer</code></td>
-    </tr>
-    <tr>
-      <td><code>DEGOOG_INDEXER_DB</code></td>
-      <td>Path to the main SQLite index file.</td>
-      <td><code>data/indexer/index.db</code></td>
     </tr>
     <tr>
       <td><code>DEGOOG_INDEXER_CONFIG_FILE</code></td>
@@ -608,12 +661,43 @@ Restart=on-failure</code></pre>
   </tbody>
 </table>
 
+<h2 id="fourget">4get compatibility layer</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>DEGOOG_FOURGET_DIR</code></td>
+      <td>Where downloaded 4get scrapers are kept.</td>
+      <td><code>data/fourget</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_FOURGET_EXTRA_SCRAPERS</code></td>
+      <td>
+        Comma-separated 4get scraper codes to offer on top of the built-in
+        list. For trying scrapers that have not been checked yet.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_PHP_BIN</code></td>
+      <td>PHP interpreter used to run 4get scrapers. Needs PHP 8.1 or newer.</td>
+      <td><code>php</code></td>
+    </tr>
+  </tbody>
+</table>
+
 <div class="block-note">
   <p>
     The <code>degoog-mcp</code> sidecar has its own
     <code>DEGOOG_MCP_*</code> variables, documented in the
     <a
-      href="https://github.com/degoog-org/degoog/tree/main/mcp"
+      href="https://github.com/degoog-org/mcp"
       class="external"
       target="_blank"
       rel="noopener"

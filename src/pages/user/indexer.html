@@ -21,10 +21,20 @@
   the web.
 </p>
 <p>
-  Results that came from your index are labelled
-  <strong>From your index</strong> on the results page, and the sidebar tells
+  Results that came from your index carry a <strong>Degoog</strong> engine tag
+  (hover it and it says "From your index") on the results page, and the sidebar tells
   you how many of the results came from there.
 </p>
+
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/indexer-results-light.webp"
+    alt="Results for adam sandler films. The top preview says Found on: Degoog, DuckDuckGo, and the sidebar lists Degoog with 41 from your index, followed by DuckDuckGo and Wikipedia."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/indexer-results-dark.webp"
+    alt="Results for adam sandler films. The top preview says Found on: Degoog, DuckDuckGo, and the sidebar lists Degoog with 41 from your index, followed by DuckDuckGo and Wikipedia."
+    loading="lazy" />
+  <figcaption>Results coming back from the index, tagged Degoog.</figcaption>
+</figure>
 
 <h2 id="turning-on">Turning it on</h2>
 <p>
@@ -34,10 +44,40 @@
   below lives in that tab.
 </p>
 
-<figure class="doc-screenshot-image-wrapper">
-  <img class="doc-screenshot-image" src="images/screenshots/indexer-tab.png"
-    data-screenshot-target="images/screenshots/indexer-tab.png"
-    alt="The Indexer tab, with filters, limits, and index stats." />
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/indexer-enable-light.webp"
+    alt="The Degoog Indexer section of the Server tab, with the Enable the indexer switch on and the note Stores results on disk."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/indexer-enable-dark.webp"
+    alt="The Degoog Indexer section of the Server tab, with the Enable the indexer switch on and the note Stores results on disk."
+    loading="lazy" />
+  <figcaption>The switch in Settings, Server.</figcaption>
+</figure>
+
+<p>
+  The new tab sits between Server and Engines, and an engine called
+  <strong>Degoog</strong> (bang <code>!degoog</code>) shows up in the Engines
+  tab, already switched on. That engine is your index, so switch it off there if
+  you want to keep saving results without seeing them in searches.
+</p>
+
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/engines-tab-light.webp"
+    alt="The Engines tab. Under Web, Degoog with its !degoog tag sits above Brave Search, DuckDuckGo and Wikipedia. Brave Search is switched off and reads Off in normal searches, still works with !brave."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/engines-tab-dark.webp"
+    alt="The Engines tab. Under Web, Degoog with its !degoog tag sits above Brave Search, DuckDuckGo and Wikipedia. Brave Search is switched off and reads Off in normal searches, still works with !brave."
+    loading="lazy" />
+  <figcaption>The Degoog engine, added when the indexer is on.</figcaption>
+</figure>
+
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/indexer-tab-light.webp"
+    alt="The Indexer tab, selected in the settings sidebar between Server and Engines. It opens on the Indexing filters with empty Domain allowlist, Domain blocklist and Word blocklist boxes."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/indexer-tab-dark.webp"
+    alt="The Indexer tab, selected in the settings sidebar between Server and Engines. It opens on the Indexing filters with empty Domain allowlist, Domain blocklist and Word blocklist boxes."
+    loading="lazy" />
   <figcaption>The Indexer tab.</figcaption>
 </figure>
 
@@ -92,7 +132,7 @@
   <tbody>
     <tr>
       <td><strong>Results saved per search</strong></td>
-      <td>Only the top results from each search are saved.</td>
+      <td>Only the top results from each search are saved. Defaults to 30.</td>
     </tr>
     <tr>
       <td><strong>Max unique pages</strong></td>
@@ -180,9 +220,9 @@
 <h2 id="storage-backend">Where it is stored</h2>
 <p>
   By default the index is SQLite under <code>data/indexer/</code>, with one
-  database per engine type. The directory, the database path, and the config
-  file can all be moved with <code>DEGOOG_INDEXER_DIR</code>,
-  <code>DEGOOG_INDEXER_DB</code>, and <code>DEGOOG_INDEXER_CONFIG_FILE</code>.
+  <code>index-&lt;type&gt;.db</code> file per engine type. The directory and the config
+  file can be moved with <code>DEGOOG_INDEXER_DIR</code> and
+  <code>DEGOOG_INDEXER_CONFIG_FILE</code>.
 </p>
 <p>
   For a busy instance with a large index, set <code>DEGOOG_POSTGRES</code> to a

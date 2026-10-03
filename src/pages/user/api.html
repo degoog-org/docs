@@ -45,7 +45,7 @@
   nothing would be protecting the key itself.
 </p>
 <pre><code>curl -H "Authorization: Bearer YOUR_API_KEY" \
-  "http://localhost:4444/api/search?q=hello"</code></pre>
+  "http://localhost:4444/api/search?q=adam+sandler"</code></pre>
 <p>
   The web UI does not use that header. It receives a short-lived signed nonce
   with the page and sends it as <code>x-search-nonce</code> and
@@ -124,7 +124,7 @@
     </tr>
   </tbody>
 </table>
-<pre><code>curl "http://localhost:4444/api/search?q=rust+lifetimes"</code></pre>
+<pre><code>curl "http://localhost:4444/api/search?q=adam+sandler"</code></pre>
 <p>Response:</p>
 <pre><code>{
   "results": [
@@ -211,7 +211,7 @@
     <code>engineTimings</code>, and <code>relatedSearches</code>.
   </li>
 </ul>
-<pre><code>curl -N "http://localhost:4444/api/search/stream?q=hello"</code></pre>
+<pre><code>curl -N "http://localhost:4444/api/search/stream?q=adam+sandler"</code></pre>
 
 <h2 id="retry">GET and POST /api/search/retry</h2>
 <p>
@@ -416,9 +416,10 @@
 
 <h2 id="mcp">Model Context Protocol</h2>
 <p>
-  <code>degoog-mcp</code> is a small Go sidecar that exposes Degoog to
+  <code>degoog-mcp</code> is a small TypeScript sidecar that exposes Degoog to
   MCP-capable clients over Streamable HTTP at <code>/mcp</code>, listening on
-  port <code>4443</code> by default. It offers two tools:
+  port <code>4443</code> by default. It offers eight tools, and these two do
+  most of the work:
 </p>
 <ul>
   <li>
@@ -433,11 +434,18 @@
   </li>
 </ul>
 <p>
-  It is configured entirely through <code>DEGOOG_MCP_*</code> environment
+  The rest are <code>bundle_search</code> (search and read the sources in one
+  go, the one to point small models at), <code>deep_search</code>,
+  <code>discover</code>, <code>retry_engine</code>, <code>command</code> and
+  <code>health</code>.
+</p>
+<p>
+  It is configured through the <code>mcp.yml</code> it writes to
+  <code>/data</code> on first run and <code>DEGOOG_MCP_*</code> environment
   variables, including an optional inbound bearer token, per-call result caps,
   and an engine allowlist. The <code>mcp.yml</code> compose example runs it
   alongside Degoog. Full details are in the
-  <a href="https://github.com/degoog-org/degoog/tree/main/mcp" class="external" target="_blank"
+  <a href="https://github.com/degoog-org/mcp" class="external" target="_blank"
     rel="noopener">degoog-mcp README</a>.
 </p>
 <div class="block-note">

@@ -33,6 +33,25 @@
   and it takes effect on the next request. No restart.
 </p>
 <p>
+  Once it's on, <code>/nojs</code> is the home page and searches go to
+  <code>/nojs/search?q=adam+sandler</code>. Tacking <code>?q=</code> onto plain
+  <code>/nojs</code> just shows you the home page again. Turning it on also adds
+  a built-in <strong>No-JS page</strong> plugin with a <code>!nojs</code> bang
+  (<code>!no-js</code> and <code>!nojavascript</code> work too), so you can jump
+  to it from the normal page, or search it straight away with
+  <code>!nojs adam sandler</code>.
+</p>
+
+<figure class="doc-shot">
+  <img class="doc-shot-light" src="images/screenshots/guide/nojs-results-light.webp"
+    alt="The no-JS results page for adam sandler. It has the same logo, search box, Web and Images tabs and Filter link as the normal page. IMDb and Wikipedia results carry their engine tags, and a Wikipedia card with a large photo sits on the right."
+    loading="lazy" />
+  <img class="doc-shot-dark" src="images/screenshots/guide/nojs-results-dark.webp"
+    alt="The no-JS results page for adam sandler. It has the same logo, search box, Web and Images tabs and Filter link as the normal page. IMDb and Wikipedia results carry their engine tags, and a Wikipedia card with a large photo sits on the right."
+    loading="lazy" />
+  <figcaption>The no-JS page. Same theme, no scripts.</figcaption>
+</figure>
+<p>
   While the switch is off, <code>/nojs</code> answers the same 404 as
   <code>/purple-elephant</code>: same status, same headers, same bytes. There is
   nothing there to fingerprint and nothing to probe. Turning it back off closes
