@@ -214,8 +214,9 @@ export interface FaviconProvider {
 </p>
 <p>
   If every provider returns <code>null</code>, the result shows the domain's
-  first letter. If no provider is enabled, results show a "No favicon
-  extension installed" placeholder and the browser requests no icons.
+  first letter. If no provider is enabled and the favicon store is off,
+  results show a "No favicon extension installed" placeholder and the
+  browser requests no icons.
 </p>
 <p>
   Core caches the final answer, icon or miss, so your provider is asked

@@ -290,7 +290,7 @@ export const filters = {
   <code>transparent</code> is just another value. Some engines treat it as a
   colour (Google), others as a type (Bing, DuckDuckGo). Put it under whichever
   group your engine implements it in, and degoog will show it there. If two
-  enabled engines place it in different groups, it simply appears in both
+  enabled engines place it in different groups, it appears in both
   dropdowns, and each engine applies the one it understands.
 </p>
 <p>
@@ -583,7 +583,8 @@ async executeSearch(query, page = 1, timeFilter, context) {
   gets an Anubis page back, Degoog solves it, sends the pass request with the
   cookies the page set, and repeats your request with the token it gets. It
   keeps that token per site and transport, so every engine on the same site
-  shares one solve. Your engine only ever sees the real page.
+  shares one solve. Your engine sees the real page, unless the transport
+  handles challenges itself.
 </p>
 <p>
   This works on transports that return response cookies or keep their own
@@ -601,7 +602,7 @@ async executeSearch(query, page = 1, timeFilter, context) {
   Create your <code>data/engines/</code> directory or set your
   <code>DEGOOG_ENGINES_DIR</code>. Add a single file like
   <code>my-engine.js</code> or a folder with an <code>index.js</code> file. The
-  engine ID will simply be the filename or folder name with an
+  engine ID is the filename or folder name with an
   <code>-engine</code> suffix (so <code>my-engine</code> becomes
   <code>my-engine-engine</code>).
 </p>
@@ -636,7 +637,7 @@ async executeSearch(query, page = 1, timeFilter, context) {
       rel="noopener"
       >Ecosia</a
     >
-    is a web engine using <code>bangShortcut</code> while correctly utilizing
+    is a web engine using <code>bangShortcut</code> and
     <code>context.fetch</code>.
   </li>
   <li>

@@ -190,8 +190,8 @@
   <code>context.proxyUrl</code> is populated and
   <code>context.fetch</code>
   routes through it automatically. Your transport should always use
-  <code>context.fetch</code> for any outbound HTTP calls so proxy routing just
-  works effortlessly:
+  <code>context.fetch</code> for any outbound HTTP calls so they go through
+  the configured proxy:
 </p>
 <pre><code>async fetch(url, options, context) {
   const doFetch = context.fetch;

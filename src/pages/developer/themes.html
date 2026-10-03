@@ -204,7 +204,7 @@
   </tbody>
 </table>
 <p>
-  Your custom HTML can utilize these placeholders:
+  Your custom HTML can use these placeholders:
   <code>__THEME_CSS__</code>, <code>__THEME_ATTRS__</code>,
   <code>__PLUGIN_ASSETS__</code>, <code>__CUSTOM_CSS__</code>,
   <code>__APP_VERSION__</code>, <code>__THEME_TEMPLATES__</code>,
@@ -410,7 +410,7 @@
 
 <h2>Skeleton IDs</h2>
 <p>
-  Skeleton elements are simply empty <code>&lt;div&gt;</code> tags that only
+  Skeleton elements are empty <code>&lt;div&gt;</code> tags that only
   contain an <code>id</code>. Our JavaScript injects the templates right into
   them.
   <strong>Please do not remove or rename these IDs.</strong>
@@ -776,7 +776,7 @@
       <td>string</td>
       <td>
         The signed <code>/api/proxy/favicon</code> URL for this host. Empty
-        when no favicon provider is enabled
+        when no favicon provider is enabled and the favicon store is off
       </td>
     </tr>
     <tr>
@@ -788,7 +788,8 @@
       <td><code>favicon_missing</code></td>
       <td>boolean</td>
       <td>
-        True when no favicon provider is enabled. Render the placeholder
+        True when no favicon provider is enabled and the favicon store is
+        off. Render the placeholder
         instead of the image
       </td>
     </tr>

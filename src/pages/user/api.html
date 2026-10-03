@@ -151,7 +151,8 @@
 </p>
 <p>
   <code>favicon</code> is a signed URL on your instance, or an empty string
-  when no favicon provider is enabled. See <a href="#favicons">Favicons</a>.
+  when no favicon provider is enabled and the favicon store is off. See
+  <a href="#favicons">Favicons</a>.
 </p>
 
 <h3 id="searx-shape">SearXNG-shaped responses</h3>
@@ -203,7 +204,7 @@
     <code>engine</code>, that engine's <code>timing</code>, the running merged
     <code>results</code> list, and retry metadata. Because
     <code>results</code> is the full merged list each time, a lazy consumer can
-    simply keep the last one.
+    keep the last one.
   </li>
   <li>
     <code>done</code> is the final event, with <code>totalTime</code>,
@@ -259,7 +260,9 @@
   Lists what is installed, grouped into <code>engines</code>,
   <code>plugins</code>, <code>themes</code>, <code>transports</code>,
   <code>autocomplete</code>, <code>favicon</code> and <code>shortcuts</code>. Each entry includes the
-  <code>id</code> you would use to restrict a search.
+  <code>id</code>. Engine IDs are the ones you pass to restrict a search.
+  Favicon providers can't be picked per search. Their order comes from
+  <a href="settings.html#favicons">Settings, Favicons</a>.
 </p>
 <p>
   Add <code>?type=</code> to fetch one group: <code>engine</code>,
