@@ -114,30 +114,31 @@
   wouldn't question it lol)
 </p>
 <p>
-  In <em>Settings, Engines, Google, Configure</em>, the
-  <strong>Results format</strong> option decides everything:
+  The Google engine needs the <a href="#4play">4play (lolcat)</a> transport.
+  Google now wants a real browser session for both of its results pages, so
+  over <code>fetch</code>, <code>curl</code> or <code>curl-fallback</code> you
+  get 403s or the "Blocked by an interstitial page" failure, whichever results
+  format you pick. 4play runs through a Firefox extension, and there is no
+  Chromium version, so you need Firefox running on a real desktop. If you can't
+  run 4play, install Google CSE from the Store instead, it works over plain
+  HTTP.
+</p>
+<p>
+  With 4play selected, the <strong>Results format</strong> option in
+  <em>Settings, Engines, Google, Configure</em> picks which page to read:
 </p>
 <ul>
   <li>
-    <strong>Lite results</strong> (the default) fetch a lightweight mobile page.
-    It works over any transport, including plain <code>fetch</code> or
-    <code>curl</code>, and needs no extra infrastructure. Titles and snippets
-    are thinner than the real thing, but it is reliable and it is the right
-    starting point. Google does rate-limit that page per IP though, so busy
-    instances start getting CAPTCHAs, and 4play is still the recommended
-    transport for either mode.
+    <strong>Lite results</strong> (the default) read the lightweight mobile
+    page. Titles and snippets are thinner than the real thing.
   </li>
   <li>
-    <strong>HTML results</strong> fetch the full desktop results page. Much
-    better titles and snippets, but Google will only serve it to something that
-    looks like a genuine browser session. Without one you get the "Blocked by an
-    interstitial page" failure. This mode expects the
-    <strong>4play (lolcat)</strong> transport.
+    <strong>HTML results</strong> read the full desktop results page, with much
+    better titles and snippets.
   </li>
 </ul>
 <p>
-  The engine's default outgoing transport is <code>curl</code>, and its bang
-  shortcut is <code>!g</code>.
+  The engine's bang shortcut is <code>!g</code>.
 </p>
 
 <h2 id="cloudflare">Cloudflare-fronted engines</h2>
