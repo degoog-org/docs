@@ -299,6 +299,73 @@ export const filters = {
   Read only the keys you declared; anything you do not map is safely ignored.
 </p>
 
+<h2>Image input</h2>
+<p>
+  Engines search with text by default. Export <code>input = "image"</code> to
+  make an engine that searches with a picture instead, a reverse image search
+  for example. As soon as one enabled engine takes an image, the search bar
+  accepts one: dropped, pasted or picked with the camera button.
+</p>
+<pre><code>export const type = "images"
+export const input = "image"</code></pre>
+<p>
+  An image engine only runs when the search has an image, and never for a text
+  search. The picture arrives on <code>context.image</code>. Any words the user
+  typed next to it arrive as the normal <code>query</code>, which can be an
+  empty string.
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>What it is</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>context.image.bytes</code></td>
+      <td>The image as a <code>Uint8Array</code>. The browser resizes it to 1024 pixels on the longest side before sending it.</td>
+    </tr>
+    <tr>
+      <td><code>context.image.mime</code></td>
+      <td><code>image/jpeg</code>, <code>image/png</code> or <code>image/webp</code>, read from the bytes.</td>
+    </tr>
+    <tr>
+      <td><code>context.image.base64</code></td>
+      <td>The same bytes as base64, without a <code>data:</code> prefix.</td>
+    </tr>
+    <tr>
+      <td><code>context.image.hash</code></td>
+      <td>SHA-256 of the bytes. degoog already puts it in the cache key, so you don't need to.</td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  Upload it with <code>context.fetch</code> like any other request, so proxies
+  and the user's transport choice still apply. <code>body</code> takes a string
+  or a <code>Uint8Array</code>, so a multipart upload looks like this:
+</p>
+<pre><code>const boundary = `----degoog${crypto.randomUUID()}`;
+const head = `--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="image.jpg"\r\nContent-Type: ${context.image.mime}\r\n\r\n`;
+const tail = `\r\n--${boundary}--\r\n`;
+const enc = new TextEncoder();
+const body = new Uint8Array([...enc.encode(head), ...context.image.bytes, ...enc.encode(tail)]);
+const response = await context.fetch("https://example.com/upload", {
+  method: "POST",
+  headers: { "Content-Type": `multipart/form-data; boundary=${boundary}` },
+  body,
+});</code></pre>
+<p>
+  The Fetch and Curl Impersonate transports carry binary bodies. Transports
+  that drive a browser or a solver service may not, so pick a default
+  <code>outgoingTransport</code> that does.
+</p>
+<p>
+  An image engine sends the user's picture to whoever runs the upstream site.
+  Say so in its settings and README, and leave it off until the user turns it
+  on.
+</p>
+
 <h2>Language &amp; time filters</h2>
 <p>
   When someone selects a language or time filter in the UI, those values get
@@ -374,6 +441,26 @@ export const filters = {
         external image URL. Use this when you include thumbnails in your results
         so they load correctly regardless of the outgoing allowlist
         configuration.
+      </td>
+    </tr>
+    <tr>
+      <td><code>context.apiBase</code></td>
+      <td><code>string | undefined</code></td>
+      <td>
+        The base path of your engine's own routes, for example
+        <code>/api/engine/my-engine</code>. Only set when your engine exports
+        <code>routes</code>. See <a href="#engine-routes">Engine routes</a>.
+      </td>
+    </tr>
+    <tr>
+      <td><code>context.routeUrl(path)</code></td>
+      <td><code>(path: string) =&gt; string</code></td>
+      <td>
+        Builds the URL of one of your engine's routes on this instance, for
+        example <code>context.routeUrl("/thumb?id=42")</code>. Use it for
+        thumbnails your engine serves itself; they go through the image proxy
+        like any other thumbnail. Only set when your engine exports
+        <code>routes</code>.
       </td>
     </tr>
     <tr>
@@ -596,6 +683,64 @@ async executeSearch(query, page = 1, timeFilter, context) {
   <code>DEGOOG_ANUBIS_MAX_DIFFICULTY</code>.
 </p>
 <pre><code>challenges = ["anubis"];</code></pre>
+
+<h2 id="engine-routes">Engine routes</h2>
+<p>
+  An engine can serve its own HTTP endpoints, the same way
+  <a href="developer.html#plugin-routes">plugin routes</a> do. This is useful
+  when your results point at something the image proxy cannot fetch, such as
+  thumbnails that need an API key or that live on a private network. Export
+  <code>routes</code> as an array of <code>{ method, path, handler }</code>,
+  either on your engine object or class, or as a named export next to it.
+  <code>method</code> is <code>get</code>, <code>post</code>, <code>put</code>,
+  <code>delete</code> or <code>patch</code>, and <code>handler(req)</code>
+  receives the standard <code>Request</code> and returns a
+  <code>Response</code>.
+</p>
+<p>
+  Routes are served under <code>/api/engine/&lt;folderName&gt;/</code>, separate
+  from plugin routes, so an engine and a plugin from the same repository never
+  clash. They are public, like plugin routes, and answer 403 while the engine is
+  disabled in Settings. Paths are matched exactly; pass parameters in the query
+  string.
+</p>
+<p>
+  Every result thumbnail goes through the image proxy, including the ones your
+  engine serves. <code>context.routeUrl(path)</code> returns your route's address
+  on this instance, and the proxy fetches it like any other image, so the browser
+  never talks to your route or the service behind it directly. Because the proxy
+  fetches from this instance, it only works when <strong>Allow local images</strong>
+  is on in the image proxy settings, and not when Degoog listens on a unix socket.
+  Validate everything your route receives: anyone who can reach the instance can
+  call it.
+</p>
+<pre><code>export const type = "images";
+
+export default class MyPhotos {
+  name = "My photos";
+  bangShortcut = "photos";
+  routes = [
+    {
+      method: "get",
+      path: "/thumb",
+      handler: async (req) =&gt; {
+        const id = new URL(req.url).searchParams.get("id") ?? "";
+        if (!/^[0-9a-f-]{36}$/.test(id)) return new Response(null, { status: 400 });
+        return fetch(`${this.baseUrl}/thumbnails/${id}`, { headers: { "x-api-key": this.apiKey } });
+      },
+    },
+  ];
+  async executeSearch(query, page, timeFilter, context) {
+    const items = await this.search(query, context);
+    return items.map((item) =&gt; ({
+      title: item.name,
+      url: item.link,
+      snippet: "",
+      source: this.name,
+      thumbnail: context.routeUrl(`/thumb?id=${item.id}`),
+    }));
+  }
+}</code></pre>
 
 <h2>Setup</h2>
 <p>
