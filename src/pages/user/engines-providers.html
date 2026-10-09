@@ -247,6 +247,34 @@
   <code>DEGOOG_PYTHON_BIN</code>.
 </p>
 
+<h4 id="searx-add">Adding an engine that is not listed</h4>
+<p>
+  The box at the top of <strong>Browse SearX engines</strong> takes either the
+  name of any SearXNG engine (the file name without <code>.py</code>, for
+  example <code>seekninja</code>) or an <code>https</code> link to an engine's
+  <code>.py</code> file. GitHub file links work too, Degoog fetches the raw file
+  for you.
+</p>
+<ul>
+  <li>
+    Files the engine imports from other engines
+    (<code>from searx.engines.something import ...</code>) are downloaded from
+    the same folder automatically, along with its region and language data.
+  </li>
+  <li>
+    Degoog loads the engine once before keeping it. If it fails to load, nothing
+    is left behind and the error tells you why, usually a missing Python
+    package or something SearXNG-only that Degoog does not provide.
+  </li>
+  <li>
+    Added engines are marked as added by hand, and update and uninstall like any
+    other entry in the list. Update pulls again from the link you added.
+  </li>
+  <li>
+    Installing an engine runs its code on your server. Only add links you trust.
+  </li>
+</ul>
+
 <h2 id="autocomplete">Autocomplete providers</h2>
 <p>
   These power the suggestion dropdown under the search box. They are separate

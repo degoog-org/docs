@@ -752,8 +752,12 @@ DEGOOG_POSTGRES_DATABASE=degoog</code></pre>
       <td><code>DEGOOG_SEARX_EXTRA_ENGINES</code></td>
       <td>
         Comma-separated SearXNG engine codes to treat as supported in addition
-        to the built-in compatibility list. For trying engines that have not
-        been verified yet.
+        to the built-in compatibility list. This only lets Degoog load them,
+        you still have to put each <code>.py</code> file (and any engine it
+        imports) in <code>DEGOOG_SEARX_ENGINES_DIR</code> yourself. Most of the
+        time it is easier to
+        <a href="engines-providers.html#searx-add">add the engine from the
+        browser</a>, which downloads everything it needs.
       </td>
       <td></td>
     </tr>
