@@ -10,8 +10,8 @@
   <i class="fa-solid fa-terminal"></i>
   <p>
     <strong>degoog-cli is now available.</strong>
-    Scaffold plugin boilerplate directly from your terminal - no copy-pasting,
-    no guessing the folder structure. Install with
+    It scaffolds plugin boilerplate from your terminal, so you don't copy-paste
+    files or guess the folder structure. Install with
     <code
       >curl -fsSL
       https://raw.githubusercontent.com/degoog-org/cli/main/install.sh |
@@ -28,9 +28,9 @@
 <p>
   Your plugins belong in the <code>data/plugins/</code> directory, or whatever
   you set <code>DEGOOG_PLUGINS_DIR</code> to. A plugin is a
-  <strong>folder</strong> containing an entry file. You can use a single plugin
-  to handle multiple tasks like a bang command, a slot, search bar actions, HTTP
-  routes, or request middleware.
+  <strong>folder</strong> with an entry file in it. One plugin can do several
+  jobs at once, such as a bang command, a slot, search bar actions, HTTP routes
+  and request middleware.
 </p>
 
 <h2>Folder structure</h2>
@@ -50,21 +50,21 @@
 <h3>Asset files</h3>
 <ul>
   <li>
-    <strong>template.html</strong>: This is the HTML fragment for your plugin
-    output. You can use <code>{{placeholders}}</code> and replace them inside
-    <code>execute()</code>. This gets injected directly into the search results
-    rather than rendering a full page.
+    <strong>template.html</strong> holds the HTML fragment for your plugin's
+    output. Put <code>{{placeholders}}</code> in it and replace them inside
+    <code>execute()</code>. Degoog injects the fragment into the search results.
+    It is not a full page.
   </li>
   <li>
-    <strong>style.css</strong>: This loads automatically when your plugin is
-    active. Make sure to use class names scoped to your specific plugin to avoid
-    styling conflicts. You can check the
-    <a href="developer-styling.html">Styling</a> page for available CSS
+    <strong>style.css</strong> loads automatically while your plugin is active.
+    Scope your class names to your plugin so they don't clash with other
+    styles. The
+    <a href="developer-styling.html">Styling</a> page lists the available CSS
     variables.
   </li>
   <li>
-    <strong>script.js</strong>: Your client side JavaScript that loads
-    automatically.
+    <strong>script.js</strong> is your client-side JavaScript, and it also
+    loads automatically.
   </li>
 </ul>
 <p>
@@ -75,9 +75,8 @@
 
 <h3>Plugin context and init()</h3>
 <p>
-  The system calls your optional <code>init(ctx)</code> function once during
-  startup before running <code>configure()</code>. The context provides the
-  following:
+  Degoog calls your optional <code>init(ctx)</code> function once at startup,
+  before <code>configure()</code>. The context has these members:
 </p>
 <pre><code>init(ctx) {
   // ctx.template contains your template.html
@@ -89,58 +88,56 @@
   // ctx.signProxyUrl(url) returns a signed /api/proxy/image URL for any external image
   // ctx.signFaviconUrl(url) returns a signed /api/proxy/favicon URL for the url's host, or "" when no favicon provider is enabled and the favicon store is off
   // ctx.fetch(url, init?) is a proxy-aware fetch, respects your outgoing proxy settings
+  // ctx.searchTypes() resolves to the search types this instance has tabs for, "web" first
   // ctx.useCache(namespace, defaultTtlMs) returns an async TTL cache { get, set, delete, clear }
 }</code></pre>
 <p>
-  When your <strong>backend</strong> code generates a URL that points at one of
-  your own plugin routes (for example an image cache that returns a link to a
-  <code>/thumb</code> route), never hardcode the folder name or derive it from
+  When your <strong>backend</strong> code builds a URL that points at one of
+  your own plugin routes, for example an image cache that returns a link to a
+  <code>/thumb</code> route, never hardcode the folder name or derive it from
   <code>ctx.dir</code>. Store-installed plugins run under a generated folder ID
-  such as <code>&lt;author&gt;-&lt;repo&gt;-&lt;plugin-name&gt;</code>, so the
-  only correct base is <code>ctx.apiBase</code> (or
-  <code>ctx.routeUrl("thumb")</code>). The frontend equivalent is the injected
-  <code>__PLUGIN_ID__</code> constant.
+  such as <code>&lt;author&gt;-&lt;repo&gt;-&lt;plugin-name&gt;</code>, so use
+  <code>ctx.apiBase</code> or <code>ctx.routeUrl("thumb")</code> as the base.
+  In frontend code, use the injected <code>__PLUGIN_ID__</code> constant.
 </p>
 <h3>TTL cache (<code>useCache</code>)</h3>
 <p>
   Both <code>init(ctx)</code> and slot
   <code>execute(query, context)</code> receive
-  <strong><code>useCache</code></strong
-  >: a factory that returns an <strong>async</strong> namespaced cache. Call
+  <strong><code>useCache</code></strong>, a factory that returns an
+  <strong>async</strong> namespaced cache. Call
   <code>ctx.useCache&lt;T&gt;(namespace, defaultTtlMs)</code> (or
   <code>context.useCache&lt;T&gt;(namespace, defaultTtlMs)</code> in slots) to
   get an object with <code>await get(key)</code>,
   <code>await set(key, value, ttlMs?)</code>, <code>await delete(key)</code>,
-  and <code>await clear()</code>. Keys are strings; values are typed by your
-  generic <code>T</code>. Entries expire automatically after the TTL
-  (milliseconds).
+  and <code>await clear()</code>. Keys are strings, and your generic
+  <code>T</code> types the values. Entries expire once the TTL, in
+  milliseconds, runs out.
 </p>
 <p>
-  The <code>namespace</code> is a per-cache discriminator (for example,
-  <code>"ext:my-plugin:articles"</code>). It is combined with the instance's ID
-  internally, so different plugins never collide. When the optional Valkey
-  sidecar is configured (<code>DEGOOG_VALKEY_URL</code>), <code>useCache</code>
-  transparently becomes a shared cache across all replicas of the instance;
-  otherwise it falls back to a per-process in-memory store. The API is identical
-  either way.
+  The <code>namespace</code> keeps one cache apart from another, for example
+  <code>"ext:my-plugin:articles"</code>. Degoog combines it with the instance's
+  ID, so different plugins never collide. If you configure the optional Valkey
+  sidecar with <code>DEGOOG_VALKEY_URL</code>, <code>useCache</code> becomes a
+  cache shared by every replica of the instance. Without it, you get an
+  in-memory store per process. The API is the same either way.
 </p>
 <p>
-  Typical usage: call <code>useCache</code> once in <code>init</code>, keep the
-  returned cache on a module-level variable, and use <code>await get</code> /
-  <code>await set</code> from <code>execute</code>
-  (for example, for fetched page excerpts). Always prefer
-  <code>ctx.useCache</code> / <code>context.useCache</code> over importing cache
-  helpers from server internals so plugins behave the same in every environment.
+  The usual pattern is to call <code>useCache</code> once in <code>init</code>,
+  keep the returned cache in a module-level variable, and call
+  <code>await get</code> / <code>await set</code> from <code>execute</code>,
+  for example to hold fetched page excerpts. Use <code>ctx.useCache</code> /
+  <code>context.useCache</code> instead of importing cache helpers from server
+  internals, so your plugin behaves the same in every environment.
 </p>
 <p>
   Store <code>ctx.fetch</code> during <code>init</code> if your plugin makes
   outgoing HTTP requests outside of <code>execute()</code>, for example inside
-  custom plugin routes. Using it keeps your requests consistent with the proxy
-  settings configured in Settings.
+  custom plugin routes. Those requests then follow the proxy settings in
+  Settings.
 </p>
 <p>
-  For example, you might build a plugin that uses both a command template and a
-  separate card template. The
+  A plugin can use a command template and a separate card template. The
   <a
     href="https://github.com/degoog-org/official-extensions/tree/main/plugins/rss"
     class="external"
@@ -148,99 +145,158 @@
     rel="noopener"
     >RSS</a
   >
-  plugin does exactly this by reading <code>card.html</code> through
+  plugin does this, reading <code>card.html</code> with
   <code>ctx.readFile("card.html")</code>.
 </p>
 
 <h2 id="bang-commands">Bang commands</h2>
 <p>
-  Bang commands run whenever you type
+  A bang command runs when you type
   <code>!trigger something</code> or <code>something !trigger</code> into the
-  search bar. You need to export a single object using
-  <code>export default</code> or <code>export const command</code> containing
-  these properties:
+  search bar. Export one object with <code>export default</code> or
+  <code>export const command</code> that has these properties:
 </p>
 <ul>
   <li>
-    <strong>name</strong> and <strong>description</strong>: These appear in
-    Settings and the <code>!help</code> menu.
+    <strong>name</strong> and <strong>description</strong> appear in Settings
+    and the <code>!help</code> menu.
   </li>
   <li>
-    <strong>trigger</strong>: The word you type right after the
-    <code>!</code> symbol. For example, typing <code>weather</code> becomes
+    <strong>trigger</strong> is the word you type right after the
+    <code>!</code> symbol. For example, <code>weather</code> becomes
     <code>!weather</code>.
   </li>
   <li>
-    <strong>execute(args, context)</strong> (async): The
-    <code>args</code> parameter contains whatever text follows or precedes your
-    trigger. You must return an object containing a <code>title</code> string
-    and an <code>html</code> string. You can also include an optional
-    <code>totalPages</code> number.
+    <strong>execute(args, context)</strong> is async. <code>args</code> holds
+    the text before or after your trigger. Return an object with a
+    <code>title</code> string and an <code>html</code> string. It can also have
+    an optional <code>totalPages</code> number and an optional
+    <code>searchType</code>.
   </li>
 </ul>
 <p>
-  The second argument passed to <code>execute</code> is <code>context</code>,
-  which might contain your <code>clientIp</code>, <code>page</code>, and
-  <code>signProxyUrl(url)</code>. Call <code>context.signProxyUrl</code> to get
-  a signed <code>/api/proxy/image</code> URL for any external image you want to
-  serve through the built-in image proxy. On an instance that serves the
-  script-free <code>/nojs</code> page, <code>context.nojs</code> is
-  <code>true</code> and your command only runs at all if you set
-  <code>supportsNojs: true</code>. See
+  By default the results page hides its tabs while a command's output is
+  showing. Set <code>searchType</code> on your command, for example
+  <code>searchType: "images"</code>, and the results page switches to that tab
+  instead. The tab shows as selected, the URL carries the type, and
+  <code>images</code> uses the wide media layout. Returning
+  <code>searchType</code> from <code>execute</code> overrides the declared one
+  for that call. Pick one of the types from <code>ctx.searchTypes()</code>.
+  That also lets you offer the choice as a setting:
+</p>
+<pre><code>let searchTypes = null;
+let tab = "web";
+
+export default {
+  name: "My library",
+  trigger: "library",
+  settingsSchema: [
+    {
+      key: "tab",
+      label: "Show results on",
+      type: "select",
+      default: "web",
+      options: ["web"],
+      optionsFrom: { dependsOn: [], refreshLabel: "Load tabs", auto: true },
+    },
+  ],
+  init(ctx) { searchTypes = ctx.searchTypes; },
+  configure(settings) { tab = settings.tab || "web"; },
+  async getFieldOptions(key) {
+    if (key !== "tab") return { options: [] };
+    return { options: searchTypes ? await searchTypes() : ["web"] };
+  },
+  async execute(args, context) {
+    return { title: "My library", html: render(args, context.searchType), searchType: tab };
+  },
+};</code></pre>
+<p>
+  A command can return <code>results</code> instead of <code>html</code>. That
+  is an array of normal search results with <code>title</code>,
+  <code>url</code>, <code>snippet</code>, <code>source</code> and optional
+  <code>thumbnail</code> and <code>imageUrl</code>. Degoog renders them the same
+  way as results from an engine on that tab, with the image grid, the preview
+  panel, pagination and infinite scroll. Give plain image URLs. Degoog signs
+  them through the image proxy, so the browser never contacts your service.
+  Each result gets the favicon of its own site. To show a different one, set
+  <code>favicon</code> to a URL from <code>ctx.signFaviconUrl(url)</code>.
+  Degoog drops results that have no title or whose URL is not http or https.
+</p>
+<pre><code>return {
+  title: `My library: ${args}`,
+  html: "",
+  results: items.map((item) =&gt; ({
+    title: item.name,
+    url: item.link,
+    snippet: item.summary,
+    source: "My library",
+    thumbnail: item.posterUrl,
+    favicon: signFaviconUrl("https://example.org"),
+  })),
+  totalPages,
+};</code></pre>
+<p>
+  The second argument to <code>execute</code> is <code>context</code>. It can
+  hold <code>clientIp</code>, <code>page</code>,
+  <code>signProxyUrl(url)</code> and <code>searchType</code>, which is the tab
+  the search came from and defaults to <code>web</code>. Call
+  <code>context.signProxyUrl</code> to get a signed
+  <code>/api/proxy/image</code> URL for any external image you want to serve
+  through the built-in image proxy. On an instance that serves the script-free
+  <code>/nojs</code> page, <code>context.nojs</code> is <code>true</code>, and
+  your command only runs there if you set <code>supportsNojs: true</code>. See
   <a href="developer-nojs.html">No-JS support</a>.
 </p>
 <p>
-  You can also include optional properties like
-  <code>aliases</code> for extra triggers, or
-  <code>naturalLanguagePhrases</code> which are phrases that trigger the command
-  without needing the <code>!</code> symbol when natural language is enabled in
-  Settings. You can also use <code>settingsSchema</code>,
-  <code>configure(settings)</code>, <code>init(ctx)</code>, and
-  <code>isConfigured()</code>. If <code>isConfigured()</code> is async and
-  returns false, your command stays hidden from the <code>!help</code> menu
-  until the user configures it.
+  Optional properties include <code>aliases</code> for extra triggers and
+  <code>naturalLanguagePhrases</code>, phrases that run the command without the
+  <code>!</code> symbol when natural language is on in Settings. You can also
+  use <code>settingsSchema</code>, <code>configure(settings)</code>,
+  <code>init(ctx)</code>, and <code>isConfigured()</code>. If
+  <code>isConfigured()</code> is async and returns false, your command stays
+  out of the <code>!help</code> menu until the user configures it.
 </p>
 <p>
-  For your <code>settingsSchema</code>, each field requires a <code>key</code>,
+  Each <code>settingsSchema</code> field needs a <code>key</code>,
   <code>label</code>, and <code>type</code>. The type can be <code>text</code>,
   <code>password</code>, <code>url</code>, <code>number</code>,
   <code>toggle</code>, <code>textarea</code>, <code>select</code>,
   <code>hex</code>, <code>range</code>, <code>file</code>, <code>urllist</code>,
-  <code>list</code>, or <code>info</code>. You can also add optional flags like
-  <code>required</code>, <code>placeholder</code>, <code>description</code>, or
-  <code>secret</code>. Secret fields are never sent back to the browser. If you
-  use the <code>select</code> type, you will need to add an
-  <code>options</code> array containing your string choices, or an
-  <code>optionsFrom</code> block if your extension fetches the choices itself.
+  <code>list</code>, or <code>info</code>. Optional flags include
+  <code>required</code>, <code>placeholder</code>, <code>description</code>, and
+  <code>secret</code>. Degoog never sends secret fields back to the browser. A
+  <code>select</code> field needs an <code>options</code> array of string
+  choices, or an <code>optionsFrom</code> block if your extension fetches the
+  choices itself.
 </p>
 <p>
-  The <code>hex</code> type shows a colour picker paired with a text input and
+  The <code>hex</code> type shows a colour picker next to a text input and
   stores a <code>#rrggbb</code> string. The <code>range</code> type renders a
-  slider; set <code>min</code>, <code>max</code> and <code>step</code> and it
+  slider. Set <code>min</code>, <code>max</code> and <code>step</code>, and it
   stores the chosen number as a string. The <code>file</code> type lets users
-  upload a file; restrict it with <code>accept</code> (a comma-separated list of
-  MIME types or extensions such as <code>"image/*,.png"</code>) and
-  <code>maxSizeKb</code> / <code>minSizeKb</code>. The file is stored inside
-  your plugin's own <code>uploads/</code> folder and the setting value is the
-  served path (for example
-  <code>/plugins/&lt;folderName&gt;/uploads/logo-abc123.png</code>), ready to
-  use directly or via <code>ctx.readFile</code>.
+  upload a file. Restrict it with <code>accept</code>, a comma-separated list
+  of MIME types or extensions such as <code>"image/*,.png"</code>, and with
+  <code>maxSizeKb</code> / <code>minSizeKb</code>. Degoog stores the file in
+  your plugin's own <code>uploads/</code> folder, and the setting value is the
+  served path, for example
+  <code>/plugins/&lt;folderName&gt;/uploads/logo-abc123.png</code>. Use it
+  as-is or read it with <code>ctx.readFile</code>.
 </p>
 <p>
-  Group related fields by giving them the same <code>fieldset</code>
-  string; matching fields render together under one titled fieldset in the
-  Configure modal, in first-seen order.
+  To group related fields, give them the same <code>fieldset</code> string.
+  The Configure modal renders matching fields together under one titled
+  fieldset, in the order it first meets them.
 </p>
 <p>
   The <code>list</code> type lets users manage a repeatable list of structured
-  rows. Add an <code>itemSchema</code> array describing one row (each entry is
-  itself a field with a <code>key</code>, <code>label</code> and
+  rows. Add an <code>itemSchema</code> array that describes one row. Each entry
+  is itself a field with a <code>key</code>, <code>label</code> and a
   <code>type</code> such as <code>text</code>, <code>toggle</code>,
-  <code>hex</code>, <code>range</code> or <code>file</code>), and an optional
-  <code>addLabel</code> for the add button. Rows can be reordered by drag and
-  drop (or the keyboard arrow keys on the grip handle); the stored order is the
-  row position. The value is stored and passed to
-  <code>configure(settings)</code> as a JSON array of objects, so parse it with
+  <code>hex</code>, <code>range</code> or <code>file</code>. An optional
+  <code>addLabel</code> names the add button. Users reorder rows by drag and
+  drop, or with the arrow keys on the grip handle, and the stored order is the
+  row position. Degoog stores the value as a JSON array of objects and passes
+  it to <code>configure(settings)</code> that way, so parse it with
   <code>JSON.parse</code>.
 </p>
 <pre><code>settingsSchema: [
@@ -263,26 +319,26 @@
   choices at configure time instead of hardcoding them. Add an
   <code>optionsFrom</code> block to the field and export a
   <code>getFieldOptions(key, values)</code> function alongside
-  <code>configure(settings)</code>. Degoog renders a button next to the field;
-  clicking it calls your function with the values currently typed into the
-  dialog, so you can hit an API using a base URL the user has not saved yet.
+  <code>configure(settings)</code>. Degoog renders a button next to the field.
+  Clicking it calls your function with the values currently typed into the
+  dialog, so you can call an API with a base URL the user has not saved yet.
 </p>
 <p>
   Inside <code>optionsFrom</code>, <code>dependsOn</code> lists the field keys
   your lookup needs, <code>refreshLabel</code> renames the button,
-  <code>emptyHint</code> is shown before the first fetch, and
-  <code>auto: true</code> runs the lookup automatically when the dialog opens
-  and every dependency already has a value. On a <code>select</code> the
-  fetched values replace the dropdown; on a text field they become suggestions
-  in a datalist, so the user can still type a value that is not on the list.
+  <code>emptyHint</code> shows before the first fetch, and
+  <code>auto: true</code> runs the lookup when the dialog opens and every
+  dependency already has a value. On a <code>select</code>, the fetched values
+  replace the dropdown. On a text field they become suggestions in a datalist,
+  so the user can still type a value that is not on the list.
 </p>
 <p>
   Return <code>{ options, notice }</code>. Each option is a plain string or
-  <code>{ value, label }</code>, and <code>notice</code> is a short line of
-  feedback rendered under the field, which is a good place to report what your
-  lookup detected. Secret fields are handled for you: values reach your function
-  with the stored secret filled in even though the browser never sent it back.
-  Lookups are capped at 500 options and 15 seconds.
+  <code>{ value, label }</code>. <code>notice</code> is a short line of
+  feedback under the field, a good place to report what your lookup found.
+  Degoog handles secret fields for you. Your function gets the values with the
+  stored secret filled in, even though the browser never sent it back. Lookups
+  are capped at 500 options and 15 seconds.
 </p>
 <pre><code>settingsSchema: [
   { key: "baseUrl", label: "API Base URL", type: "url" },
@@ -307,36 +363,114 @@ async getFieldOptions(key, values) {
     notice: `Found ${data.models.length} models`
   };
 }</code></pre>
+<h3>Fields that show and hide</h3>
+<p>
+  Give a field <code>visibleWhen</code> and it only appears while another
+  field holds a given value. The rule is
+  <code>{ key, equals }</code>. <code>key</code> names the field to watch, and
+  <code>equals</code> is the value it must hold. For a <code>toggle</code> that
+  value is the string <code>"true"</code> or <code>"false"</code>.
+</p>
+<p>
+  <code>equals</code> also takes an array, and the field shows when the
+  watched value is any of them. One dropdown can drive a whole form this way.
+  Every field lists the options it belongs to, and the modal swaps fields as
+  soon as the user picks another option, before anything is saved. Pass an
+  array of rules instead of one and every rule has to match. Any field type
+  takes a rule, <code>info</code> included, so a short note can follow the
+  option it explains.
+</p>
+<p>
+  Use <code>notEquals</code> in place of <code>equals</code> to show a field
+  while the watched value is anything else. <code>notEquals: ""</code> means
+  "once it has a value", which suits a timeout that only matters after a URL
+  is filled in. A saved secret counts as having a value even though the
+  browser never sees it. To show a field when either of two things is true,
+  wrap the rules in <code>anyOf</code>:
+</p>
+<pre><code>visibleWhen: {
+  anyOf: [
+    { key: "useContainer", equals: "true" },
+    { key: "proxyType", notEquals: "none" }
+  ]
+}</code></pre>
+<p>
+  Fields inside a <code>list</code> row's <code>itemSchema</code> take the same
+  rules, and they read the other fields of their own row.
+</p>
+<p>
+  Hiding cascades. When the field a rule watches is hidden, the fields that
+  watch it hide too, so a toggle can switch off a dropdown and everything that
+  hangs off it. A hidden <code>required</code> field does not count as
+  missing, so an extension is not flagged as needing setup over a field the
+  user cannot see. Hidden fields keep their saved values and still reach
+  <code>configure(settings)</code>, so read the dropdown before trusting them.
+</p>
+<pre><code>settingsSchema: [
+  {
+    key: "provider",
+    label: "Provider",
+    type: "select",
+    options: ["ollama", "openai", "azure"],
+    optionLabels: ["Ollama", "OpenAI", "Azure OpenAI"],
+    default: "ollama"
+  },
+  { key: "advancedMode", label: "Show tuning options", type: "toggle" },
+  {
+    key: "apiKey",
+    label: "API key",
+    type: "password",
+    secret: true,
+    required: true,
+    visibleWhen: { key: "provider", equals: ["openai", "azure"] }
+  },
+  {
+    key: "deployment",
+    label: "Deployment name",
+    type: "text",
+    required: true,
+    visibleWhen: { key: "provider", equals: "azure" }
+  },
+  {
+    key: "keepAlive",
+    label: "Keep the model loaded",
+    type: "toggle",
+    visibleWhen: [
+      { key: "provider", equals: "ollama" },
+      { key: "advancedMode", equals: "true" }
+    ]
+  }
+]</code></pre>
 <h3>How settings work</h3>
 <ol>
   <li>
-    Declare your <code>settingsSchema</code> so a Configure button appears in
+    Declare your <code>settingsSchema</code> and a Configure button appears in
     Settings then Plugins.
   </li>
   <li>
-    When you save, the values are stored in
+    Saving stores the values in
     <code>data/plugin-settings.json</code> under
     <code>&lt;folderName&gt;-command</code>.
   </li>
   <li>
-    The <code>configure(settings)</code> function runs right after saving and
-    every time the server restarts if settings are present.
+    The <code>configure(settings)</code> function runs right after a save, and
+    on every server restart when settings exist.
   </li>
   <li>
-    Use <code>isConfigured()</code> to return false when required settings are
-    missing. This hides the command from the <code>!help</code> menu.
+    Return false from <code>isConfigured()</code> when required settings are
+    missing. That hides the command from the <code>!help</code> menu.
   </li>
   <li>
-    You can disable any plugin using the toggle in Settings then Plugins.
-    Disabled plugins disappear from <code>!help</code> and return an error if
-    you try to invoke them.
+    Disable any plugin with its toggle in Settings then Plugins. Disabled
+    plugins drop out of <code>!help</code> and return an error if you try to
+    invoke them.
   </li>
 </ol>
 <p>
   Set <code>needsAppRestart: true</code> on an exported plugin object if your
-  plugin cannot work correctly until the Degoog server process restarts, for
-  example because it registers a WebSocket route that Degoog only mounts at
-  boot. When installed or updated via the Store, Degoog will show a restart
+  plugin cannot work until the Degoog server process restarts, for example
+  because it registers a WebSocket route that Degoog only mounts at boot. When
+  someone installs or updates it from the Store, Degoog shows a restart
   required warning on the extension and in the admin Server tab until the
   instance owner restarts.
 </p>
@@ -353,10 +487,10 @@ async getFieldOptions(key, values) {
     >
     lets users define their own bang shortcuts that redirect to any site. It
     uses a <code>list</code> setting for the bangs and a small client script
-    that rewrites the query. Type <code>!&lt;shortcut&gt; terms</code> (leading
-    or trailing); the <code>{{{s}}}</code> or <code>%s</code> placeholder in the
-    URL template is replaced with the query, and a bare bang can open the base
-    path or snap domain.
+    that rewrites the query. Type <code>!&lt;shortcut&gt; terms</code>, with the
+    bang before or after the terms. The query replaces the
+    <code>{{{s}}}</code> or <code>%s</code> placeholder in the URL template, and
+    a bare bang can open the base path or snap domain.
   </li>
   <li>
     <a
@@ -366,8 +500,8 @@ async getFieldOptions(key, values) {
       rel="noopener"
       >Weather</a
     >
-    is a bang command complete with a template, styles, settings for things like
-    default city or Fahrenheit, aliases, and natural language phrases.
+    is a bang command with a template, styles, settings such as default city or
+    Fahrenheit, aliases, and natural language phrases.
   </li>
   <li>
     <a
@@ -398,7 +532,7 @@ async getFieldOptions(key, values) {
       rel="noopener"
       >Password</a
     >
-    are examples of simple command only plugins.
+    are simple command-only plugins.
   </li>
   <li>
     <a
@@ -416,36 +550,36 @@ async getFieldOptions(key, values) {
       rel="noopener"
       >Meilisearch</a
     >
-    let you search your own personal backend through a bang command.
+    search your own backend through a bang command.
   </li>
 </ul>
 
 <h2>Slot plugins</h2>
 <p>
-  Slots let you inject custom panels directly into the search results page when
-  a query matches. Just export <code>slot</code> or <code>slotPlugin</code>. A
-  single module can actually export both a slot and a bang command.
+  A slot injects a custom panel into the search results page when a query
+  matches. Export <code>slot</code> or <code>slotPlugin</code>. One module can
+  export both a slot and a bang command.
 </p>
 <ul>
   <li>
-    <strong>id</strong> and <strong>name</strong>: Your unique identifier and
+    <strong>id</strong> and <strong>name</strong> are your unique identifier and
     display name.
   </li>
   <li>
-    <strong>position</strong>: Choose between <code>above-results</code>,
+    <strong>position</strong> is one of <code>above-results</code>,
     <code>below-results</code>, <code>full-width-above-results</code>,
     <code>above-sidebar</code>, <code>below-sidebar</code>,
-    <code>knowledge-panel</code>, or <code>at-a-glance</code>. Please use the
-    specific sidebar positions instead of the old deprecated sidebar option.
+    <code>knowledge-panel</code>, or <code>at-a-glance</code>. Use the specific
+    sidebar positions, not the old deprecated sidebar option.
   </li>
   <li>
-    <strong>trigger(query)</strong>: This needs to return true, or a Promise
-    that resolves to true, whenever the slot should appear for a specific query.
+    <strong>trigger(query)</strong> returns true, or a Promise that resolves to
+    true, when the slot should appear for a query.
   </li>
   <li>
-    <strong>execute(query, context)</strong> (async): Return an object with an
-    optional <code>title</code> string and an <code>html</code> string. If you
-    return an empty string for the html, nothing will show up. The
+    <strong>execute(query, context)</strong> is async and returns an object with
+    an optional <code>title</code> string and an <code>html</code> string. An
+    empty html string shows nothing. The
     <code>context</code> includes <code>clientIp</code>;
     <code>results</code> (only when <code>waitForResults: true</code>);
     proxy-aware <code>fetch(url, init?)</code>;
@@ -454,16 +588,16 @@ async getFieldOptions(key, values) {
     empty string when no favicon provider is enabled and the favicon store
     is off; and
     <code>useCache(namespace, defaultTtlMs)</code> for the same async TTL cache
-    factory as in <code>init(ctx)</code>. The results array is only
-    populated if you set <code>waitForResults: true</code> on your plugin.
+    factory as in <code>init(ctx)</code>. The results array is only filled when
+    you set <code>waitForResults: true</code> on your plugin.
   </li>
 </ul>
 <p>
-  You can add an optional <strong>settingsId</strong> to specify the key where
-  your settings are stored. This defaults to <code>&lt;id&gt;-slot</code>. You
-  can also include <code>settingsSchema</code>,
-  <code>configure(settings)</code>, and <code>init(ctx)</code>. If multiple
-  slots match the exact same query, they will all display together.
+  The optional <strong>settingsId</strong> sets the key your settings are
+  stored under. It defaults to <code>&lt;id&gt;-slot</code>. You can also
+  include <code>settingsSchema</code>, <code>configure(settings)</code>, and
+  <code>init(ctx)</code>. When several slots match the same query, they all
+  show.
 </p>
 <p>
   Panels are left out of the script-free <code>/nojs</code> page unless you set
@@ -472,66 +606,63 @@ async getFieldOptions(key, values) {
   are in <a href="developer-nojs.html">No-JS support</a>.
 </p>
 <p>
-  Another optional flag is <strong>waitForResults</strong>. Set this to true if
-  you need to receive <code>context.results</code> inside your
-  <code>execute()</code> function. While results are always available when
-  execution happens since slots run after the search finishes, they are only
-  passed to your plugin if you explicitly enable this flag. It defaults to false
-  so plugins that do not need results can stay completely independent.
+  Set the optional <strong>waitForResults</strong> flag to true to receive
+  <code>context.results</code> in your <code>execute()</code> function. Slots
+  run after the search finishes, so the results always exist by then, but
+  Degoog only passes them to your plugin when this flag is on. It defaults to
+  false, so plugins that don't need results stay independent of them.
 </p>
 <p>
-  You can also provide an optional
-  <strong>slotPositions</strong> array. This lets you list multiple position
-  values like
-  <code>["knowledge-panel", "above-sidebar", "below-sidebar"]</code>. If you
-  include this, the application adds a Position dropdown in your plugin settings
-  so you can choose exactly where the slot appears. If you leave it empty or
-  omit it, the slot uses your fixed <code>position</code> value.
+  The optional <strong>slotPositions</strong> array lists several positions,
+  like
+  <code>["knowledge-panel", "above-sidebar", "below-sidebar"]</code>. With it,
+  Degoog adds a Position dropdown to your plugin settings so you can choose
+  where the slot appears. Leave it empty or out and the slot uses your fixed
+  <code>position</code> value.
 </p>
 <h3 id="full-width-above-results-slot">Full width above results slot</h3>
 <p>
-  Setting your position to <code>full-width-above-results</code>
-  renders your panel above the whole results layout, spanning the full content
-  width across both the results column and the sidebar. Degoog only gives this
-  slot the shared width and horizontal padding so it lines up with the rest of
-  the page. It applies no background, border, radius, or inner padding, so the
-  look is entirely up to you. This is the recommended position for large
-  media-style panels that need more room than the results column allows.
+  The <code>full-width-above-results</code> position renders your panel above
+  the whole results layout, across the full content width of both the results
+  column and the sidebar. Degoog gives this slot only the shared width and
+  horizontal padding, so it lines up with the rest of the page. It adds no
+  background, border, radius, or inner padding, so the look is up to you. Use
+  this position for large media-style panels that need more room than the
+  results column has.
 </p>
 <h3>Sidebar positions</h3>
 <p>
-  Using <code>above-sidebar</code> renders right at the top of the sidebar
-  before any main content. Using <code>below-sidebar</code> renders at the very
-  bottom of the sidebar below the engine timings and related searches.
+  <code>above-sidebar</code> renders at the top of the sidebar, before the main
+  content. <code>below-sidebar</code> renders at the bottom of the sidebar,
+  below the engine timings and related searches.
 </p>
 <h3>Knowledge panel slot</h3>
 <p>
-  Setting your position to <code>knowledge-panel</code> replaces only the very
-  first block in the sidebar, which is usually the Wikipedia or knowledge panel.
-  Your engine performance and related searches blocks stay exactly where they
-  are. When your plugin returns content for this position, it shows up instead
-  of the default knowledge panel.
+  The <code>knowledge-panel</code> position replaces only the first block in
+  the sidebar, which is usually the Wikipedia or knowledge panel. The engine
+  performance and related searches blocks stay where they are. When your plugin
+  returns content for this position, it shows in place of the default
+  knowledge panel.
 </p>
 <h3 id="at-a-glance-slot">At a glance slot</h3>
 <p>
-  Slots using the <code>at-a-glance</code> position will fill the block directly
-  above the search results. This does not delay your search response. The client
-  shows your results immediately and fetches the panel content in a separate
-  background request using
+  A slot in the <code>at-a-glance</code> position fills the block above the
+  search results, without delaying the search response. The client shows the
+  results first and fetches the panel in a separate background request to
   <code>POST /api/slots/glance</code>
-  with the query and results. Your
-  <code>execute(query, context)</code> function will always receive
-  <code>context.results</code> for these types of slots.
+  with the query and results. For these slots, your
+  <code>execute(query, context)</code> function always receives
+  <code>context.results</code>.
 </p>
 <h3 id="targeting-a-slot">Targeting a slot from CSS</h3>
 <p>
-  Every injected slot panel carries a
-  <code>data-slot</code> attribute set to your extension id on its top parent
-  element, so you can target a specific slot from your
-  <code>style.css</code> without relying on the generic wrapper classes. For
-  example, a slot with the id <code>tmdb-slot</code> can be styled with
-  <code>[data-slot="tmdb-slot"] { ... }</code>. This applies to the results and
-  sidebar positions as well as <code>full-width-above-results</code>.
+  The top element of every injected slot panel carries a
+  <code>data-slot</code> attribute set to your extension id. Target a specific
+  slot from your <code>style.css</code> with it instead of relying on the
+  generic wrapper classes. For example, a slot with the id
+  <code>tmdb-slot</code> can be styled with
+  <code>[data-slot="tmdb-slot"] { ... }</code>. This works for the results and
+  sidebar positions and for <code>full-width-above-results</code>.
 </p>
 <p><strong>Examples from the official store:</strong></p>
 <ul>
@@ -543,8 +674,8 @@ async getFieldOptions(key, values) {
       rel="noopener"
       >TMDb</a
     >
-    is a slot above the results showing movie and TV details. It uses a secret
-    API key stored in settings.
+    is a slot above the results that shows movie and TV details. It keeps a
+    secret API key in settings.
   </li>
   <li>
     <a
@@ -562,7 +693,7 @@ async getFieldOptions(key, values) {
       rel="noopener"
       >GitHub</a
     >
-    are examples of slots appearing above the results.
+    are slots that appear above the results.
   </li>
   <li>
     <a
@@ -577,8 +708,8 @@ async getFieldOptions(key, values) {
   </li>
 </ul>
 <p>
-  <strong>Slot API:</strong> Calling <code>POST /api/slots</code> with the query
-  and results returns the panels for the main positions. Calling
+  <code>POST /api/slots</code> with the query and results returns the panels
+  for the main positions.
   <code>POST /api/slots/glance</code>
   returns only the glance panels. Slots also work on custom tabs. The
   client fetches the panels after a tab search and renders them in the
@@ -587,78 +718,76 @@ async getFieldOptions(key, values) {
 
 <h2 id="search-result-tabs">Search result tabs</h2>
 <p>
-  Search result tabs let you add new entries to the main tab bar, just like the
-  Web or Images tabs. Export <code>tab</code> or
-  <code>searchResultTab</code> from your plugin folder. You use the same
-  folder structure as any other plugin.
+  A search result tab adds an entry to the main tab bar, next to tabs like Web
+  and Images. Export <code>tab</code> or
+  <code>searchResultTab</code> from your plugin folder. The folder structure is
+  the same as for any other plugin.
 </p>
 <p>
-  <strong>Required properties:</strong> You must provide an
-  <strong>id</strong> and a <strong>name</strong>. You also need to provide
+  A tab needs an <strong>id</strong> and a <strong>name</strong>. It also needs
   either an <strong>engineType</strong> string like <code>web</code>,
   <code>images</code>, <code>videos</code>, <code>news</code>, or a custom type
   from your engines, or an
-  <strong>executeSearch(query, page?, context?)</strong> async function. If you
-  use the function, it must return an object containing your results array and
-  an optional totalPages number. Each result needs a title, url, snippet, and
-  source, plus an optional thumbnail and duration.
+  <strong>executeSearch(query, page?, context?)</strong> async function. The
+  function returns an object with your results array and an optional
+  totalPages number. Each result needs a title, url, snippet, and source, and
+  can have a thumbnail and a duration.
 </p>
 <p>
-  <strong>Optional properties:</strong> You can add an <strong>icon</strong>,
+  The optional properties are <strong>icon</strong>,
   <strong>settingsId</strong>, <strong>settingsSchema</strong>,
-  <strong>configure(settings)</strong>, and <strong>init(ctx)</strong>. If you
-  are sharing this on the Store, make sure to set your type to
-  <code>search-result-tab</code> in your <code>package.json</code>. You can also
-  add a dependencies array containing URLs if your tab relies on a specific
-  engine, just like how the File tab depends on the Internet Archive engine.
+  <strong>configure(settings)</strong>, and <strong>init(ctx)</strong>. To
+  share the tab on the Store, set your type to
+  <code>search-result-tab</code> in your <code>package.json</code>. If your tab
+  relies on a specific engine, add a dependencies array of URLs, the way the
+  File tab depends on the Internet Archive engine.
 </p>
 <p>
-  Set <code>needsAppRestart: true</code> if your tab cannot work correctly until
-  the Degoog server process restarts, for example because it registers a
-  WebSocket route that Degoog only mounts at boot. When installed or updated via
-  the Store, Degoog will show a restart required warning on the extension and in
-  the admin Server tab until the instance owner restarts.
+  Set <code>needsAppRestart: true</code> if your tab cannot work until the
+  Degoog server process restarts, for example because it registers a WebSocket
+  route that Degoog only mounts at boot. When someone installs or updates it
+  from the Store, Degoog shows a restart required warning on the extension and
+  in the admin Server tab until the instance owner restarts.
 </p>
 <pre><code>needsAppRestart: true,</code></pre>
 <p>
-  <strong>API:</strong> A <code>GET</code> request to
-  <code>/api/search-tabs</code> returns the list of available tabs. A
-  <code>GET</code> request to <code>/api/tab-search</code> along with your tab
-  id, query, and page number will run the specific search for that tab.
+  A <code>GET</code> request to
+  <code>/api/search-tabs</code> returns the available tabs. A
+  <code>GET</code> request to <code>/api/tab-search</code> with your tab id,
+  query, and page number runs the search for that tab.
 </p>
 
 <h2>Search bar actions</h2>
 <p>
-  Your plugins can also add buttons right next to the search bar. Just export
-  <code>searchBarActions</code> as an array of objects containing an
+  Plugins can add buttons next to the search bar. Export
+  <code>searchBarActions</code> as an array of objects, each with an
   <strong>id</strong>, a <strong>label</strong>, and a <strong>type</strong>.
-  The type can be <code>navigate</code> to open a specific URL,
-  <code>bang</code> to fill the search bar with your trigger, or
-  <code>custom</code>. If you use custom, your <code>script.js</code> will
-  listen for a <code>search-bar-action</code> event that contains the action
-  details. You can also include an optional <strong>icon</strong> image URL.
+  <code>navigate</code> opens a URL, <code>bang</code> fills the search bar
+  with your trigger, and <code>custom</code> fires a
+  <code>search-bar-action</code> event with the action details, which your
+  <code>script.js</code> listens for. An action can also have an optional
+  <strong>icon</strong> image URL.
 </p>
 
-<h2>Plugin routes</h2>
+<h2 id="plugin-routes">Plugin routes</h2>
 <p>
   Plugins can expose their own HTTP endpoints under the
-  <code>/api/plugin/&lt;folderName&gt;/</code> path. You do this by exporting
-  <code>routes</code> as an array containing the <code>method</code>,
-  <code>path</code>, and <code>handler(req)</code>. Your method can be
+  <code>/api/plugin/&lt;folderName&gt;/</code> path. Export
+  <code>routes</code> as an array of objects with a <code>method</code>,
+  <code>path</code>, and <code>handler(req)</code>. The method can be
   <code>get</code>, <code>post</code>, <code>put</code>, <code>delete</code>, or
-  <code>patch</code>. The path is just the URL segment that comes after your
-  plugin id. Your handler receives the standard Request object and needs to
-  return a Response or a Promise that resolves to a Response. These routes
-  become available the moment your plugin loads, meaning your
-  <code>script.js</code> can call them immediately using fetch.
+  <code>patch</code>. The path is the URL segment after your plugin id. Your
+  handler receives the standard Request object and returns a Response or a
+  Promise that resolves to one. Routes go live as soon as your plugin loads,
+  so your <code>script.js</code> can fetch them right away.
 </p>
 <p>
   When installed from the store, the plugin folder name is
   <code>&lt;author&gt;-&lt;repo&gt;-&lt;plugin-name&gt;</code>. Never hardcode
-  that in your API URLs. In <strong>frontend</strong> scripts use the injected
+  that in your API URLs. In <strong>frontend</strong> scripts, use the
   <strong><code>__PLUGIN_ID__</code></strong> constant, which Degoog injects
-  automatically into every plugin script at serve time. In
-  <strong>backend</strong> plugin code use <code>ctx.apiBase</code> or
+  into every plugin script when it serves it. In
+  <strong>backend</strong> plugin code, use <code>ctx.apiBase</code> or
   <code>ctx.routeUrl("path")</code> from <code>init(ctx)</code>.
 </p>
 <pre><code>// frontend script.js
@@ -674,23 +803,150 @@ export default {
     return { title: "Example", html: `&lt;img src="${apiBase}/thumb?id=abc"&gt;` };
   },
 };</code></pre>
+<p>
+  Routes are public, so anyone who can reach your instance can call them.
+  Degoog's IP blocklist always applies. Set <code>rateLimit: true</code> on a
+  route that does expensive work, such as calling a model, and Degoog applies
+  the instance's own rate limit settings to it, the same ones searches use. Each
+  extension gets its own bucket, so busy routes from one extension do not use
+  up another's. Leave it off for routes the browser calls many times per page,
+  such as thumbnails or model files.
+</p>
+<pre><code>routes: [
+  { method: "post", path: "/describe", rateLimit: true, handler: describe },
+  { method: "get", path: "/thumb", handler: thumb },
+]</code></pre>
+
+<h2 id="results-api">Re-ranking results from the browser</h2>
+<p>
+  Plugin scripts can reorder, label and hide results on the Images and Videos
+  tabs through <code>window.degoog.results</code>. Plugin scripts can load before
+  Degoog's own script, so wait for the
+  <code>degoog-results-api-ready</code> event when
+  <code>window.degoog</code> is not there yet.
+</p>
+<ul>
+  <li>
+    <code>current()</code> returns <code>{ query, type, search, settled, image }</code>
+    for the search on screen. <code>search</code> is a number that changes with
+    every new search. <code>settled</code> turns <code>true</code> once every
+    engine has answered for the first page, and stays <code>false</code> while
+    results are still streaming in. <code>image</code> is <code>null</code> for a text search,
+    otherwise <code>{ id, dataUrl, query }</code>, where <code>query</code> is the
+    text query a plugin generated from the image, or <code>null</code> if there
+    is none yet.
+  </li>
+  <li>
+    <code>list()</code> returns the current results in display order.
+  </li>
+  <li>
+    <code>setRanking(id, ranking)</code> applies a ranking, and
+    <code>setRanking(id, null)</code> removes it. A ranking can have
+    <code>compare(a, b)</code> to sort results, <code>hidden(result)</code> to
+    hide them, and <code>badge(result)</code> to label them with a string or
+    <code>{ text, tone }</code>, where tone is <code>"strong"</code> or
+    <code>"weak"</code>. Hidden results move to the end. Results that compare
+    equal keep their original order.
+  </li>
+  <li>
+    <code>refresh()</code> runs the ranking again. Call it when your scores
+    change.
+  </li>
+</ul>
+<p>
+  A ranking only lasts for the search it was set on. Degoog drops it when a new
+  search starts, and applies it to results loaded later by infinite scroll.
+  Degoog fires <code>degoog-results-ready</code> on <code>window</code> whenever
+  results are rendered or more are loaded. That is when to score the new ones.
+  It fires <code>degoog-results-settled</code> once per search, with
+  <code>{ search }</code> in <code>detail</code>, when the last engine has
+  answered. Wait for it before you tell the visitor you're finished, because a
+  slow engine can still add results after the first ones render.
+</p>
+<pre><code>const api = window.degoog.results;
+const scores = new Map();
+api.setRanking(__PLUGIN_ID__, {
+  compare: (a, b) => (scores.get(b.thumbnail) ?? 0) - (scores.get(a.thumbnail) ?? 0),
+  badge: (r) => (scores.has(r.thumbnail) ? `${Math.round(scores.get(r.thumbnail) * 100)}%` : null),
+});
+window.addEventListener("degoog-results-ready", async () => {
+  for (const r of api.list()) if (!scores.has(r.thumbnail)) scores.set(r.thumbnail, await score(r));
+  api.refresh();
+});</code></pre>
+<p>
+  <code>window.degoog.search(query, type)</code> runs a search the same way the
+  search bar does. On the results page it searches in place. From the home page
+  it opens the results page, and keeps the query out of the URL when the visitor
+  has POST search turned on.
+</p>
+<p>
+  <code>window.degoog.pickImage()</code> opens the file picker for an image
+  search. It only exists while at least one enabled engine can search with an
+  image. Degoog fires <code>degoog-image-query</code> on <code>window</code>
+  with <code>{ query, error }</code> in <code>detail</code> once it knows the
+  generated query for the image search on screen.
+</p>
+
+<h2 id="image-queries">Turning images into text queries</h2>
+<p>
+  A bang command can give degoog a text query for an image. When someone
+  searches with an image, degoog asks the first enabled command that has an
+  <code>imageQuery</code> method, then runs the answer through the normal text
+  engines of that tab, next to the engines that take the image itself (see
+  <a href="engines.html">Image input</a>). Words typed next to the image arrive
+  as <code>context.text</code>.
+</p>
+<pre><code>export default {
+  name: "Image describer",
+  trigger: "describe",
+  async execute() { /* the bang itself */ },
+
+  describesImages() {
+    return settings.enabled;
+  },
+
+  async imageQuery(image, context) {
+    // image: { bytes, mime, base64, hash }
+    // context: { text, lang, signal }
+    const query = await askMyModel(image.base64, context.text, context.signal);
+    return query; // a string, or null for no query
+  },
+};</code></pre>
+<ul>
+  <li>
+    <code>describesImages()</code> is optional. Return <code>false</code> to sit
+    out without disabling the whole plugin.
+  </li>
+  <li>
+    Throw an <code>Error</code> with a translated message when it fails. Degoog
+    shows the message when the search has no other results, and the engines
+    that take the image still run.
+  </li>
+  <li>
+    Degoog asks once per image and words. The browser keeps the answer and sends
+    it back for later pages, retries and reloads, so your model isn't asked again.
+  </li>
+  <li>
+    The image is only in memory while the search runs. Don't store it, and if
+    your plugin sends it somewhere else, say so in its settings.
+  </li>
+</ul>
 
 <h2 id="interceptors">Query interceptors</h2>
 <p>
-  Interceptors run <strong>before</strong> the search engines execute. They
-  receive the raw query the user typed and return the query that should actually
-  be searched. The plugin can do anything in between: correct spelling, expand
-  abbreviations, translate, enrich, or replace the query entirely. Export
+  Interceptors run <strong>before</strong> the search engines. They receive the
+  raw query the user typed and return the query to search. In between, the
+  plugin can do anything, such as fix spelling, expand abbreviations,
+  translate, enrich, or replace the query entirely. Export
   <code>interceptor</code> as an object with a <strong>name</strong>, a
   <strong>description</strong>, and an
   <strong>intercept(query, context)</strong> async function that returns
   <code>{ query: string }</code>.
 </p>
 <p>
-  You can also return an optional <code>overrides</code> object to influence how
-  the search is executed - without touching the query text at all. This is
-  useful when your interceptor has enough information to determine the best
-  search context upfront.
+  You can also return an optional <code>overrides</code> object to change how
+  the search runs without touching the query text. Use it when your
+  interceptor already knows the best search context.
 </p>
 <pre><code>export const interceptor = {
   name: "My Interceptor",
@@ -718,35 +974,35 @@ export default {
 <h3>Supported overrides</h3>
 <ul>
   <li>
-    <code>searchType</code> - route the search to a specific tab by its engine
-    type (e.g. <code>"images"</code>, <code>"news"</code>, or any custom tab
-    type registered by a plugin)
+    <code>searchType</code> routes the search to a tab by its engine type, such
+    as <code>"images"</code>, <code>"news"</code>, or any custom tab type a
+    plugin registers.
   </li>
-  <li><code>lang</code> - override the language for this search</li>
+  <li><code>lang</code> overrides the language for this search.</li>
   <li>
-    <code>timeFilter</code> - override the time filter (e.g. <code>"day"</code>,
-    <code>"week"</code>)
+    <code>timeFilter</code> overrides the time filter, such as
+    <code>"day"</code> or <code>"week"</code>.
   </li>
 </ul>
 <p>
-  All fields are optional. When multiple interceptors run, overrides are merged
-  in order - later interceptors win for each field.
+  Every field is optional. When several interceptors run, Degoog merges their
+  overrides in order, and the later interceptor wins for each field.
 </p>
 <p>
-  Interceptors are a plugin subtype - they live in the same
-  <code>data/plugins/</code> directory as bang commands and slots. A single
-  plugin folder can export an <code>interceptor</code> alongside a
-  <code>slot</code> or <code>command</code> if needed. There are no builtin
-  interceptors; all interceptors come from plugins.
+  Interceptors are a kind of plugin and live in the same
+  <code>data/plugins/</code> directory as bang commands and slots. One plugin
+  folder can export an <code>interceptor</code> alongside a
+  <code>slot</code> or <code>command</code>. Degoog has no built-in
+  interceptors. They all come from plugins.
 </p>
 
 <h2 id="multi-hook-plugins">Multi-hook plugins</h2>
 <p>
-  A single plugin folder can export any combination of hooks - a
+  One plugin folder can export any combination of hooks, such as a
   <code>slot</code>, an <code>interceptor</code>, a bang <code>command</code>, a
   <code>tab</code>, <code>middleware</code>, or a <code>route</code>. By default
-  each hook gets its own settings card in the UI. To merge them all into a
-  single card with shared settings, export a top-level
+  each hook gets its own settings card in the UI. To merge them into one card
+  with shared settings, export a top-level
   <strong>plugin</strong> object as the plugin's identity:
 </p>
 <pre><code>export const plugin = {
@@ -786,61 +1042,60 @@ export const interceptor = {
   When <code>plugin</code> is present, both hooks use <code>plugin.id</code> as
   their <code>settingsId</code>. The settings form shows manifest fields first,
   then slot fields, then interceptor fields. Saving calls
-  <code>configure()</code> on each hook separately with the same settings object
-  - shared module-level state (caches, config variables) works naturally since
-  all hooks live in the same file. Plugins that do not export
-  <code>plugin</code> are unaffected and continue to show as individual cards.
+  <code>configure()</code> on each hook separately with the same settings
+  object. All hooks live in the same file, so module-level state such as caches
+  and config variables is shared between them. Plugins that don't export
+  <code>plugin</code> still show as individual cards.
 </p>
 
 <h2>Request middleware</h2>
 <p>
-  Middleware allows your plugin to hook into specific request flows. You export
-  <code>middleware</code> as an object containing an <strong>id</strong>, a
+  Middleware lets your plugin hook into specific request flows. Export
+  <code>middleware</code> as an object with an <strong>id</strong>, a
   <strong>name</strong>, and a <strong>handle(req, context)</strong> function.
-  The context might include specific route information like
-  <code>settings-auth</code>. Your function should return a Response, a redirect
-  URL object, or null to let the request continue normally. The
-  application uses this middleware for the <strong>settings gate</strong>. To
-  choose a plugin for the gate, just click Use as settings gate in that plugin
-  configuration menu under Settings. This updates your
-  <code>plugin-settings.json</code> file automatically.
+  The context can include route information such as
+  <code>settings-auth</code>. Return a Response, a redirect URL object, or null
+  to let the request continue. Degoog uses this middleware for the
+  <strong>settings gate</strong>. To pick a plugin for the gate, click Use as
+  settings gate in that plugin's configuration menu under Settings. That
+  updates your <code>plugin-settings.json</code> file for you.
 </p>
 
 <h2>Settings gate (login flow)</h2>
 <p>
-  You can protect your settings using a simple password with
-  <code>DEGOOG_SETTINGS_PASSWORDS</code> or by using a
-  <strong>middleware plugin</strong>. When you use a plugin, anyone opening the
-  Settings page goes through your custom flow like a magic link or external
-  login before returning to the settings with a valid session token.
+  Protect your settings with a password through
+  <code>DEGOOG_SETTINGS_PASSWORDS</code>, or with a
+  <strong>middleware plugin</strong>. With a plugin, anyone who opens the
+  Settings page goes through your own flow, such as a magic link or an external
+  login, and comes back to the settings with a valid session token.
 </p>
 <h3>What your middleware must do</h3>
 <ul>
   <li>
-    <strong>route "settings-auth"</strong>: Return a JSON object with required
-    set to true, valid set to false, and your loginUrl.
+    For <strong>route "settings-auth"</strong>, return a JSON object with
+    required set to true, valid set to false, and your loginUrl.
   </li>
   <li>
-    <strong>route "settings-auth-callback"</strong>: After a successful
-    authentication, return a redirect to <code>/settings</code>. The application
-    will issue a session token and redirect the user automatically.
+    For <strong>route "settings-auth-callback"</strong>, return a redirect to
+    <code>/settings</code> after a successful login. Degoog then issues a
+    session token and redirects the user.
   </li>
   <li>
-    <strong>route "settings-auth-post"</strong>: If you do not want to support
-    password submissions via POST, just return a 400 error or something similar.
+    For <strong>route "settings-auth-post"</strong>, return a 400 error or
+    similar if you don't support password submissions via POST.
   </li>
 </ul>
 <p>
-  Make sure to expose a <code>GET /login</code> route that redirects back to the
-  callback URL. You can clear the <code>degoog-settings-token</code> in your
-  browser Session Storage anytime you need to test the flow.
+  Expose a <code>GET /login</code> route that redirects back to the callback
+  URL. To test the flow again, clear <code>degoog-settings-token</code> from
+  your browser's Session Storage.
 </p>
 
 <h2>Example: minimal bang command</h2>
 <p>
-  Here is what a simple folder at
-  <code>data/plugins/greeting/</code> looks like with an <code>index.js</code>,
-  <code>template.html</code>, and <code>style.css</code> file.
+  A simple plugin at
+  <code>data/plugins/greeting/</code> has an <code>index.js</code>, a
+  <code>template.html</code>, and a <code>style.css</code>.
 </p>
 <pre><code>let template = "";
 export default {
@@ -859,17 +1114,17 @@ export default {
   &lt;h3 class="greeting-title"&gt;Hello, {{name}}!&lt;/h3&gt;
 &lt;/div&gt;</code></pre>
 <p>
-  For your <strong>style.css</strong>, you should use variables like
-  <code>var(--text-primary)</code> to ensure everything matches. You can find
-  more details on the <a href="developer-styling.html">Styling</a> page.
+  In your <strong>style.css</strong>, use variables like
+  <code>var(--text-primary)</code> so the plugin matches the rest of the page.
+  The <a href="developer-styling.html">Styling</a> page has the details.
 </p>
 
 <h2 id="declaring-client-exposure">Declaring client exposure</h2>
 <p>
-  The settings page shows a small icon on each extension card indicating whether
-  the extension causes the user's browser to contact external services directly.
-  Set <code>isClientExposed</code> on your exported object so users know what to
-  expect:
+  Each extension card on the settings page has a small icon that says whether
+  the extension makes the user's browser contact external services directly.
+  Set <code>isClientExposed</code> on your exported object so users know what
+  to expect:
 </p>
 <table>
   <thead>
@@ -883,8 +1138,8 @@ export default {
     <tr>
       <td><code>true</code></td>
       <td>
-        The browser makes direct requests to external services (images, APIs,
-        scripts rendered into HTML).
+        The browser makes direct requests to external services, such as images,
+        APIs, or scripts rendered into HTML.
       </td>
       <td>
         <i
@@ -924,7 +1179,7 @@ export default {
 <p>
   Use <code>context.signProxyUrl(url)</code> to route external images through
   the server proxy, and <code>context.signFaviconUrl(url)</code> for a
-  site's favicon. Doing so means you can declare
+  site's favicon. Then you can declare
   <code>isClientExposed: false</code>.
 </p>
 <p>
@@ -955,7 +1210,7 @@ export default {
 
 <h2>Debugging plugins</h2>
 <p>
-  If you need to troubleshoot, set <code>LOG_LEVEL=debug</code> to print the
-  execution times for all your plugin types directly to the server console. You
-  can check the Environment variables page for more details.
+  Set <code>LOG_LEVEL=debug</code> to print the execution times for all your
+  plugin types to the server console. The Environment variables page has more
+  details.
 </p>
