@@ -94,9 +94,10 @@ sudo chown -R 1000:1000 ./data</code></pre>
   <a href="https://curl.se" class="external" target="_blank" rel="noopener">curl</a>
   (several transports shell out to it).
   And you will likely need to install <a href="https://github.com/lwthiker/curl-impersonate" class="external"
-    target="_blank" rel="noopener">curl-impersonate</a> for some transports to work and some python libraries for
-  the searx
-  compatibility layer.
+    target="_blank" rel="noopener">curl-impersonate</a> for some transports to work, some python libraries for
+  the <a href="engines-providers.html#searx">SearX compatibility layer</a>, and php-cli 8.1+ with sodium and
+  mbstring for the <a href="engines-providers.html#fourget">4get one</a>. Both layers log what is missing and
+  stay empty rather than breaking search, so you can add them later.
 </p>
 <pre><code>git clone https://github.com/degoog-org/degoog.git
 cd degoog

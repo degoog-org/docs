@@ -27,7 +27,7 @@
 <p>
   A transport controls exactly how Degoog makes its outgoing HTTP requests to
   search engines. You can select a specific transport for each engine by
-  navigating to Settings then Engines then Configure then Advanced.
+  navigating to Settings then Engines then Configure.
 </p>
 <p>We include three built in transports out of the box:</p>
 <table>
@@ -111,6 +111,12 @@
     safely in <code>data/plugin-settings.json</code> under
     <code>transport-&lt;name&gt;</code>.
   </li>
+  <li>
+    <strong>endSession(sessionKey)</strong>: Called once an engine search
+    finishes, with the same <code>sessionKey</code> its requests carried.
+    Release anything you held for that search here, like a browser container
+    or a warmed origin.
+  </li>
 </ul>
 
 <h2>Arguments</h2>
@@ -142,7 +148,13 @@
     <tr>
       <td><code>redirect</code></td>
       <td><code>RequestRedirect</code></td>
-      <td>The redirect mode which defaults to <code>"follow"</code>.</td>
+      <td>
+        The redirect mode which defaults to <code>"follow"</code>. With
+        <code>"manual"</code>, return the 3xx response with its
+        <code>Location</code> header instead of following it. Engines use this
+        to resolve redirect links, and Degoog uses it to check each redirect
+        hop against the allowed hosts list.
+      </td>
     </tr>
     <tr>
       <td><code>signal</code></td>
@@ -166,9 +178,21 @@
       <td><code>proxyUrl</code></td>
       <td><code>string | undefined</code></td>
       <td>
-        The proxy URL configured in Settings then Server then Proxy. This comes
-        already rotated. It will be
+        The proxy URL configured in Settings then Server then Proxy. It is
+        picked once per engine search, so every request in that search uses the
+        same proxy. It will be
         <code>undefined</code> when proxies are disabled.
+      </td>
+    </tr>
+    <tr>
+      <td><code>sessionKey</code></td>
+      <td><code>string | undefined</code></td>
+      <td>
+        The same for every request one engine makes during one search, and
+        different for the next search. Use it to keep cookies, browser state
+        or a container together for the whole search, so a follow-up request
+        looks like the same visitor. It is <code>undefined</code> for requests
+        that don't come from an engine search.
       </td>
     </tr>
     <tr>

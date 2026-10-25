@@ -1048,6 +1048,54 @@ export const interceptor = {
   <code>plugin</code> still show as individual cards.
 </p>
 
+<h3 id="manifest-engines">Pairing an engine with a plugin</h3>
+<p>
+  An engine can join the same manifest even though it lives in its own folder
+  under <code>data/engines/</code> rather than beside the plugin. Export a
+  <code>plugin</code> object from the engine whose <code>id</code> matches the
+  plugin's, listing the fields the two share:
+</p>
+<pre><code>// data/engines/my-engine/index.js
+export const plugin = {
+  id: "my-plugin",        // the same id the paired plugin declares
+  name: "My Plugin",
+  settingsSchema: [
+    { key: "url", label: "Service URL", type: "url" },
+    { key: "apiKey", label: "API Key", type: "password", secret: true },
+  ],
+};
+
+export default {
+  name: "My Engine",
+  settingsSchema: [
+    { key: "resultLimit", label: "Result limit", type: "number" },
+  ],
+  configure(settings) { /* url, apiKey and resultLimit, merged */ },
+  async executeSearch(query, page, timeFilter, context) { return []; },
+};</code></pre>
+<p>
+  The user then fills the URL and key once, on the plugin's card, and both
+  halves of the integration read them.
+</p>
+<p>
+  Engines split their settings rather than moving them wholesale, which is the
+  one place this differs from slots and interceptors. The manifest fields live
+  in the shared bucket. Everything else, the engine's own schema plus the
+  reserved keys <code>disabled</code>, <code>score</code>,
+  <code>outgoingTransport</code> and <code>searchTypeOverride</code>, stays in
+  the engine's own bucket under its canonical ID. Disabling the plugin does not
+  disable the engine, and the engine keeps its own score and transport. The
+  engine's card stays in the Engines tab and shows its own fields; the shared
+  ones are left to the plugin's card so nothing is asked for twice.
+</p>
+<p>
+  A <code>required</code> field declared in the manifest gates the engine the
+  same way one declared on the engine does, so an engine waiting on a token from
+  the plugin will not run until it has one. Uninstalling the engine leaves the
+  shared bucket alone. Uninstalling the plugin removes it, and an engine still
+  installed loses those values, so ship the pair together.
+</p>
+
 <h2>Request middleware</h2>
 <p>
   Middleware lets your plugin hook into specific request flows. Export

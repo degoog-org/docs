@@ -42,7 +42,7 @@
 </p>
 <p>
   Compatibility engines are marked in Settings then Engines with a small badge
-  showing the layer name, for example <code>searx</code>.
+  showing the layer name, for example <code>searx</code> or <code>4get</code>.
 </p>
 
 <h3>SearXNG Python engines</h3>
@@ -160,6 +160,66 @@
   separately from the list of engines skipped on purpose.
 </p>
 
+<h3>4get PHP scrapers</h3>
+<p>
+  The 4get layer runs a scraper from
+  <a href="https://git.lolcat.ca/lolcat/4get">lolcat's 4get</a> as a normal
+  Degoog engine, one short-lived PHP process per call. It needs PHP 8.1 or newer
+  with sodium and mbstring. It does not need ext-curl or APCu, and the shipped
+  image has neither.
+</p>
+<p>
+  4get scrapers work differently from SearXNG engines, and the layer is built
+  around that difference. A SearXNG engine builds a request and parses a
+  response, and never touches the network. A 4get scraper calls
+  <code>curl_init()</code> itself, halfway through its own logic.
+</p>
+<p>
+  Degoog does not patch the scraper. It loads the file under a private PHP
+  namespace, where an unqualified <code>curl_init()</code> resolves to Degoog's
+  own function before PHP's. Those shims hand the request back over the bridge,
+  and Degoog performs the fetch through the engine's configured transport. The
+  file on disk stays exactly as upstream wrote it, which is what keeps
+  <strong>Update</strong> a plain re-download.
+</p>
+<p>
+  The same trick covers paging. 4get encrypts its next-page state into APCu,
+  which dies with the process, so <code>apcu_*</code> is shimmed onto Degoog's
+  cache. The scraper's own token minting then works untouched and a token
+  survives into the next process.
+</p>
+<p>Before you add a scraper to the catalogue:</p>
+<ul>
+  <li>
+    Unqualified function calls fall back to the global namespace, but class names
+    do not. The staging prelude imports the built-ins the scrapers use. A scraper
+    reaching for a class nobody imported fails to load, and says so.
+  </li>
+  <li>
+    <code>curl_multi_*</code> is not bridged. A scraper using it throws rather
+    than quietly returning nothing.
+  </li>
+</ul>
+
+<h3>Adding a layer</h3>
+<p>
+  Layers are registered in
+  <code>src/server/extensions/compatibility-layer/registry.ts</code>. A new one
+  is a single <code>CompatLayerDef</code>: an id, a label, the server setting
+  key that turns it on, the note keys the UI lists, and functions to load
+  engines, list the catalogue, install, update, uninstall, and take the
+  install lock. Everything else already iterates the registry. The engine
+  loader, the <code>/api/compat/:layer/*</code> routes, the server settings
+  toggles, and the Engines tab section pick a new layer up without changes.
+</p>
+<p>
+  Both runners share
+  <code>compatibility-layer/rpc.ts</code>, which speaks line-delimited JSON over
+  stdin and stdout and serves <code>fetch</code> and <code>cache</code> calls
+  back from the child process. A new runtime needs a binary, its flags, and a
+  script that reads one line, does the work, prints one envelope and exits.
+</p>
+
 <h2>Engine contract</h2>
 <p><strong>What you need:</strong></p>
 <ul>
@@ -171,11 +231,24 @@
     (async): This needs to return a Promise that resolves to an array of
     results. Each result is an object holding a <code>title</code>,
     <code>url</code>, <code>snippet</code>, <code>source</code>, and optionally
-    a <code>thumbnail</code> and <code>duration</code>. Make sure you use
+    a <code>thumbnail</code>, <code>duration</code> and
+    <code>publishedAt</code>. Make sure you use
     <code>context.fetch</code> for all your outbound HTTP requests so your
     engine respects any proxy settings the user has configured.
   </li>
 </ul>
+<p>
+  <code>publishedAt</code> is a <code>YYYY-MM-DD</code> string and it is worth
+  setting when the page you are scraping gives you a real date. If you leave it
+  out, Degoog looks for a date at the start of the snippet during the merge,
+  which covers the common
+  <code>12 Jan 2024 - some text</code> and <code>3 days ago - some text</code>
+  shapes, lifts it into <code>publishedAt</code> and takes it off the front of
+  the snippet. It only lifts ISO dates, dates with a month name, and
+  "N days ago" style dates. Numeric forms like <code>01/12/2024</code> stay in
+  the snippet, because Degoog can't tell whether the site meant January or
+  December. Anything you set yourself wins over the guess.
+</p>
 <p><strong>Optional extras:</strong></p>
 <ul>
   <li>
@@ -628,13 +701,21 @@ async executeSearch(query, page = 1, timeFilter, context) {
 }</code></pre>
 <p>
   Every engine also features an
-  <strong>Outgoing HTTP client</strong> control under the
-  <strong>Advanced</strong> section in Settings then Engines. This setting is
-  stored per engine and can be set to <code>fetch</code>, system
+  <strong>Outgoing HTTP client</strong> control in Settings then Engines. This
+  setting is stored per engine and can be set to <code>fetch</code>, system
   <code>curl</code>, <code>auto</code>, or any custom
   <a href="developer-transports.html">transport</a> you install from the Store.
   You should still use <code>context.fetch</code> in your custom engines so this
   setting applies automatically.
+</p>
+<p>
+  Every <code>context.fetch</code> call during one
+  <code>executeSearch</code> shares a session: the same proxy and the same
+  transport state, like cookies or a browser container. Send follow-up
+  requests, such as resolving redirect links from the results page, through
+  <code>context.fetch</code> too, so the site sees one visitor instead of
+  several. Pass <code>redirect: "manual"</code> when you only need the
+  <code>Location</code> header.
 </p>
 <p>
   <strong>Client exposure:</strong> The network indicator on extension cards in

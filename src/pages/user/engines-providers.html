@@ -211,16 +211,22 @@
   theirs.
 </p>
 
-<h3 id="searx">SearX compatibility layer</h3>
+<h3 id="compat">Compatibility layers</h3>
 <p>
-  Degoog can run SearXNG's own engine files directly, inside Degoog, with no
-  separate SearXNG instance. Enable it in
-  <em>Settings, Server, SearX compatibility layer</em> and a
-  <strong>Compatibility layers</strong> box appears in the Engines tab with a
-  <strong>Browse SearX engines</strong> button.
+  A compatibility layer lets Degoog run engine files written for a different
+  search engine, without running that search engine. Each layer is off until you
+  turn it on in <em>Settings, Server, Compatibility layers</em>. Turn one on and
+  a <strong>Compatibility layers</strong> section appears in the Engines tab with
+  a button for each layer you enabled.
 </p>
 <p>
-  It is marked experimental for good reasons, and the UI is upfront about them:
+  Both layers are experimental. Other people write the engine code, Degoog does
+  not review it, and an engine breaks whenever the site it scrapes changes.
+</p>
+
+<h4 id="searx">SearX</h4>
+<p>
+  Degoog runs SearXNG's own engine files, with no separate SearXNG instance.
 </p>
 <ul>
   <li>
@@ -244,7 +250,65 @@
 <p>
   Only engines known to be compatible are listed. Running these requires Python
   on the host; the binary can be pointed elsewhere with
-  <code>DEGOOG_PYTHON_BIN</code>.
+  <code>DEGOOG_PYTHON_BIN</code>. Anything Degoog skipped is named in the
+  startup log under <code>[searx-compat]</code>, so if an engine you dropped in
+  never appears, look there first.
+</p>
+<p>
+  <code>DEGOOG_SEARX_EXTRA_ENGINES</code> takes a comma-separated list of engine
+  codes and loads them anyway. That is all it does. An engine that needs a
+  Python library Degoog does not ship, or an upstream helper nobody ported,
+  still fails, and you only find out at query time. Use it to test an engine
+  before it goes on the list, and don't expect support for it. If one turns
+  out to work, say so on
+  <a href="https://github.com/degoog-org/degoog/issues">the issue tracker</a> or
+  Discord and it can go on the tested list for everybody.
+</p>
+
+<h4 id="fourget">4get</h4>
+<p>
+  Degoog runs <a href="https://git.lolcat.ca/lolcat/4get">4get</a>'s scrapers the
+  same way, one short-lived PHP process per query. This needs PHP 8.1 or newer on
+  the host with the sodium and mbstring extensions. The Docker image ships it
+  already. On a bare-metal or Proxmox install, install php-cli yourself, or the
+  layer logs what is missing and stays empty. Point
+  <code>DEGOOG_PHP_BIN</code> at the binary if it is not on the path.
+</p>
+<ul>
+  <li>
+    Score, safe search, proxies, transports, and bangs behave like a normally
+    installed engine. The scrapers run their own HTTP internally, and Degoog
+    intercepts it so your transport and proxy settings still apply.
+  </li>
+  <li>
+    A scraper's own filters, the ones 4get shows as dropdowns, become engine
+    settings. Degoog's time filter drives the date ones.
+  </li>
+  <li>
+    Paging works. 4get hands back an encrypted token for the next page instead of
+    a page number, and Degoog keeps the chain for fifteen minutes, so you page
+    forward rather than jumping to page nine.
+  </li>
+  <li>
+    Some scrapers want an API key, and some expect a browser TLS fingerprint. The
+    install list says which. For the second kind, set that engine's outgoing
+    transport to curl-impersonate.
+  </li>
+  <li>
+    <code>lib/backend.php</code> and friends download automatically when the
+    first scraper needs them, and go when the last one does.
+  </li>
+</ul>
+<p>
+  Only scrapers known to work are listed. The Google scraper is not, because it
+  needs 4get's own 4play render server. Skipped scrapers are named in the
+  startup log under <code>[4get-compat]</code>.
+</p>
+<p>
+  <code>DEGOOG_FOURGET_EXTRA_SCRAPERS</code> takes a comma-separated list of
+  scraper names and loads them anyway. Same deal as on the SearX side. It lifts
+  the block and an untested scraper can still fail. Try one out with it, but
+  don't run your instance on it.
 </p>
 
 <h4 id="searx-add">Adding an engine that is not listed</h4>
@@ -364,7 +428,7 @@
 </p>
 <p>
   You choose a transport <strong>per engine</strong>, in
-  <em>Configure, Advanced, Outgoing HTTP client</em>. Four are built in:
+  <em>Configure, Outgoing HTTP client</em>. Four are built in:
 </p>
 <table>
   <thead>

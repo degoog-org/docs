@@ -738,7 +738,7 @@ DEGOOG_POSTGRES_DATABASE=degoog</code></pre>
   expected to be on Postgres, grep your logs for <code>[indexer]</code>.
 </p>
 
-<h2 id="searx">SearX compatibility layer</h2>
+<h2 id="searx">Compatibility layers</h2>
 <table>
   <thead>
     <tr>
@@ -757,12 +757,12 @@ DEGOOG_POSTGRES_DATABASE=degoog</code></pre>
       <td><code>DEGOOG_SEARX_EXTRA_ENGINES</code></td>
       <td>
         Comma-separated SearXNG engine codes to treat as supported in addition
-        to the built-in compatibility list. This only lets Degoog load them,
-        you still have to put each <code>.py</code> file (and any engine it
-        imports) in <code>DEGOOG_SEARX_ENGINES_DIR</code> yourself. Most of the
-        time it is easier to
+        to the built-in compatibility list. Use it to try engines nobody has
+        tested yet. It only lifts the block, so an engine with unported
+        dependencies still fails at query time. You also need the
+        <code>.py</code> file in <code>DEGOOG_SEARX_ENGINES_DIR</code>, or you can
         <a href="engines-providers.html#searx-add">add the engine from the
-        browser</a>, which downloads everything it needs.
+        browser</a>, which downloads the engines it imports too.
       </td>
       <td></td>
     </tr>
@@ -770,6 +770,33 @@ DEGOOG_POSTGRES_DATABASE=degoog</code></pre>
       <td><code>DEGOOG_PYTHON_BIN</code></td>
       <td>Python interpreter used to run SearXNG engine files.</td>
       <td><code>python3</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_FOURGET_DIR</code></td>
+      <td>
+        Where downloaded 4get scrapers and their shared libs are kept. Degoog
+        also stages its sandboxed copies under here.
+      </td>
+      <td><code>data/fourget</code></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_FOURGET_EXTRA_SCRAPERS</code></td>
+      <td>
+        Comma-separated 4get scraper names to treat as supported on top of the
+        built-in list. Use it to try scrapers nobody has tested yet. Like the
+        SearX one, it only lifts the block. See
+        <a href="engines-providers.html#fourget">4get</a>.
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>DEGOOG_PHP_BIN</code></td>
+      <td>
+        PHP binary used to run 4get scrapers. Needs 8.1 or newer with sodium and
+        mbstring. Alpine installs it as <code>php84</code>, so set this if there
+        is no plain <code>php</code> on the path.
+      </td>
+      <td><code>php</code></td>
     </tr>
   </tbody>
 </table>

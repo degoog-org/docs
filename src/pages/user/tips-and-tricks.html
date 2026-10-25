@@ -159,7 +159,7 @@
 <h2 id="transports">Choosing a transport</h2>
 <p>
   You pick a transport per engine, in
-  <em>Settings, Engines, Configure, Advanced, Outgoing HTTP client</em>. Working
+  <em>Settings, Engines, Configure, Outgoing HTTP client</em>. Working
   roughly from "no setup" to "most convincing":
 </p>
 <table>
@@ -294,19 +294,18 @@
 <pre><code>brew tap shakacode/brew
 brew install curl-impersonate</code></pre>
 <p>On Linux, drop a release binary onto your <code>PATH</code>:</p>
-<pre><code>curl -fsSL https://github.com/lexiforest/curl-impersonate/releases/download/v1.2.2/curl-impersonate-v1.2.2.x86_64-linux-gnu.tar.gz \
-  | tar -xz -C /usr/local/bin curl_firefox133
-chmod +x /usr/local/bin/curl_firefox133</code></pre>
+<pre><code>curl -fsSL https://github.com/lexiforest/curl-impersonate/releases/download/v2.3.1/curl-impersonate-v2.3.1.x86_64-linux-gnu.tar.gz \
+  | tar -xz -C /usr/local/bin curl-impersonate curl_firefox135
+chmod +x /usr/local/bin/curl-impersonate /usr/local/bin/curl_firefox135</code></pre>
 <p>
   The Degoog image is Alpine-based, so inside Docker you need the
-  <code>-linux-musl</code> release, and <code>bash</code> installed first
-  because the curl-impersonate binaries are bash wrappers:
+  <code>-linux-musl</code> release:
 </p>
 <pre><code>services:
   degoog:
     image: ghcr.io/degoog-org/degoog:latest
     entrypoint: >
-      sh -c "apk add --no-cache bash && curl -fsSL https://github.com/lexiforest/curl-impersonate/releases/download/v1.2.2/curl-impersonate-v1.2.2.x86_64-linux-musl.tar.gz
+      sh -c "curl -fsSL https://github.com/lexiforest/curl-impersonate/releases/download/v2.3.1/curl-impersonate-v2.3.1.x86_64-linux-musl.tar.gz
       | tar -xz -C /usr/local/bin || true && exec /entrypoint.sh"
     volumes:
       - ./data:/app/data

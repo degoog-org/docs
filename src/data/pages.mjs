@@ -53,7 +53,7 @@ export const userPages = [
     navTitle: "Engines & providers",
     icon: "fa-bolt",
     source: "src/pages/user/engines-providers.html",
-    description: "Search engines, autocomplete providers, favicon providers, transports, and the SearX layer."
+    description: "Search engines, autocomplete providers, favicon providers, transports, and the compatibility layers."
   },
   {
     file: "plugins-themes-store.html",
