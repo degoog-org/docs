@@ -114,6 +114,13 @@
     so to not hammer engines that decide you are being rate limited. It'll just make the situation worse.
   </li>
   <li>
+    <strong>Max wait for result panels</strong> is how long panels that need
+    search results, like AI summaries, wait before starting. After that they
+    run with whatever results have arrived, even if a slow engine is still
+    going. The default is 4000ms. Set it to 0 to make them wait for every
+    engine. Panels that don't need results show straight away either way.
+  </li>
+  <li>
     Streaming is <strong>not compatible</strong> with the POST search method. If you turn on POST in your search
     options, streaming will stop applying to you.
   </li>
