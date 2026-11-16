@@ -568,6 +568,21 @@ const response = await context.fetch("https://example.com/upload", {
         <code>"network"</code>.
       </td>
     </tr>
+    <tr>
+      <td><code>context.emit(results, progress?)</code></td>
+      <td>
+        <code>
+          (results: SearchResult[], progress?: { expected?: number }) =&gt; void
+        </code>
+      </td>
+      <td>
+        Sends results to the page before <code>executeSearch</code> returns.
+        Each call adds to what you already sent. See
+        <a href="#emitting-results">Emitting results</a>.
+        <code>undefined</code> on degoog versions without it, so call it as
+        <code>context?.emit?.(...)</code>.
+      </td>
+    </tr>
   </tbody>
 </table>
 <h3>Surfacing upstream failures</h3>
@@ -641,6 +656,77 @@ if (html.includes("cf-challenge")) {
     // parse and return array of { title, url, snippet, source }
   }
 }</code></pre>
+
+<h2 id="emitting-results">Emitting results</h2>
+<p>
+  Some engines can't hand back a full page in one go. Google and Brave now
+  wrap result links in redirects, and each one costs its own request to
+  unwrap, sometimes after a wait the engine tells you to sit through. Ten
+  links can take 20 seconds. Without <code>emit</code>, the user stares at
+  nothing for that whole time, then the engine hits its timeout and every
+  result it had already unwrapped is thrown away.
+</p>
+<p>
+  <code>context.emit</code> fixes that. Call it with results as soon as you
+  have them and they show up on the page straight away.
+</p>
+<ul>
+  <li>
+    Every emit adds to the ones before it. degoog drops any URL you already
+    sent, so emitting the same result twice is harmless.
+  </li>
+  <li>
+    Every emit resets the engine's timeout. An engine that keeps producing
+    results keeps running, up to three times its timeout in total. An engine
+    that goes quiet for a full timeout gets stopped.
+  </li>
+  <li>
+    When the engine gets stopped, degoog keeps everything it emitted. That run
+    is not cached, so the next search tries again.
+  </li>
+  <li>
+    When <code>executeSearch</code> returns, the array you return sets the
+    final order. Anything you emitted but didn't return gets added after it.
+    Return your full list in rank order.
+  </li>
+  <li>
+    Pass <code>{ expected }</code> to say how many results you're working
+    through. The sidebar shows the engine as <em>emitting 3/10</em> until it
+    finishes. Without it, the sidebar shows <em>emitting 3</em>.
+  </li>
+  <li>
+    Only page 1 with streaming on shows results as they arrive. The nojs page,
+    page 2 onwards and <code>GET /api/search</code> wait for the engine, and
+    there an emitting engine gets its normal timeout with no extension. It
+    still keeps whatever it emitted before the timeout.
+  </li>
+</ul>
+<p>
+  Don't emit just because you can. If your engine gets its whole page from
+  one request, return it like you always have. Emit when results trickle in,
+  like unwrapping redirect links one request at a time:
+</p>
+<pre><code>async executeSearch(query, page = 1, timeFilter, context) {
+  const doFetch = context?.fetch ?? fetch;
+  const res = await doFetch(`https://example.com/search?q=${encodeURIComponent(query)}`);
+  context?.sentinel?.(res, this.name);
+  const parsed = parseResults(await res.text());
+  const progress = { expected: parsed.length };
+
+  const resolved = await Promise.all(
+    parsed.map(async (result) => {
+      const url = await unwrapRedirect(result.url, context);
+      if (url) context?.emit?.([{ ...result, url }], progress);
+      return { ...result, url };
+    }),
+  );
+  return resolved.filter((result) => result.url);
+}</code></pre>
+<p>
+  Pass <code>context.signal</code> into the requests you make while emitting.
+  When degoog stops the engine it aborts that signal, and anything still in
+  flight should stop with it.
+</p>
 
 <h2>Safe Search</h2>
 <p>

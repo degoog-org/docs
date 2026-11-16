@@ -196,7 +196,7 @@
 <h2 id="stream">GET /api/search/stream</h2>
 <p>
   The server-sent events variant. Same query parameters as
-  <code>GET /api/search</code>. It emits two event types:
+  <code>GET /api/search</code>. Events:
 </p>
 <ul>
   <li>
@@ -205,6 +205,21 @@
     <code>results</code> list, and retry metadata. Because
     <code>results</code> is the full merged list each time, a lazy consumer can
     keep the last one.
+  </li>
+  <li>
+    <code>engine-partial</code> fires when an engine sends results before it
+    has finished. Its payload carries <code>engine</code>, <code>id</code>,
+    <code>emitted</code> (how many results that engine has sent so far),
+    <code>expected</code> when the engine knows its total, and the running
+    merged <code>results</code> list. The engine's <code>engine-result</code>
+    still arrives when it finishes. Clients that don't know this event can
+    ignore it.
+  </li>
+  <li>
+    <code>results-settled</code> fires at most once, when every engine still
+    running is one that is sending partial results. It has an empty payload.
+    The degoog UI starts its result panels on it. It never fires when no
+    engine sends partial results.
   </li>
   <li>
     <code>done</code> is the final event, with <code>totalTime</code>,
