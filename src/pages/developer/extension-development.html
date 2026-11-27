@@ -238,8 +238,11 @@ export default {
 <p>
   The second argument to <code>execute</code> is <code>context</code>. It can
   hold <code>clientIp</code>, <code>page</code>,
-  <code>signProxyUrl(url)</code> and <code>searchType</code>, which is the tab
-  the search came from and defaults to <code>web</code>. Call
+  <code>signProxyUrl(url)</code>, <code>authenticated</code> and
+  <code>searchType</code>, which is the tab the search came from and defaults
+  to <code>web</code>. <code>context.authenticated</code> is
+  <code>true</code> when the person running the command is signed in to
+  Settings, see <a href="#auth-gate">Gating behind the settings login</a>. Call
   <code>context.signProxyUrl</code> to get a signed
   <code>/api/proxy/image</code> URL for any external image you want to serve
   through the built-in image proxy. On an instance that serves the script-free
@@ -588,8 +591,11 @@ async getFieldOptions(key, values) {
     empty string when no favicon provider is enabled and the favicon store
     is off; and
     <code>useCache(namespace, defaultTtlMs)</code> for the same async TTL cache
-    factory as in <code>init(ctx)</code>. The results array is only filled when
-    you set <code>waitForResults: true</code> on your plugin.
+    factory as in <code>init(ctx)</code>; and <code>authenticated</code>, which
+    is <code>true</code> when the visitor is signed in to Settings (see
+    <a href="#auth-gate">Gating behind the settings login</a>). The results
+    array is only filled when you set <code>waitForResults: true</code> on your
+    plugin.
   </li>
 </ul>
 <p>
@@ -729,6 +735,7 @@ async getFieldOptions(key, values) {
   <code>images</code>, <code>videos</code>, <code>news</code>, or a custom type
   from your engines, or an
   <strong>executeSearch(query, page?, context?)</strong> async function. The
+  context holds <code>clientIp</code> and <code>authenticated</code>. The
   function returns an object with your results array and an optional
   totalPages number. Each result needs a title, url, snippet, and source, and
   can have a thumbnail and a duration.
@@ -774,11 +781,12 @@ async getFieldOptions(key, values) {
   Plugins can expose their own HTTP endpoints under the
   <code>/api/plugin/&lt;folderName&gt;/</code> path. Export
   <code>routes</code> as an array of objects with a <code>method</code>,
-  <code>path</code>, and <code>handler(req)</code>. The method can be
+  <code>path</code>, and <code>handler(req, context)</code>. The method can be
   <code>get</code>, <code>post</code>, <code>put</code>, <code>delete</code>, or
   <code>patch</code>. The path is the URL segment after your plugin id. Your
-  handler receives the standard Request object and returns a Response or a
-  Promise that resolves to one. Routes go live as soon as your plugin loads,
+  handler receives the standard Request object and a context with
+  <code>authenticated</code>, and returns a Response or a Promise that
+  resolves to one. Routes go live as soon as your plugin loads,
   so your <code>script.js</code> can fetch them right away.
 </p>
 <p>
@@ -804,8 +812,8 @@ export default {
   },
 };</code></pre>
 <p>
-  Routes are public, so anyone who can reach your instance can call them.
-  Degoog's IP blocklist always applies. Set <code>rateLimit: true</code> on a
+  Routes are public unless you set <code>auth: true</code>, so anyone who can
+  reach your instance can call them. Degoog's IP blocklist always applies. Set <code>rateLimit: true</code> on a
   route that does expensive work, such as calling a model, and Degoog applies
   the instance's own rate limit settings to it, the same ones searches use. Each
   extension gets its own bucket, so busy routes from one extension do not use
@@ -815,6 +823,22 @@ export default {
 <pre><code>routes: [
   { method: "post", path: "/describe", rateLimit: true, handler: describe },
   { method: "get", path: "/thumb", handler: thumb },
+]</code></pre>
+<p>
+  Set <code>auth: true</code> on a route that only signed-in people should
+  reach. Degoog answers <code>401</code> with
+  <code>{ "error": "You shall not pass!" }</code> before your handler runs.
+  For a route that serves everyone but shows more to signed-in people, leave
+  <code>auth</code> off and read <code>context.authenticated</code> instead.
+</p>
+<pre><code>routes: [
+  { method: "post", path: "/bookmarks", auth: true, handler: saveBookmark },
+  {
+    method: "get",
+    path: "/bookmarks",
+    handler: async (req, { authenticated }) =&gt;
+      Response.json(authenticated ? await allBookmarks() : await publicBookmarks()),
+  },
 ]</code></pre>
 
 <h2 id="results-api">Re-ranking results from the browser</h2>
@@ -1090,6 +1114,98 @@ export const interceptor = {
   URL. To test the flow again, clear <code>degoog-settings-token</code> from
   your browser's Session Storage.
 </p>
+
+<h2 id="auth-gate">Gating behind the settings login</h2>
+<p>
+  Degoog has no user accounts. It has one gate, the Settings login, and
+  somebody either passed it or they did not. Extensions can ask the same
+  question, so a plugin can keep private data, a personal service or an
+  expensive action away from strangers on a public instance.
+</p>
+<p>
+  The answer is a boolean named <code>authenticated</code>. Degoog works it out
+  for every request and hands it to:
+</p>
+<ul>
+  <li>bang commands, as <code>context.authenticated</code> in <code>execute(args, context)</code>;</li>
+  <li>slot plugins, as <code>context.authenticated</code> in <code>execute(query, context)</code>;</li>
+  <li>search result tabs, as <code>context.authenticated</code> in <code>executeSearch(query, page, context)</code>;</li>
+  <li>plugin, engine and easter egg routes, as the second argument to <code>handler(req, context)</code>, plus the <code>auth: true</code> route flag;</li>
+  <li>
+    plugin scripts in the browser, as
+    <code>window.__DEGOOG_AUTH__.authenticated</code> on the home and results
+    pages.
+  </li>
+</ul>
+<p>
+  It is <code>true</code> exactly when Degoog would let the same request into
+  Settings. That has a few consequences worth knowing:
+</p>
+<ul>
+  <li>
+    With <code>DEGOOG_DANGEROUSLY_NO_PASSWORD=true</code> there is no gate, so
+    every visitor is <code>authenticated</code>.
+  </li>
+  <li>
+    On a public instance with no password configured, nobody is ever
+    <code>authenticated</code>.
+  </li>
+  <li>
+    A middleware settings gate, such as an external login, counts. Once
+    someone signs in through it, they are <code>authenticated</code>.
+  </li>
+  <li>Cross-site requests are never <code>authenticated</code>.</li>
+</ul>
+<p>
+  Degoog never gives extensions the session token, only the answer.
+</p>
+<pre><code>export const slot = {
+  id: "my-notes",
+  name: "My notes",
+  description: "Shows matching notes from my own notes app",
+  position: "knowledge-panel",
+  trigger: (query) =&gt; query.length &gt; 2,
+  async execute(query, context) {
+    if (gateBehindAuth &amp;&amp; !context?.authenticated) return { html: "" };
+    return { title: "Notes", html: await renderNotes(query) };
+  },
+};</code></pre>
+<p>
+  Let the instance owner decide. A toggle in your
+  <code>settingsSchema</code> such as "Gate behind auth" keeps the plugin
+  useful on a private instance and safe on a public one.
+</p>
+<pre><code>settingsSchema: [
+  {
+    key: "gateBehindAuth",
+    label: "Gate behind auth",
+    type: "toggle",
+    default: "true",
+    description: "Only people signed in to Settings can use this.",
+  },
+],</code></pre>
+<p>Keep these in mind when you gate something:</p>
+<ul>
+  <li>
+    <strong>The browser flag is for the interface only.</strong>
+    <code>window.__DEGOOG_AUTH__</code> decides what your script shows, not who
+    gets the data. Anyone can flip it in their console, so the route or hook
+    that returns the data has to check <code>authenticated</code> itself.
+  </li>
+  <li>
+    <strong>Cache per audience.</strong> If you cache output through
+    <code>useCache</code> and that output depends on
+    <code>authenticated</code>, put it in the cache key. Otherwise the next
+    anonymous visitor gets what the admin saw.
+  </li>
+  <li>
+    <strong>Engines, autocomplete providers, interceptors and transports do not
+    receive it.</strong> Engine results are cached per query for everyone, so
+    gating them would leak across visitors. Engine routes do support
+    <code>auth: true</code>, but thumbnails fetched through the image proxy
+    never carry a session, so a gated route cannot serve them.
+  </li>
+</ul>
 
 <h2>Example: minimal bang command</h2>
 <p>
