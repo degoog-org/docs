@@ -800,6 +800,13 @@ async executeSearch(query, page = 1, timeFilter, context) {
   Validate everything your route receives: anyone who can reach the instance can
   call it.
 </p>
+<p>
+  Handlers also get a second argument, <code>{ authenticated }</code>, and a
+  route can set <code>auth: true</code> to refuse anyone who is not signed in to
+  Settings. The image proxy never carries a session, so it skips gated routes,
+  and a gated route cannot serve thumbnails. See
+  <a href="developer.html#auth-gate">Gating behind the settings login</a>.
+</p>
 <pre><code>export const type = "images";
 
 export default class MyPhotos {
